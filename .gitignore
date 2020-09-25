@@ -1,5 +1,2 @@
 *.dll
-*.iobj
-*.ipdb
-*.pdb
-*.lnk
+*.code-workspace

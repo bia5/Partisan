@@ -10,8 +10,6 @@ state = STATE_MAINMENU
 
 songs = {Music.new("assets/music/TremLoadingloopl.wav"),Music.new("assets/music/ruski.mp3"),Music.new("assets/music/song18.mp3")}
 cur_song = 1
-songs[cur_song]:setVolume(8)
-songs[cur_song]:play()
 
 sound_click = Sound.new("assets/sounds/click.wav")
 sound_click:setVolume(4)
@@ -26,7 +24,8 @@ sound_walking:setVolume(32)
 sound_coin = Sound.new("assets/sounds/coin.wav")
 sound_coin:setVolume(8)
 
-devmode = false
+devmode = true
+playMusic = false
 
 mouseX = 0
 mouseY = 0
@@ -86,13 +85,15 @@ function event_update()
 	popups_update()
 	text_fps:setText("FPS "..mya_getFPS(), mya_getRenderer())
 	
-	if songs[cur_song]:isPlaying() == false then
-		cur_song = cur_song + 1
-		if cur_song > tablelength(songs) then
-			cur_song = 1
+	if playMusic then
+		if songs[cur_song]:isPlaying() == false then
+			cur_song = cur_song + 1
+			if cur_song > tablelength(songs) then
+				cur_song = 1
+			end
+			songs[cur_song]:setVolume(8)
+			songs[cur_song]:play()
 		end
-		songs[cur_song]:setVolume(8)
-		songs[cur_song]:play()
 	end
 end
 
