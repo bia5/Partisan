@@ -75,6 +75,21 @@ function ig_mouseButtonUp(btn)
 	end
 end
 
+function ig_keyDown(key)
+	if key == "w" then
+		player_up = true
+	end
+	if key == "a" then
+		player_lt = true
+	end
+	if key == "s" then
+		player_dn = true
+	end
+	if key == "d" then
+		player_rt = true
+	end
+end
+
 function ig_keyUp(key)
 	if state == STATE_INGAME then
 		if popup_active == false then
@@ -85,16 +100,16 @@ function ig_keyUp(key)
 				popups_windowResize(mya_getWidth(), mya_getHeight())
 			end
 			if key == "w" then
-				player_moveUp()
+				player_up = false
 			end
 			if key == "a" then
-				player_moveLeft()
+				player_lt = false
 			end
 			if key == "s" then
-				player_moveDown()
+				player_dn = false
 			end
 			if key == "d" then
-				player_moveRight()
+				player_rt = false
 			end
 			if key == "e" then
 				player_interact()
@@ -190,7 +205,11 @@ ig_windowResize(mya_getWidth(), mya_getHeight())
 function ig_update()
 	if state == STATE_INGAME then
 		player_update()
-		ig_tv_turns:setText("Turn "..game_turns, mya_getRenderer())
+		if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)] then
+			ig_tv_turns:setText("X: "..player_x..", Y: "..player_y..", Tile: "..level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].tile, mya_getRenderer())
+		else
+			ig_tv_turns:setText("X: "..player_x..", Y: "..player_y..", Tile: NULL", mya_getRenderer())
+		end
 	end
 end
 

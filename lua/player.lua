@@ -8,9 +8,14 @@ player_animation_frames = 3
 player_animation_cur_frame = 0
 player_animation_wait = 10
 player_animation_tick = 0
-player_movement_speed = ig_size/(player_animation_frames*10)
+player_speed = 0.05
+player_movement_speed = player_speed/(player_animation_frames*10)
 player_flip = false
 player_health = 3
+player_up = false
+player_dn = false
+player_lt = false
+player_rt = false
 
 player_STATE_IDLE = "idle"
 player_STATE_RUNNING = "run"
@@ -27,42 +32,6 @@ function player_windowResize(w, h)
 end
 player_windowResize(w, h)
 
-function player_moveUp()
-	if not isTileCollision(player_x,player_y - 1) then
-		player_y = player_y - 1
-		player_vel_y = player_vel_y - ig_size
-		sound_walking:play()
-	end
-	game_turns = game_turns + 1
-end
-
-function player_moveDown()
-	if not isTileCollision(player_x,player_y + 1) then
-		player_y = player_y + 1
-		player_vel_y = player_vel_y + ig_size
-		sound_walking:play()
-	end
-	game_turns = game_turns + 1
-end
-
-function player_moveLeft()
-	if not isTileCollision(player_x-1,player_y) then
-		player_x = player_x - 1
-		player_vel_x = player_vel_x - ig_size
-		sound_walking:play()
-	end
-	game_turns = game_turns + 1
-end
-
-function player_moveRight()
-	if not isTileCollision(player_x+1,player_y) then
-		player_x = player_x + 1
-		player_vel_x = player_vel_x + ig_size
-		sound_walking:play()
-	end
-	game_turns = game_turns + 1
-end
-
 function player_interact()
 	game_turns = game_turns + 1
 	hintObj(player_x,player_y, false)
@@ -76,8 +45,33 @@ function player_stab()
 	game_turns = game_turns + 1
 	stab(player_x,player_y)
 end
-
+--sound_walking:play()
 function player_update()
+	if player_up then
+		if not isTileCollision(player_x,player_y - player_speed) then
+			player_y = player_y - player_speed
+			player_vel_y = player_vel_y - player_speed
+		end
+	end
+	if player_lt then
+		if not isTileCollision(player_x-player_speed,player_y) then
+			player_x = player_x - player_speed
+			player_vel_x = player_vel_x - player_speed
+		end
+	end
+	if player_dn then
+		if not isTileCollision(player_x,player_y + player_speed) then
+			player_y = player_y + player_speed
+			player_vel_y = player_vel_y + player_speed
+		end
+	end
+	if player_rt then
+		if not isTileCollision(player_x+player_speed,player_y) then
+			player_x = player_x + player_speed
+			player_vel_x = player_vel_x + player_speed
+		end
+	end
+
 	if player_vel_x > 0 then
 		player_flip = false
 		player_vel_x = player_vel_x - player_movement_speed
@@ -119,9 +113,9 @@ function player_update()
 			player_animation_cur_frame = 0
 			player_state = player_STATE_IDLE
 			if level[game_level] and game_hasWon == true then
-				if level[game_level].tiles[player_x.."-"..player_y] then
-					if level[game_level].tiles[player_x.."-"..player_y].tile == "coin" then
-						setLevel(level[game_level].tiles[player_x.."-"..player_y].data)
+				if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)] then
+					if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].tile == "coin" then
+						setLevel(level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].data)
 					end
 				end
 			end

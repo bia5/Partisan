@@ -60,6 +60,7 @@ function event_mouseButtonUp(btn)
 end
 
 function event_keyDown(key)
+	ig_keyDown(key)
 end
 
 function event_keyUp(key)

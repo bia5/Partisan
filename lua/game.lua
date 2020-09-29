@@ -56,8 +56,10 @@ end
 function stab(xxx,yyy)
 	sound_swoosh2:play()
 	if level[game_level] then
-		if level[game_level].tiles[xxx.."-"..yyy] then
-			if level[game_level].tiles[xxx.."-"..yyy].tile == "ghost" then
+		xxxx = math.floor(xxx)
+		yyyy = math.floor(yyy)+1
+		if level[game_level].tiles[xxxx.."-"..yyyy] then
+			if level[game_level].tiles[xxxx.."-"..yyyy].tile == "ghost" then
 				addPopup(false,"You stabbed the ghost!")
 				game_hasWon = true
 				sound_coin:play()
@@ -87,12 +89,14 @@ end
 function isTileCollision(xxx,yyy)
 	yyeett = false
 	if level[game_level] then
-		if level[game_level].undertiles[xxx.."-"..yyy] then
-			if level[game_level].undertiles[xxx.."-"..yyy].collision == true then
+		xxxx = math.floor(xxx)
+		yyyy = math.floor(yyy)+1
+		if level[game_level].undertiles[xxxx.."-"..yyyy] then
+			if level[game_level].undertiles[xxxx.."-"..yyyy].collision == true then
 				yyeett = true
 			end
-		elseif level[game_level].tiles[xxx.."-"..yyy] then
-			if level[game_level].tiles[xxx.."-"..yyy].collision == true then
+		elseif level[game_level].tiles[xxxx.."-"..yyyy] then
+			if level[game_level].tiles[xxxx.."-"..yyyy].collision == true then
 				yyeett = true
 			end
 		end
