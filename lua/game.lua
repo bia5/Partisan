@@ -1,5 +1,4 @@
 
-game_turns = 1
 game_level = "level_1"
 game_hasWon = false
 game_last_level = game_level

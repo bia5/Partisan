@@ -9,13 +9,14 @@ player_animation_cur_frame = 0
 player_animation_wait = 10
 player_animation_tick = 0
 player_speed = 0.05
-player_movement_speed = player_speed/(player_animation_frames*10)
+player_movement_speed = player_speed/(player_animation_frames*3)
 player_flip = false
 player_health = 3
 player_up = false
 player_dn = false
 player_lt = false
 player_rt = false
+player_reach = 1.5
 
 player_STATE_IDLE = "idle"
 player_STATE_RUNNING = "run"
@@ -33,7 +34,6 @@ end
 player_windowResize(w, h)
 
 function player_interact()
-	game_turns = game_turns + 1
 	hintObj(player_x,player_y, false)
 	hintObj(player_x,player_y-1, false)
 	hintObj(player_x,player_y+1, false)
@@ -42,33 +42,40 @@ function player_interact()
 end
 
 function player_stab()
-	game_turns = game_turns + 1
 	stab(player_x,player_y)
 end
 --sound_walking:play()
 function player_update()
 	if player_up then
-		if not isTileCollision(player_x,player_y - player_speed) then
-			player_y = player_y - player_speed
-			player_vel_y = player_vel_y - player_speed
+		if not isTileCollision(player_x+.05,player_y - player_speed) then
+			if not isTileCollision(player_x+.95,player_y - player_speed) then
+				player_y = player_y - player_speed
+				player_vel_y = player_vel_y - player_speed
+			end
 		end
 	end
 	if player_lt then
-		if not isTileCollision(player_x-player_speed,player_y) then
-			player_x = player_x - player_speed
-			player_vel_x = player_vel_x - player_speed
+		if not isTileCollision(player_x+.05-player_speed,player_y) then
+			if not isTileCollision(player_x+.95-player_speed,player_y) then
+				player_x = player_x - player_speed
+				player_vel_x = player_vel_x - player_speed
+			end
 		end
 	end
 	if player_dn then
-		if not isTileCollision(player_x,player_y + player_speed) then
-			player_y = player_y + player_speed
-			player_vel_y = player_vel_y + player_speed
+		if not isTileCollision(player_x+.05,player_y + player_speed) then
+			if not isTileCollision(player_x+.95,player_y + player_speed) then
+				player_y = player_y + player_speed
+				player_vel_y = player_vel_y + player_speed
+			end
 		end
 	end
 	if player_rt then
-		if not isTileCollision(player_x+player_speed,player_y) then
-			player_x = player_x + player_speed
-			player_vel_x = player_vel_x + player_speed
+		if not isTileCollision(player_x+.05+player_speed,player_y) then
+			if not isTileCollision(player_x+.95+player_speed,player_y) then
+				player_x = player_x + player_speed
+				player_vel_x = player_vel_x + player_speed
+			end
 		end
 	end
 
@@ -106,19 +113,20 @@ function player_update()
 			player_sprite_y = player_y*ig_size
 		end
 	end
+
+	if level[game_level] and game_hasWon == true then -- Coin Portal Detection
+		if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)] then
+			if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].tile == "coin" then
+				setLevel(level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].data)
+			end
+		end
+	end
 	
 	
 	if player_vel_x == 0 and player_vel_y == 0 then
 		if player_state == player_STATE_RUNNING then
 			player_animation_cur_frame = 0
 			player_state = player_STATE_IDLE
-			if level[game_level] and game_hasWon == true then
-				if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)] then
-					if level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].tile == "coin" then
-						setLevel(level[game_level].tiles[math.floor(player_x).."-"..math.floor(player_y)].data)
-					end
-				end
-			end
 		end
 	else
 		if player_state == player_STATE_IDLE then

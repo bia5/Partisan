@@ -108,7 +108,7 @@ function mm_render()
 	end
 	if state == STATE_END then
 		mm_end:render(mya_getRenderer(), mya_getWidth(), mya_getHeight())
-		mm_tv_end:setText("Game completed in "..game_turns.." turns!", mya_getRenderer())
+		mm_tv_end:setText("Game completed in 69 turns!", mya_getRenderer())
 		mm_tv_end:render(mya_getRenderer())
 	end
 end

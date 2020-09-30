@@ -13,7 +13,7 @@ ig_btn_stab = Sprite.new(assets:getTexture("ig_btn_stab"))
 
 ig_gui_heart = Sprite.new(assets:getTexture("ui_heart_full"))
 
-ig_tv_turns = TextView.new(font, "Turn "..game_turns, 0, 0, mya_getRenderer())
+ig_tv_turns = TextView.new(font, "Turn ", 0, 0, mya_getRenderer())
 ig_tv_turns:setColor(mya_getRenderer(), 0, 0, 0)
 
 function ig_mouseButtonUp(btn)
