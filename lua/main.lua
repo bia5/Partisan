@@ -34,13 +34,13 @@ math.randomseed(os.time()) math.random() math.random() math.random() --setup tha
 
 json = require "json"
 require("file")
+require("collisionbox")
 require("assets")
 require("util")
 require("popups")
 require("mainmenu")
 require("game")
 require("ingame")
-require("player")
 
 text_fps = TextView.new(font, "Fps 0", 0, 0, mya_getRenderer())
 text_fps:setColor(mya_getRenderer(), 15, 15, 15)
@@ -78,7 +78,6 @@ function event_windowResize(w, h)
 	mm_windowResize(w, h)
 	ig_windowResize(w, h)
 	popups_windowResize(w, h)
-	player_windowResize(w, h)
 end
 
 function event_update()
