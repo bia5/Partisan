@@ -21,3 +21,9 @@ STATE_LOADSAVE = "loadsave"
 STATE_LEVELEDITOR = "leveleditor"
 STATE_INGAME = "ingame"
 state = STATE_MAINMENU
+
+-- Game Variables
+player_name = "Player"
+world_ids = 0
+world_id = 0
+local_player_id = 0

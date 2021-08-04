@@ -1,4 +1,4 @@
---Functions and Callbacks For Mya 1.3.5 (Codename: Leah)
+--Functions and Callbacks For Mya 1.4.1 (Codename: Jisoo)
 
 --Functions
 mya_getMya() --Returns current mya (Needed for other functions)
@@ -20,6 +20,7 @@ mya_setWindowIcon("assets\\icon.png") --Will try to set mya's window's icon to t
 mya_showCursor(true) --Sets if the os's cursor will show when hovering over mya's window
 mya_getWidth() --Returns an int with mya's window's current width.
 mya_getHeight() --Returns an int with mya's window's current height.
+mya_getPath() --Returns the exe's path
 	
 texture = Texture.new("assets\\texture.png", mya_getRenderer()) --Generates a new texture. Arg1 is the image's path according to "Mya-Yasmine.exe". Arg2 is current renderer so will almost always be "mya_getRenderer()".
 texture:destroy() --Destroys the texture from memory. Only run it when your done using it.

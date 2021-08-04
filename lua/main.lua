@@ -9,6 +9,8 @@ require("file")
 require("util")
 require("variables")
 require("keybinds")
+require("world")
+require("player")
 
 function event_mouseMotion(x, y)
 	mouseX = x
