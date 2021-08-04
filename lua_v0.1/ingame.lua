@@ -1,8 +1,6 @@
 ig_blocks_x = 48
 ig_blocks_y = 26
 
-ig_gui_heart = Sprite.new(assets:getTexture("ui_heart_full"))
-
 function ig_mouseButtonUp(btn)
 	if state == STATE_INGAME then
 		if btn == "left" then
@@ -109,8 +107,6 @@ end
 function ig_windowResize(w, h)
 	ig_size = math.ceil(mya_getHeight()/ig_blocks_y)
 	
-	ig_gui_heart:setY(mya_getHeight()/64)
-	
 	generateSprites()
 end
 ig_windowResize(mya_getWidth(), mya_getHeight())
@@ -141,19 +137,5 @@ function ig_render()
 				end
 			end
 		end
-		
-		--ig_gui_heart:setTexture(assets:getTexture("ui_heart_full"))
-		--for iii = 0, player_health-1 do
-			--ig_gui_heart:setX(((mya_getWidth()/2)-(((((((mya_getWidth()-mya_getHeight())/10)))*2)/2)))+((((mya_getWidth()-mya_getHeight())/10))*iii))
-			--ig_gui_heart:render(mya_getRenderer(), (mya_getWidth()-mya_getHeight())/10, (mya_getWidth()-mya_getHeight())/10)
-		--end
-		--ig_gui_heart:setTexture(assets:getTexture("ui_heart_empty"))
-		
-		--if player_health == 3 then else
-			--for iii = player_health, 2 do
-				--ig_gui_heart:setX(((mya_getWidth()/2)-(((((((mya_getWidth()-mya_getHeight())/10)))*2)/2)))+((((mya_getWidth()-mya_getHeight())/10))*iii))
-				--ig_gui_heart:render(mya_getRenderer(), (mya_getWidth()-mya_getHeight())/10, (mya_getWidth()-mya_getHeight())/10)
-			--end
-		--end
 	end
 end

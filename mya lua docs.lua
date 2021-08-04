@@ -91,3 +91,4 @@ function event_networkMessage(clientMessage) end --Called when the program recie
 function event_update() end --called on every update loop.
 function event_windowResize(w, h) end --called when window is resized
 function event_render() end --called on render loop.
+function event_tupdate() end --called for every tick update

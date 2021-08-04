@@ -23,7 +23,7 @@ function generateSprites()
 end
 
 function generateVoid()
-	level[game_level] = {undertiles={},tiles={},defaultPlayerX=0,defaultPlayerY=0,immediatePopups={}}
+	level[game_level] = {undertiles={},tiles={},unalignedtiles={},defaultPlayerX=0,defaultPlayerY=0,immediatePopups={}}
 	for ff = 0, ig_blocks_y do
 		for f = 0, ig_blocks_x do
 			level[game_level].undertiles[f.."-"..ff] = {tile="void",data="",collision=true}
