@@ -22,7 +22,12 @@ STATE_LEVELEDITOR = "leveleditor"
 STATE_INGAME = "ingame"
 state = STATE_MAINMENU
 
+-- Netcode
+net_ip = "localhost"
+net_port = 9999
+
 -- Game Variables
+isHosting = true
 player_name = "Player"
 world_ids = 0
 world_id = 0

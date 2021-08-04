@@ -8,10 +8,14 @@ json = require "json"
 require("file")
 require("util")
 require("variables")
-require("keybinds")
 require("world")
 require("player")
+require("ingame")
+require("netcode")
+require("mainmenu")
 
+
+require("keybinds")
 function event_mouseMotion(x, y)
 	mouseX = x
 	mouseY = y
@@ -22,9 +26,7 @@ function event_mouseButtonUp(btn)
 end
 
 function event_keyDown(key)
-	if devmode then
-		--print("KeyDN: "..key)
-	end
+	
 end
 
 function event_keyUp(key)
@@ -39,14 +41,23 @@ function event_windowResize(w, h)
 end
 
 function event_update()
-
+	if state == STATE_MAINMENU then
+		screen_mm_update()
+	end
 end
 
 function event_render()
+	if state == STATE_MAINMENU then
+		screen_mm_render()
+	end
+end
 
+function event_quit()
+	network:close()
 end
 
 while mya_isRunning() do
 	mya_update()
 	mya_render()
+	network:update()
 end
