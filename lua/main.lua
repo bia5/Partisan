@@ -1,5 +1,5 @@
 --Partisan by Alex Cooper Aug-4-2021
-init = mya_init("Partisan", 1920, 1080)
+init = mya_init("Partisan", 1280, 720)
 
 math.randomseed(os.time()) math.random() math.random() math.random() --setup that random
 
@@ -14,7 +14,7 @@ require("ingame")
 require("netcode")
 require("assets")
 require("mainmenu")
-
+require("chooseplay")
 
 require("keybinds")
 function event_mouseMotion(x, y)
@@ -23,7 +23,11 @@ function event_mouseMotion(x, y)
 end
 
 function event_mouseButtonUp(btn)
-	
+	if state == STATE_MAINMENU then
+		screen_mm_mouseButtonUp(btn)
+	elseif state == STATE_CHOOSEPLAY then
+		screen_cp_mouseButtonUp(btn)
+	end
 end
 
 function event_keyDown(key)
@@ -42,6 +46,8 @@ function event_windowResize(w, h)
 
 	if state == STATE_MAINMENU then
 		screen_mm_windowResize(w, h)
+	elseif state == STATE_CHOOSEPLAY then
+		screen_cp_windowResize(w, h)
 	end
 end
 
@@ -54,6 +60,8 @@ end
 function event_render()
 	if state == STATE_MAINMENU then
 		screen_mm_render()
+	elseif state == STATE_CHOOSEPLAY then
+		screen_cp_render()
 	end
 end
 
@@ -66,3 +74,5 @@ while mya_isRunning() do
 	mya_render()
 	network:update()
 end
+
+mya_close()
