@@ -1,5 +1,5 @@
 --Partisan by Alex Cooper Aug-4-2021
-init = mya_init("Partisan", 1280, 720)
+init = mya_init("Partisan", 1920, 1080)
 
 math.randomseed(os.time()) math.random() math.random() math.random() --setup that random
 
@@ -12,6 +12,7 @@ require("world")
 require("player")
 require("ingame")
 require("netcode")
+require("assets")
 require("mainmenu")
 
 
@@ -37,7 +38,11 @@ function event_keyUp(key)
 end
 
 function event_windowResize(w, h)
+	asset_updateFonts()
 
+	if state == STATE_MAINMENU then
+		screen_mm_windowResize(w, h)
+	end
 end
 
 function event_update()
