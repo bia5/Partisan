@@ -5,10 +5,19 @@ function saveTable(file, tablee)
 	test:close()
 end
 
+function file_exists(name)
+	local f=io.open(name,"r")
+	if f~=nil then io.close(f) return true else return false end
+ end
+ 
+
 function loadTable(file)
-	local test = io.open(file, "r")
-	local readjson= test:read("*a")
-	result = json.decode(readjson)
-	test:close()
-	return result
+	if file_exists(file) then
+		local test = io.open(file, "r")
+		local readjson= test:read("*a")
+		result = json.decode(readjson)
+		test:close()
+		return result
+	end
+	return nil
 end

@@ -6,6 +6,7 @@ function newWorld()
 end
 
 function saveWorld()
+	os.execute("mkdir "..mya_getPath().."/worlds/"..world_id)
 	saveTable(mya_getPath().."/worlds/"..world_id.."/world.world", world)
 end
 

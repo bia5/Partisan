@@ -1,12 +1,6 @@
 keys = {}
 
-function e()
-	isHosting = not isHosting
-end
-
 function registerBinds()
-	registerBind("1","test",network_start)
-	registerBind("2","e",e)
 end
 
 function registerBind(key, name, _function)

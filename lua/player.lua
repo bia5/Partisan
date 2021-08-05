@@ -6,6 +6,7 @@ function newPlayer(name, islocal, x, y)
 end
 
 function savePlayer(id)
+	os.execute("mkdir "..mya_getPath().."/worlds/"..world_id.."/players/")
 	saveTable(mya_getPath().."/worlds/"..world_id.."/players/"..id..".player", players[id])
 end
 

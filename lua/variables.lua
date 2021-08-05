@@ -18,8 +18,8 @@ STATE_OPTIONS = "options"
 STATE_ABOUT = "about"
 STATE_CHOOSEPLAY = "chooseplay" -- done
 STATE_LEVELEDITOR = "leveleditor"
-STATE_JOINSERVER = "joinserver"
-STATE_
+STATE_HOST = "host"
+STATE_JOINSERVER = "joinserver" --done
 STATE_INGAME = "ingame"
 state = STATE_MAINMENU
 

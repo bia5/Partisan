@@ -25,10 +25,10 @@ end
 function screen_cp_mouseButtonUp(btn)
     if btn == "left" then
         if screen_cp_host:isPointColliding(mouseX, mouseY) then
-            -- server setup
+           state = STATE_HOST
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
-            -- find server
+            state = STATE_JOINSERVER
         end
         if screen_cp_back:isPointColliding(mouseX, mouseY) then
             state = STATE_MAINMENU

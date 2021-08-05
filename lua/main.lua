@@ -15,6 +15,7 @@ require("netcode")
 require("assets")
 require("mainmenu")
 require("chooseplay")
+require("joinserver")
 
 require("keybinds")
 function event_mouseMotion(x, y)
@@ -27,6 +28,8 @@ function event_mouseButtonUp(btn)
 		screen_mm_mouseButtonUp(btn)
 	elseif state == STATE_CHOOSEPLAY then
 		screen_cp_mouseButtonUp(btn)
+	elseif state == STATE_JOINSERVER then
+		screen_js_mouseButtonUp(btn)
 	end
 end
 
@@ -39,6 +42,10 @@ function event_keyUp(key)
 		--print("KeyUP: "..key)
 	end
 	callBind(key)
+
+	if state == STATE_JOINSERVER then
+		screen_js_keyUp(key)
+	end
 end
 
 function event_windowResize(w, h)
@@ -48,6 +55,8 @@ function event_windowResize(w, h)
 		screen_mm_windowResize(w, h)
 	elseif state == STATE_CHOOSEPLAY then
 		screen_cp_windowResize(w, h)
+	elseif state == STATE_JOINSERVER then
+		screen_js_windowResize(w,h)
 	end
 end
 
@@ -62,6 +71,8 @@ function event_render()
 		screen_mm_render()
 	elseif state == STATE_CHOOSEPLAY then
 		screen_cp_render()
+	elseif state == STATE_JOINSERVER then
+		screen_js_render()
 	end
 end
 
