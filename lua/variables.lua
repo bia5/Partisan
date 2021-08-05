@@ -26,6 +26,7 @@ state = STATE_MAINMENU
 -- Netcode
 net_ip = "localhost"
 net_port = 9999
+net_number = 0
 
 -- Game Variables
 isHosting = true

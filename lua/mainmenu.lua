@@ -35,9 +35,3 @@ function screen_mm_mouseButtonUp(btn)
 		end
 	end
 end
-
-function screen_mm_update()
-	if screen_mm_quit:isPointColliding(mouseX, mouseY) then else end
-	if screen_mm_play:isPointColliding(mouseX, mouseY) then else end
-	if screen_mm_options:isPointColliding(mouseX, mouseY) then else end
-end

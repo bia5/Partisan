@@ -25,7 +25,9 @@ end
 function screen_cp_mouseButtonUp(btn)
     if btn == "left" then
         if screen_cp_host:isPointColliding(mouseX, mouseY) then
-           state = STATE_HOST
+            isHosting = true
+            network_start()
+            state = STATE_HOST
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
             state = STATE_JOINSERVER

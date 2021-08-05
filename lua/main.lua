@@ -16,6 +16,7 @@ require("assets")
 require("mainmenu")
 require("chooseplay")
 require("joinserver")
+require("host")
 
 require("keybinds")
 function event_mouseMotion(x, y)
@@ -60,11 +61,7 @@ function event_windowResize(w, h)
 	end
 end
 
-function event_update()
-	if state == STATE_MAINMENU then
-		screen_mm_update()
-	end
-end
+function event_update() end
 
 function event_render()
 	if state == STATE_MAINMENU then
@@ -77,6 +74,7 @@ function event_render()
 end
 
 function event_quit()
+	network:sendMessage("bye-"..net_number, network:getIP())
 	network:close()
 end
 
