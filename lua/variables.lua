@@ -14,12 +14,19 @@ function variables_load()
 		settings = setting
 	end
 end
+variables_load()
 
 -- Sound Variables
-settings.snd_music_v = 0.5
-settings.snd_effects_v = 0.5
+if settings.snd_music_v == nil then
+	settings.snd_music_v = 0.5
+end
+if settings.snd_effects_v == nil then
+	settings.snd_effects_v = 0.5
+end
 
-settings.player_name = "Player"
+if settings.player_name == nil then
+	settings.player_name = "Player"
+end
 
 -- Mouse Coords
 mouseX = 0
@@ -40,11 +47,12 @@ state = STATE_MAINMENU
 net_ip = "localhost"
 net_port = 9999
 net_number = 0
+net_max = 4
 
 -- Game Variables
 isHosting = true
-settings.world_ids = 0
+if settings.world_ids == nil then
+	settings.world_ids = 0
+end
 world_id = 0
 local_player_id = 0
-
-variables_load() -- needs to be executed last

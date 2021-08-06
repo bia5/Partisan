@@ -38,6 +38,8 @@ function event_mouseButtonUp(btn)
 		screen_js_mouseButtonUp(btn)
 	elseif state == STATE_OPTIONS then
 		screen_op_mouseButtonUp(btn)
+	elseif state == STATE_HOST then
+		screen_ho_mouseButtonUp(btn)
 	end
 end
 
@@ -66,6 +68,8 @@ function event_windowResize(w, h)
 		screen_js_windowResize(w, h)
 	elseif state == STATE_OPTIONS then
 		screen_op_windowResize(w, h)
+	elseif state == STATE_HOST then
+		screen_ho_windowResize(w, h)
 	end
 end
 
@@ -80,6 +84,8 @@ function event_render()
 		screen_js_render()
 	elseif state == STATE_OPTIONS then
 		screen_op_render()
+	elseif state == STATE_HOST then
+		screen_ho_render()
 	end
 end
 
@@ -88,10 +94,16 @@ function event_quit()
 	network:close()
 end
 
+mya_setUPS(10)
+
+function event_tupdate()
+	network:update()
+	network_update()
+end
+
 while mya_isRunning() do
 	mya_update()
 	mya_render()
-	network:update()
 end
 
 mya_close()
