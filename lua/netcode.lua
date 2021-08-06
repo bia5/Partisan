@@ -11,7 +11,7 @@ function network_start()
 	else
 		network:init(isHosting)
 
-		network:sendMessage("hi-"..player_name, network:getIP())
+		network:sendMessage("hi-"..settings.player_name, network:getIP())
 	end
 end
 

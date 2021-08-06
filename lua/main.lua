@@ -17,11 +17,16 @@ require("mainmenu")
 require("chooseplay")
 require("joinserver")
 require("host")
+require("options")
 
 require("keybinds")
 function event_mouseMotion(x, y)
 	mouseX = x
 	mouseY = y
+end
+
+function event_mouseButtonDown(btn)
+
 end
 
 function event_mouseButtonUp(btn)
@@ -31,6 +36,8 @@ function event_mouseButtonUp(btn)
 		screen_cp_mouseButtonUp(btn)
 	elseif state == STATE_JOINSERVER then
 		screen_js_mouseButtonUp(btn)
+	elseif state == STATE_OPTIONS then
+		screen_op_mouseButtonUp(btn)
 	end
 end
 
@@ -39,13 +46,12 @@ function event_keyDown(key)
 end
 
 function event_keyUp(key)
-	if devmode then
-		--print("KeyUP: "..key)
-	end
 	callBind(key)
 
 	if state == STATE_JOINSERVER then
 		screen_js_keyUp(key)
+	elseif state == STATE_OPTIONS then
+		screen_op_keyUp(key)
 	end
 end
 
@@ -57,7 +63,9 @@ function event_windowResize(w, h)
 	elseif state == STATE_CHOOSEPLAY then
 		screen_cp_windowResize(w, h)
 	elseif state == STATE_JOINSERVER then
-		screen_js_windowResize(w,h)
+		screen_js_windowResize(w, h)
+	elseif state == STATE_OPTIONS then
+		screen_op_windowResize(w, h)
 	end
 end
 
@@ -70,6 +78,8 @@ function event_render()
 		screen_cp_render()
 	elseif state == STATE_JOINSERVER then
 		screen_js_render()
+	elseif state == STATE_OPTIONS then
+		screen_op_render()
 	end
 end
 

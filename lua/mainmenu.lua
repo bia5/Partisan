@@ -30,8 +30,9 @@ function screen_mm_mouseButtonUp(btn)
 		if screen_mm_play:isPointColliding(mouseX, mouseY) then 
 			state = STATE_CHOOSEPLAY
 		end
-		if screen_mm_options:isPointColliding(mouseX, mouseY) then 
+		if screen_mm_options:isPointColliding(mouseX, mouseY) then
 			state = STATE_OPTIONS
+			resizeFont(48)
 		end
 	end
 end

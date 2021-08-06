@@ -2,11 +2,24 @@
 
 devmode = true
 
+settings = {}
+
+function variables_save()
+	saveTable(mya_getPath().."/options.save", settings)
+end
+
+function variables_load()
+	local setting = loadTable(mya_getPath().."/options.save")
+	if setting then
+		settings = setting
+	end
+end
+
 -- Sound Variables
-snd_music_p = true
-snd_music_v = 0.5
-snd_effects_p = true
-snd_effects_v = 0.5
+settings.snd_music_v = 0.5
+settings.snd_effects_v = 0.5
+
+settings.player_name = "Player"
 
 -- Mouse Coords
 mouseX = 0
@@ -30,7 +43,8 @@ net_number = 0
 
 -- Game Variables
 isHosting = true
-player_name = "Player"
-world_ids = 0
+settings.world_ids = 0
 world_id = 0
 local_player_id = 0
+
+variables_load() -- needs to be executed last
