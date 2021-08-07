@@ -90,7 +90,15 @@ function event_render()
 end
 
 function event_quit()
-	network:sendMessage("bye-"..net_number, network:getIP())
+	if isHosting then
+		for k,v in pairs(clients) do
+			if v.ip ~= "host" then
+				network:sendMessage("quitting", v.ip)
+			end
+		end
+	else
+		network:sendMessage("bye"..net_split1..getPlayerID(), network:getIP())
+	end
 	network:close()
 end
 

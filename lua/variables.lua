@@ -3,6 +3,34 @@
 devmode = true
 
 settings = {}
+_playerid = {}
+
+function createPlayerID()
+	return "1"..os.time()..math.floor(math.random()*1000000000)
+end
+
+function savePlayerID()
+	saveTable(mya_getPath().."id.save", _playerid)
+end
+
+function loadPlayerID() 
+	if devmode then
+		_playerid = {}
+		_playerid.id = createPlayerID()
+	else
+		_playerid = loadTable(mya_getPath().."id.save")
+		if not _playerid then
+			_playerid = {}
+			_playerid.id = createPlayerID()
+			savePlayerID()
+		end
+	end
+end
+loadPlayerID()
+
+function getPlayerID() 
+	return _playerid.id
+end
 
 function variables_save()
 	saveTable(mya_getPath().."/options.save", settings)
@@ -46,11 +74,12 @@ state = STATE_MAINMENU
 -- Netcode
 net_ip = "localhost"
 net_port = 9999
-net_number = 0
 net_max = 4
+net_split1 = "-"
 
 -- Game Variables
 isHosting = true
+playerid = 0
 if settings.world_ids == nil then
 	settings.world_ids = 0
 end

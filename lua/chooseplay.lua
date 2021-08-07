@@ -27,7 +27,7 @@ function screen_cp_mouseButtonUp(btn)
         if screen_cp_host:isPointColliding(mouseX, mouseY) then
             isHosting = true
             network_start()
-            addClient("host", settings.player_name)
+            addClient("host", settings.player_name, getPlayerID())
             state = STATE_HOST
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
