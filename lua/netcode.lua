@@ -2,6 +2,9 @@ network = Network.new()
 local net_ping_tick = 0
 net_connected = 0
 clients = {}
+clients_simplified = {}
+clients_simplified[1] = {}
+clients_simplified[2] = {}
 
 packet_out = {}
 packet_inc = {}
@@ -35,12 +38,30 @@ function addClient(_ip, _name, _id)
 	clients[_id].ping = 0
 	clients[_id].ping_ = 0
 	clients[_id].ping_r = true
+
+
+	table.insert(clients_simplified[1],_id)
+	clients_simplified[2][_id] = {}
+	clients_simplified[2][_id].name = _name
+	clients_simplified[2][_id].ping = 0
+
+	packet_out_s["clients_simplified"] = clients_simplified
 end
 
 function removeClient(_id)
 	net_connected = net_connected - 1
 	print("Client Leaving: "..clients[_id].name)
 	clients[_id] = nil
+	clients_simplified[2][_id] = nil
+	removeFromTable(clients_simplified[1],_id)
+	clients_simplified_ = clients_simplified
+	clients_simplified = {}
+	clients_simplified[1] = {}
+	clients_simplified[2] = {}
+	for k,v in pairs(clients_simplified_[1]) do
+		table.insert(clients_simplified[1], v)
+	end
+	clients_simplified[2] = clients_simplified_[2]
 end
 
 function findClient(_ip)
@@ -66,7 +87,7 @@ function event_networkMessage(clientMessage)
 			if net_connected ~= net_max then
 				addClient(ip, msgd[2], msgd[3])
 			else
-				print("Max clients connected, rejecting: ".._name)
+				print("Max clients connected, rejecting: "..msgd[2])
 				network:sendMessage("full", ip)
 			end
 		elseif msgd[1] == "bye" then
@@ -75,10 +96,13 @@ function event_networkMessage(clientMessage)
 			clients[msgd[2]].ping = clients[msgd[2]].ping_*(1000/mya_getUPS())
 			clients[msgd[2]].ping_ = 0
 			clients[msgd[2]].ping_r = true
-			--print(clients[msgd[2]].name.."'s ping: "..clients[msgd[2]].ping-(1000/mya_getUPS()).."-"..clients[tonumber(msgd[2])].ping.."ms")
+
+			clients_simplified[2][msgd[2]].ping = clients[msgd[2]].ping
+			packet_out_s["clients_simplified"] = clients_simplified
+			--print(clients[msgd[2]].name.."'s ping: "..clients[msgd[2]].ping-(1000/mya_getUPS()).."-"..clients[msgd[2]].ping.."ms")
 		elseif msgd[1] == "packet_s" then
 			packet_inc_s = json.decode(msgd[2])
-			print("Recieved Packet from Client!")
+			--print("Recieved Packet from Client!")
 		end
 	else -- Not Server Stuff
 		if msgd[1] == "full" then
@@ -88,10 +112,15 @@ function event_networkMessage(clientMessage)
 			network:sendMessage("_pong"..net_split1..msgd[2], network:getIP())
 		elseif msgd[1] == "quitting" then
 			network:close()
+			clients_simplified = {}
 			state = STATE_MAINMENU
 		elseif msgd[1] == "packet" then -- Recieves packet from server
 			packet_inc = json.decode(msgd[2])
-			print("Recieved Packet from Server!")
+			--print("Recieved Packet from Server!")
+
+			if packet_inc["clients_simplified"] then
+				clients_simplified = packet_inc["clients_simplified"]
+			end
 		end
 	end
 end
@@ -99,11 +128,11 @@ end
 function network_update()
 	if isHosting then
 		if tablelength(packet_out_s) > 0 then
-			print("Server Packet Out!")
+			--print("Server Packet Out!")
 			for k, v in pairs(clients) do
 				if v.ip == "host" then
 					packet_inc = packet_out_s
-					print("Recieved Packet from Server!")
+					--print("Recieved Packet from Server!")
 				else
 					network:sendMessage("packet"..net_split1..json.encode(packet_out_s), v.ip)
 				end
@@ -140,6 +169,6 @@ function network_update()
 			network:sendMessage("packet_s"..net_split1..json.encode(packet_out), network:getIP())
 		end
 		packet_out = {}
-		print("Client Packet Out!")
+		--print("Client Packet Out!")
 	end
 end

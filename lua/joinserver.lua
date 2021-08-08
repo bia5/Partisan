@@ -14,7 +14,7 @@ if ipe then
 end
 
 function screen_js_windowResize(w,h)
-	screen_js_ip = TextView.new(font,ip,0,0,mya_getRenderer())
+	screen_js_ip = TextView.new(font,ip["ip"],0,0,mya_getRenderer())
 	screen_js_ip:setText(ip["ip"], mya_getRenderer())
 	screen_js_ip:setXY((mya_getWidth()/2)-(screen_js_ip:getWidth()/2),mya_getHeight()/16)
 	screen_js_ipbtn:setX((mya_getWidth()/2)-(screen_js_ip:getWidth()/2))
@@ -45,6 +45,7 @@ function screen_js_keyUp(key)
 			saveTable(mya_getPath().."lastip.save",ip)
 			network_start()
 			state = STATE_HOST
+			resizeFont(48)
 		else
 			ip["ip"] = ip["ip"]..key
 		end
@@ -66,6 +67,7 @@ function screen_js_mouseButtonUp(btn)
 				saveTable(mya_getPath().."lastip.save",ip)
 				network_start()
 				state = STATE_HOST
+				resizeFont(48)
 			elseif screen_js_back:isPointColliding(mouseX, mouseY) then
 				state = STATE_CHOOSEPLAY
 			end

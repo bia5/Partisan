@@ -29,6 +29,7 @@ function screen_cp_mouseButtonUp(btn)
             network_start()
             addClient("host", settings.player_name, getPlayerID())
             state = STATE_HOST
+            resizeFont(48)
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
             state = STATE_JOINSERVER
