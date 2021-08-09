@@ -1,20 +1,31 @@
 assets = mya_getAssets()
 
-fontsize = 64
+fontSizes = {16,32,48,64,96}
+font = {}
+
 function asset_updateFonts()
-	if font ~= nil then
-		font:destroy()
+	font = {}
+	for k, v in pairs(fontSizes) do
+		font[v] = Font.new("assets/font.ttf",v*(mya_getHeight()/720))
 	end
-	font = Font.new("assets/font.ttf",fontsize*(mya_getHeight()/720))
+	print("Loaded "..tablelength(fontSizes).." fonts.")
 end
 asset_updateFonts()
 
-function resizeFont(_s)
-	fontsize = _s
-	event_windowResize(mya_getWidth(), mya_getHeight())
-end
-
 assets:loadTexture("screen_mm_logo","assets/mainmenu/logo.png")
+assets:loadTexture("screen_mm_button_play","assets/mainmenu/button_play.png")
+assets:loadTexture("screen_mm_button_quit","assets/mainmenu/button_quit.png")
+assets:loadTexture("screen_mm_button_settings","assets/mainmenu/button_settings.png")
+
+assets:loadTexture("screen_cp_button_host","assets/chooseplay/button_host.png")
+assets:loadTexture("screen_cp_button_joinserver","assets/chooseplay/button_joinserver.png")
+assets:loadTexture("screen_cp_button_leveleditor","assets/chooseplay/button_leveleditor.png")
+
+assets:loadTexture("screen_js_button_leveleditor","assets/joinserver/button_joinserver.png")
+
+assets:loadTexture("screen_art_tree","assets/art/tree.png")
+
+assets:loadTexture("screen_button_back","assets/button_back.png")
 assets:loadTexture("empty","assets/empty.png")
 
 print("Finished loading "..assets:getTotalAssets().." assets!")

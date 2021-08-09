@@ -60,17 +60,11 @@ end
 function event_windowResize(w, h)
 	asset_updateFonts()
 
-	if state == STATE_MAINMENU then
-		screen_mm_windowResize(w, h)
-	elseif state == STATE_CHOOSEPLAY then
-		screen_cp_windowResize(w, h)
-	elseif state == STATE_JOINSERVER then
-		screen_js_windowResize(w, h)
-	elseif state == STATE_OPTIONS then
-		screen_op_windowResize(w, h)
-	elseif state == STATE_HOST then
-		screen_ho_windowResize(w, h)
-	end
+	screen_mm_windowResize(w, h)
+	screen_cp_windowResize(w, h)
+	screen_js_windowResize(w, h)
+	screen_op_windowResize(w, h)
+	screen_ho_windowResize(w, h)
 end
 
 function event_update() end

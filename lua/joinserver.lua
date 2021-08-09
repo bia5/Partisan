@@ -1,11 +1,12 @@
 local ip = {}
 ip["ip"] = "192.168.1.x"
-local screen_js_ip = TextView.new(font,ip,0,0,mya_getRenderer())
+local screen_js_ip = TextView.new(font[64],ip,0,0,mya_getRenderer())
+screen_js_ip:setColor(mya_getRenderer(), 16,16,16)
 local screen_js_ipbtn = Sprite.new(assets:getTexture("empty"))
 screen_js_ipbtn:setRenderOutline(true)
 screen_js_ipbtn:setOutlineColor(0, 0, 0, 32)
-local screen_js_join = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_js_back = Sprite.new(assets:getTexture("screen_mm_logo"))
+local screen_js_join = Sprite.new(assets:getTexture("screen_js_button_leveleditor"))
+local screen_js_back = Sprite.new(assets:getTexture("screen_button_back"))
 local isWriting = false
 
 ipe = loadTable(mya_getPath().."lastip.save")
@@ -14,7 +15,7 @@ if ipe then
 end
 
 function screen_js_windowResize(w,h)
-	screen_js_ip = TextView.new(font,ip["ip"],0,0,mya_getRenderer())
+	screen_js_ip:setFont(font[64], mya_getRenderer())
 	screen_js_ip:setText(ip["ip"], mya_getRenderer())
 	screen_js_ip:setXY((mya_getWidth()/2)-(screen_js_ip:getWidth()/2),mya_getHeight()/16)
 	screen_js_ipbtn:setX((mya_getWidth()/2)-(screen_js_ip:getWidth()/2))
@@ -45,7 +46,6 @@ function screen_js_keyUp(key)
 			saveTable(mya_getPath().."lastip.save",ip)
 			network_start()
 			state = STATE_HOST
-			resizeFont(48)
 		else
 			ip["ip"] = ip["ip"]..key
 		end
@@ -67,7 +67,6 @@ function screen_js_mouseButtonUp(btn)
 				saveTable(mya_getPath().."lastip.save",ip)
 				network_start()
 				state = STATE_HOST
-				resizeFont(48)
 			elseif screen_js_back:isPointColliding(mouseX, mouseY) then
 				state = STATE_CHOOSEPLAY
 			end

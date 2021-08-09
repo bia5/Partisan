@@ -1,7 +1,7 @@
-local screen_cp_host = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_cp_join = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_cp_back = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_cp_lvleditor = Sprite.new(assets:getTexture("screen_mm_logo"))
+local screen_cp_host = Sprite.new(assets:getTexture("screen_cp_button_host"))
+local screen_cp_join = Sprite.new(assets:getTexture("screen_cp_button_joinserver"))
+local screen_cp_back = Sprite.new(assets:getTexture("screen_button_back"))
+local screen_cp_lvleditor = Sprite.new(assets:getTexture("screen_cp_button_leveleditor"))
 
 function screen_cp_windowResize(w, h)
     screen_cp_host:setX(mya_getWidth()/4)
@@ -29,7 +29,6 @@ function screen_cp_mouseButtonUp(btn)
             network_start()
             addClient("host", settings.player_name, getPlayerID())
             state = STATE_HOST
-            resizeFont(48)
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
             state = STATE_JOINSERVER

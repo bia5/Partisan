@@ -1,7 +1,7 @@
 local screen_mm_logo = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_mm_quit = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_mm_play = Sprite.new(assets:getTexture("screen_mm_logo"))
-local screen_mm_options = Sprite.new(assets:getTexture("screen_mm_logo"))
+local screen_mm_quit = Sprite.new(assets:getTexture("screen_mm_button_quit"))
+local screen_mm_play = Sprite.new(assets:getTexture("screen_mm_button_play"))
+local screen_mm_options = Sprite.new(assets:getTexture("screen_mm_button_settings"))
 
 function screen_mm_windowResize(w, h)
 	screen_mm_logo:setX(mya_getWidth()/4)
@@ -32,7 +32,6 @@ function screen_mm_mouseButtonUp(btn)
 		end
 		if screen_mm_options:isPointColliding(mouseX, mouseY) then
 			state = STATE_OPTIONS
-			resizeFont(48)
 		end
 	end
 end
