@@ -23,6 +23,8 @@ assets:loadTexture("screen_cp_button_leveleditor","assets/chooseplay/button_leve
 
 assets:loadTexture("screen_js_button_leveleditor","assets/joinserver/button_joinserver.png")
 
+assets:loadTexture("screen_ho_button_kick","assets/host/button_kick.png")
+
 assets:loadTexture("screen_art_tree","assets/art/tree.png")
 
 assets:loadTexture("screen_button_back","assets/button_back.png")

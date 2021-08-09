@@ -11,6 +11,31 @@ packet_inc = {}
 packet_out_s = {}
 packet_inc_s = {}
 
+function removeMyself()
+	network:close()
+	state = STATE_JOINSERVER
+end
+
+function message(_id, _args)
+	if not packet_out["messages"] then
+		packet_out["messages"] = {}
+	end
+	local pack = {}
+	pack.id = _id
+	pack.args = _args
+	table.insert(packet_out["messages"], pack)
+end
+
+function server_message(_id, _args)
+	if not packet_out_s["messages"] then
+		packet_out_s["messages"] = {}
+	end
+	local pack = {}
+	pack.id = _id
+	pack.args = _args
+	table.insert(packet_out_s["messages"], pack)
+end
+
 function network_start()
 	network:setServerName(net_ip)
 	network:setPort(net_port)
@@ -20,7 +45,8 @@ function network_start()
 	else
 		network:init(isHosting)
 
-		network:sendMessage("hi"..net_split1..settings.player_name..net_split1..getPlayerID(), network:getIP())
+		--network:sendMessage("hi"..net_split1..settings.player_name..net_split1..getPlayerID(), network:getIP())
+		message("join", {settings.player_name, getPlayerID()})
 	end
 end
 
@@ -72,55 +98,76 @@ function findClient(_ip)
 	end
 end
 
+function server_handlePacket()
+	if packet_inc_s["messages"] then
+		for k, v in pairs(packet_inc_s["messages"]) do
+			if v.id == "join" then
+				if net_connected ~= net_max then
+					addClient(ip, v.args[1], v.args[2])
+				else
+					print("Max clients connected, rejecting: "..v.args[1])
+					network:sendMessage("full", ip)
+				end
+			elseif v.id == "remove" then
+				server_message("remove", {v.args[1]})
+				network:sendMessage("packet"..net_split1..json.encode(packet_out_s), clients[v.args[1]].ip)
+				removeClient(v.args[1])
+			elseif v.id == "pong" then
+				if clients[v.args[1]] then
+					clients[v.args[1]].ping = clients[v.args[1]].ping_*(1000/mya_getUPS())
+					clients[v.args[1]].ping_ = 0
+					clients[v.args[1]].ping_r = true
+
+					clients_simplified[2][v.args[1]].ping = clients[v.args[1]].ping
+					packet_out_s["clients_simplified"] = clients_simplified
+				end
+			end
+		end
+	end
+end
+
+function handlePacket()
+	if packet_inc["messages"] then
+		for k,v in pairs(packet_inc["messages"]) do
+			--print(json.encode(v))
+
+			if v.id == "remove" then
+				if v.args[1] == getPlayerID() then
+					removeMyself()
+				end
+			elseif v.id == "quitting" then
+				network:close()
+				clients_simplified = {}
+				state = STATE_JOINSERVER
+			end
+		end
+	end
+end
+
 function event_networkMessage(clientMessage)
 	msg = network:getDataFromClientMessage(clientMessage)
 	ip = network:getIPFromClientMessage(clientMessage)
-	
-	if devmode then
-		--print("net_inc: "..msg)
-	end
-
-	msgd = mysplit(msg,net_split1) -- Splits incoming messages by "-"
+	msgd = mysplit(msg, net_split1)
 
 	if isHosting then --Server stuffs
-		if msgd[1] == "hi" then
-			if net_connected ~= net_max then
-				addClient(ip, msgd[2], msgd[3])
-			else
-				print("Max clients connected, rejecting: "..msgd[2])
-				network:sendMessage("full", ip)
-			end
-		elseif msgd[1] == "bye" then
-			removeClient(msgd[2])
-		elseif msgd[1] == "_pong" then
-			clients[msgd[2]].ping = clients[msgd[2]].ping_*(1000/mya_getUPS())
-			clients[msgd[2]].ping_ = 0
-			clients[msgd[2]].ping_r = true
-
-			clients_simplified[2][msgd[2]].ping = clients[msgd[2]].ping
-			packet_out_s["clients_simplified"] = clients_simplified
-			--print(clients[msgd[2]].name.."'s ping: "..clients[msgd[2]].ping-(1000/mya_getUPS()).."-"..clients[msgd[2]].ping.."ms")
-		elseif msgd[1] == "packet_s" then
+		if msgd[1] == "packet_s" then
 			packet_inc_s = json.decode(msgd[2])
-			--print("Recieved Packet from Client!")
+			server_handlePacket()
 		end
 	else -- Not Server Stuff
 		if msgd[1] == "full" then
 			print("Server is full.")
-			state = STATE_MAINMENU
+			state = STATE_JOINSERVER
 		elseif msgd[1] == "_ping" then
-			network:sendMessage("_pong"..net_split1..msgd[2], network:getIP())
-		elseif msgd[1] == "quitting" then
-			network:close()
-			clients_simplified = {}
-			state = STATE_MAINMENU
+			message("pong",{msgd[2]})
 		elseif msgd[1] == "packet" then -- Recieves packet from server
 			packet_inc = json.decode(msgd[2])
-			--print("Recieved Packet from Server!")
 
 			if packet_inc["clients_simplified"] then
 				clients_simplified = packet_inc["clients_simplified"]
 			end
+
+			handlePacket()
 		end
 	end
 end
@@ -128,14 +175,13 @@ end
 function network_update()
 	if isHosting then
 		if tablelength(packet_out_s) > 0 then
-			--print("Server Packet Out!")
 			for k, v in pairs(clients) do
 				if v.ip == "host" then
 					packet_inc = packet_out_s
-					--print("Recieved Packet from Server!")
 				else
 					network:sendMessage("packet"..net_split1..json.encode(packet_out_s), v.ip)
 				end
+				--print(json.encode(packet_out_s))
 			end
 			packet_out_s = {}
 		end
@@ -149,6 +195,7 @@ function network_update()
 					if v.ip ~= "host" then
 						v.ping_r = false
 						v.ping_ = 0
+						server_message("ping", {k})
 						network:sendMessage("_ping"..net_split1..k, v.ip)
 					end
 				end
@@ -165,10 +212,11 @@ function network_update()
 	if tablelength(packet_out) > 0 then
 		if isHosting then
 			packet_inc_s = packet_out
+			server_handlePacket()
 		else
-			network:sendMessage("packet_s"..net_split1..json.encode(packet_out), network:getIP())
+			local pack = "packet_s"..net_split1..json.encode(packet_out)
+			network:sendMessage(pack, network:getIP())
 		end
 		packet_out = {}
-		--print("Client Packet Out!")
 	end
 end

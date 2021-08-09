@@ -85,14 +85,12 @@ end
 
 function event_quit()
 	if isHosting then
-		for k,v in pairs(clients) do
-			if v.ip ~= "host" then
-				network:sendMessage("quitting", v.ip)
-			end
-		end
+		server_message("quitting", {})
 	else
-		network:sendMessage("bye"..net_split1..getPlayerID(), network:getIP())
+		message("remove", {getPlayerID()})
 	end
+
+	network_update()
 	network:close()
 end
 
