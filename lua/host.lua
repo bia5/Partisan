@@ -15,6 +15,10 @@ local screen_ho_bkg = Sprite.new(assets:getTexture("screen_art_tree"))
 screen_ho_bkg:setX(0)
 screen_ho_bkg:setY(0)
 
+local screen_ho_play = Sprite.new(assets:getTexture("screen_mm_button_play"))
+screen_ho_play:setRenderOutline(true)
+screen_ho_play:setOutlineColor(0, 0, 0, 128)
+
 local screen_ho_text_names_array = {}
 local screen_ho_text_ping_array = {}
 local screen_ho_btn_kick = {}
@@ -38,6 +42,9 @@ function screen_ho_windowResize(w, h)
 	screen_ho_clientbkg3:setY(mya_getHeight()/4*2)
 	screen_ho_clientbkg4:setX(0)
 	screen_ho_clientbkg4:setY(mya_getHeight()/4*3)
+
+	screen_ho_play:setX((mya_getWidth()/2)-(mya_getWidth()/16))
+	screen_ho_play:setY(mya_getHeight()/16*13)
 	
 	for i=0,3 do
 		screen_ho_text_names_array[i]:setFont(font[48], mya_getRenderer())
@@ -56,6 +63,10 @@ function screen_ho_render()
 	screen_ho_clientbkg2:render(mya_getRenderer(), mya_getWidth()/3, mya_getHeight()/4)
 	screen_ho_clientbkg3:render(mya_getRenderer(), mya_getWidth()/3, mya_getHeight()/4)
 	screen_ho_clientbkg4:render(mya_getRenderer(), mya_getWidth()/3, mya_getHeight()/4)
+
+	if isHosting then
+		screen_ho_play:render(mya_getRenderer(), mya_getWidth()/8, mya_getHeight()/6)
+	end
 
 	for i=0,3 do
 		if clients_simplified then
@@ -101,6 +112,13 @@ function screen_ho_mouseButtonUp(btn)
 						message("remove", {clients_simplified[1][i+1]})
 					end
 				end
+			end
+		end
+
+		if isHosting then
+			if screen_ho_play:isPointColliding(mouseX, mouseY) then
+				sendWorld()
+				server_message("ingame", {})
 			end
 		end
 	end

@@ -65,6 +65,7 @@ function addClient(_ip, _name, _id)
 	clients[_id].ping_ = 0
 	clients[_id].ping_r = true
 
+	newPlayer(_id, _name, 0, 0)
 
 	table.insert(clients_simplified[1],_id)
 	clients_simplified[2][_id] = {}
@@ -96,6 +97,10 @@ function findClient(_ip)
 			return k
 		end
 	end
+end
+
+function sendWorld()
+	server_message("world",{json.encode(world)})
 end
 
 function server_handlePacket()
@@ -139,6 +144,18 @@ function handlePacket()
 				network:close()
 				clients_simplified = {}
 				state = STATE_JOINSERVER
+			elseif v.id == "ingame" then
+				state = STATE_INGAME
+			elseif v.id == "world" then
+				world = json.decode(v.args[1])
+			elseif v.id == "w" then
+				getPlayer(findClient(ip).id).w = v.args[1]
+			elseif v.id == "s" then
+				getPlayer(findClient(ip).id).s = v.args[1]
+			elseif v.id == "a" then
+				getPlayer(findClient(ip).id).a = v.args[1]
+			elseif v.id == "d" then
+				getPlayer(findClient(ip).id).d = v.args[1]
 			end
 		end
 	end
@@ -178,6 +195,7 @@ function network_update()
 			for k, v in pairs(clients) do
 				if v.ip == "host" then
 					packet_inc = packet_out_s
+					handlePacket()
 				else
 					network:sendMessage("packet"..net_split1..json.encode(packet_out_s), v.ip)
 				end

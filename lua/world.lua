@@ -1,5 +1,5 @@
 world = {}
-world.player_ids = 0
+world.players = {}
 
 function newWorld()
 

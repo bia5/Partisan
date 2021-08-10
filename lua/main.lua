@@ -8,16 +8,17 @@ json = require "json"
 require("file")
 require("util")
 require("variables")
-require("world")
-require("player")
-require("ingame")
 require("netcode")
 require("assets")
 require("mainmenu")
+require("options")
 require("chooseplay")
 require("joinserver")
 require("host")
-require("options")
+require("ingame")
+
+require("world")
+require("player")
 
 require("keybinds")
 function event_mouseMotion(x, y)
@@ -44,11 +45,11 @@ function event_mouseButtonUp(btn)
 end
 
 function event_keyDown(key)
-	
+	callBind(key, true)
 end
 
 function event_keyUp(key)
-	callBind(key)
+	callBind(key, false)
 
 	if state == STATE_JOINSERVER then
 		screen_js_keyUp(key)
@@ -67,7 +68,11 @@ function event_windowResize(w, h)
 	screen_ho_windowResize(w, h)
 end
 
-function event_update() end
+function event_update()
+	if state == STATE_INGAME then
+		screen_ig_update()
+	end
+end
 
 function event_render()
 	if state == STATE_MAINMENU then
@@ -80,6 +85,8 @@ function event_render()
 		screen_op_render()
 	elseif state == STATE_HOST then
 		screen_ho_render()
+	elseif state == STATE_INGAME then
+		screen_ig_render()
 	end
 end
 
@@ -99,6 +106,10 @@ mya_setUPS(10)
 function event_tupdate()
 	network:update()
 	network_update()
+
+	if state == STATE_INGAME then
+		screen_ig_tupdate()
+	end
 end
 
 while mya_isRunning() do

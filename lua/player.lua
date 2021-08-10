@@ -1,15 +1,15 @@
-players = {}
-
-function newPlayer(name, islocal, x, y)
-	world.player_ids = world.player_ids + 1
-	players[world.player_ids] = {name, islocal, x, y}
+function newPlayer(id, name, x, y)
+	world.players[id] = {}
+	world.players[id].name = name
+	world.players[id].x = x
+	world.players[id].y = y
+	world.players[id].speed = 1
+	world.players[id].w = false
+	world.players[id].s = false
+	world.players[id].a = false
+	world.players[id].d = false
 end
 
-function savePlayer(id)
-	os.execute("mkdir "..mya_getPath().."/worlds/"..world_id.."/players/")
-	saveTable(mya_getPath().."/worlds/"..world_id.."/players/"..id..".player", players[id])
-end
-
-function loadPlayer(id)
-	players[id] = loadTable(mya_getPath().."/worlds/"..world_id.."/players/"..id..".player")
+function getPlayer(id)
+	return world.players[id]
 end
