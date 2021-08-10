@@ -126,6 +126,21 @@ function server_handlePacket()
 					clients_simplified[2][v.args[1]].ping = clients[v.args[1]].ping
 					packet_out_s["clients_simplified"] = clients_simplified
 				end
+			elseif v.id == "w" then
+				getPlayer(v.args[1]).w = v.args[2]
+				server_message(v.id,v.args)
+			elseif v.id == "s" then
+				getPlayer(v.args[1]).s = v.args[2]
+				server_message(v.id,v.args)
+			elseif v.id == "a" then
+				getPlayer(v.args[1]).a = v.args[2]
+				server_message(v.id,v.args)
+			elseif v.id == "d" then
+				getPlayer(v.args[1]).d = v.args[2]
+				server_message(v.id,v.args)
+			elseif v.id == "player" then
+				getPlayer(v.args[1]).x = v.args[2]
+				getPlayer(v.args[1]).y = v.args[3]
 			end
 		end
 	end
@@ -149,13 +164,26 @@ function handlePacket()
 			elseif v.id == "world" then
 				world = json.decode(v.args[1])
 			elseif v.id == "w" then
-				getPlayer(findClient(ip).id).w = v.args[1]
+				if v.args[1] ~= getPlayerID() then
+					getPlayer(v.args[1]).w = v.args[2]
+				end
 			elseif v.id == "s" then
-				getPlayer(findClient(ip).id).s = v.args[1]
+				if v.args[1] ~= getPlayerID() then
+					getPlayer(v.args[1]).s = v.args[2]
+				end
 			elseif v.id == "a" then
-				getPlayer(findClient(ip).id).a = v.args[1]
+				if v.args[1] ~= getPlayerID() then
+					getPlayer(v.args[1]).a = v.args[2]
+				end
 			elseif v.id == "d" then
-				getPlayer(findClient(ip).id).d = v.args[1]
+				if v.args[1] ~= getPlayerID() then
+					getPlayer(v.args[1]).d = v.args[2]
+				end
+			elseif v.id == "player" then
+				if v.args[1] ~= getPlayerID() then
+					getPlayer(v.args[1]).x = v.args[2]
+					getPlayer(v.args[1]).y = v.args[3]
+				end
 			end
 		end
 	end
@@ -169,7 +197,10 @@ function event_networkMessage(clientMessage)
 	if isHosting then --Server stuffs
 		if msgd[1] == "packet_s" then
 			packet_inc_s = json.decode(msgd[2])
-			server_handlePacket()
+
+			if packet_inc_s then
+				server_handlePacket()
+			end
 		end
 	else -- Not Server Stuff
 		if msgd[1] == "full" then
@@ -180,17 +211,25 @@ function event_networkMessage(clientMessage)
 		elseif msgd[1] == "packet" then -- Recieves packet from server
 			packet_inc = json.decode(msgd[2])
 
-			if packet_inc["clients_simplified"] then
-				clients_simplified = packet_inc["clients_simplified"]
-			end
+			if packet_inc then
+				if packet_inc["clients_simplified"] then
+					clients_simplified = packet_inc["clients_simplified"]
+				end
 
-			handlePacket()
+				handlePacket()
+			end
 		end
 	end
 end
 
 function network_update()
 	if isHosting then
+		if state == STATE_INGAME then
+			for k, v in pairs(world.players) do
+				server_message("player",{k,v.x,v.y})
+			end
+		end
+
 		if tablelength(packet_out_s) > 0 then
 			for k, v in pairs(clients) do
 				if v.ip == "host" then
@@ -217,6 +256,10 @@ function network_update()
 						network:sendMessage("_ping"..net_split1..k, v.ip)
 					end
 				end
+			end
+
+			if state == STATE_INGAME then
+				server_message("ingame", {})
 			end
 		end
 

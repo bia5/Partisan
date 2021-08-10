@@ -101,7 +101,7 @@ function event_quit()
 	network:close()
 end
 
-mya_setUPS(10)
+mya_setUPS(20)
 
 function event_tupdate()
 	network:update()

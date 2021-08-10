@@ -75,7 +75,7 @@ state = STATE_MAINMENU
 net_ip = "localhost"
 net_port = 9999
 net_max = 4
-net_split1 = "-"
+net_split1 = "|"
 
 -- Game Variables
 isHosting = true
