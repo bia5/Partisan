@@ -6,7 +6,7 @@ local offsetY = 0
 
 local sprite_players = {}
 for i=1,4 do
-	sprite_players[i] = Sprite.new(assets:getTexture("screen_button_back"))
+	sprite_players[i] = Sprite.new(assets:getTexture("empty"))
 	if i == 1 then
 	sprite_players[i]:setRenderOutline(true)
 	sprite_players[i]:setOutlineColor(255, 0, 0, 128)
@@ -31,21 +31,29 @@ function screen_ig_windowResize(w, h)
 end
 screen_ig_windowResize(mya_getWidth(), mya_getHeight())
 
-function player_up(isPressed) 
-	message("w",{getPlayerID(),isPressed})
-	getPlayer(getPlayerID()).w = isPressed
+function player_up(isPressed)
+	if state == STATE_INGAME then
+		message("w",{getPlayerID(),isPressed})
+		getPlayer(getPlayerID()).w = isPressed
+	end
 end
 function player_down(isPressed) 
-	message("s",{getPlayerID(),isPressed})
-	getPlayer(getPlayerID()).s = isPressed
+	if state == STATE_INGAME then
+		message("s",{getPlayerID(),isPressed})
+		getPlayer(getPlayerID()).s = isPressed
+	end
 end
 function player_left(isPressed) 
-	message("a",{getPlayerID(),isPressed})
-	getPlayer(getPlayerID()).a = isPressed
+	if state == STATE_INGAME then
+		message("a",{getPlayerID(),isPressed})
+		getPlayer(getPlayerID()).a = isPressed
+	end
 end
 function player_right(isPressed) 
-	message("d",{getPlayerID(),isPressed})
-	getPlayer(getPlayerID()).d = isPressed
+	if state == STATE_INGAME then
+		message("d",{getPlayerID(),isPressed})
+		getPlayer(getPlayerID()).d = isPressed
+	end
 end
 
 function screen_ig_tupdate()
@@ -71,9 +79,9 @@ function screen_ig_update()
 		ammt=ammt+1
 	end
 
-	offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)
-	offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)
-	screen_ig_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(getPlayer(getPlayerID()).x)..", Y: "..tostring(getPlayer(getPlayerID()).y)..", Delta: "..mya_getDelta()/1000, mya_getRenderer())
+	offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)-tileSize/2
+	offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)-tileSize/2
+	screen_ig_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(getPlayer(getPlayerID()).x*100)/100)..", Y: "..tostring(math.floor(getPlayer(getPlayerID()).y*100)/100)..", Delta: "..mya_getDelta()/1000, mya_getRenderer())
 end
 
 function screen_ig_render()
