@@ -30,4 +30,7 @@ assets:loadTexture("screen_art_tree","assets/art/tree.png")
 assets:loadTexture("screen_button_back","assets/button_back.png")
 assets:loadTexture("empty","assets/empty.png")
 
+assets:loadTexture("tile_brick","assets/tiles/brick.png")
+assets:loadTexture("tile_grey","assets/tiles/grey.png")
+
 print("Finished loading "..assets:getTotalAssets().." assets!")

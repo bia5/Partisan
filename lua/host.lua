@@ -117,7 +117,8 @@ function screen_ho_mouseButtonUp(btn)
 
 		if isHosting then
 			if screen_ho_play:isPointColliding(mouseX, mouseY) then
-				sendWorld()
+				newWorld(16)
+				world.isLinked = true
 				server_message("ingame", {})
 			end
 		end

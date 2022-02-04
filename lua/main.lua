@@ -66,6 +66,7 @@ function event_windowResize(w, h)
 	screen_js_windowResize(w, h)
 	screen_op_windowResize(w, h)
 	screen_ho_windowResize(w, h)
+	screen_ig_windowResize(w, h)
 end
 
 function event_update()

@@ -5,6 +5,7 @@ function registerBinds()
 	registerBind("s", "Down", player_down)
 	registerBind("a", "Left", player_left)
 	registerBind("d", "Right", player_right)
+	registerBind("esc", "Leave", client_leave)
 end
 
 function registerBind(key, name, _function)
