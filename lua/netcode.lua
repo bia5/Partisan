@@ -175,6 +175,8 @@ function server_handlePacket()
 					clients_simplified[2][v.args[1]].ping = clients[v.args[1]].ping
 					packet_out_s["clients_simplified"] = clients_simplified
 				end
+			elseif v.id == "bullet" then
+				server_message("bullet",v.args)
 			elseif v.id == "w" then
 				getPlayer(v.args[1]).w = v.args[2]
 				server_message(v.id,v.args)
@@ -186,6 +188,8 @@ function server_handlePacket()
 				server_message(v.id,v.args)
 			elseif v.id == "d" then
 				getPlayer(v.args[1]).d = v.args[2]
+				server_message(v.id,v.args)
+			elseif v.id == "enemy_dmg" then
 				server_message(v.id,v.args)
 			elseif v.id == "player" then
 				getPlayer(v.args[1]).x = v.args[2]
@@ -232,6 +236,27 @@ function handlePacket()
 				world.tiles = json.decode(v.args[1])
 			elseif v.id == "objects" then
 				world.objects = json.decode(v.args[1])
+			elseif v.id == "bullet" then
+				spawnBullet(v.args)
+			elseif v.id == "enemy" then
+				if not isHosting then
+					spawnEnemy(v.args)
+				end
+			elseif v.id == "enemy_loc" then
+				if not isHosting then
+					if world.enemies[v.args.id] then
+						world.enemies[v.args.id].sx = v.args.sx
+						world.enemies[v.args.id].sy = v.args.sy
+					end
+				end
+			elseif v.id == "enemy_dmg" then
+				if world.enemies[v.args.id] ~= nil then
+					world.enemies[v.args.id].hp = world.enemies[v.args.id].hp - v.args.hp
+					print("Enemy "..v.args.id..": "..world.enemies[v.args.id].hp.."/"..world.enemies[v.args.id].maxhp)
+					if world.enemies[v.args.id].hp < 1 then
+						world.enemies[v.args.id] = nil
+					end
+				end
 			elseif v.args[1] ~= getPlayerID() then
 				if getPlayer(v.args[1]) ~= nil then
 					if v.id == "w" then
@@ -381,6 +406,7 @@ function network_update()
 			server_handlePacket()
 		else
 			local pack = "packet_s"..net_split1..json.encode(packet_out)
+			--print(pack)
 			network:sendMessage(pack, network:getIP())
 		end
 		packet_out = {}

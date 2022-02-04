@@ -1,10 +1,14 @@
-local tileSize_ = 8
+local tileSize_ = 16
 local tileSize = mya_getHeight()/tileSize_
 
 local offsetX = 0
 local offsetY = 0
 
 sprite_tile = Sprite.new(assets:getTexture("empty"))
+
+spr_bullet = Sprite.new(assets:getTexture("tile_brick"))
+
+spr_boss = Sprite.new(assets:getTexture("empty"))
 
 local sprite_players = {}
 for i=1,4 do
@@ -74,18 +78,54 @@ function screen_ig_tupdate()
 	end
 end
 
+function screen_ig_mouseButtonUp(btn)
+	vx = (mouseX - (mya_getWidth()/2))/30
+	vy = (mouseY - (mya_getHeight()/2))/30
+	if getPlayer(getPlayerID()) ~= nil then
+		bx = getPlayer(getPlayerID()).x+.5
+		by = getPlayer(getPlayerID()).y+.5
+		spawnBullet(bx,by,vx,vy,0.2,getPlayerID(),10)
+	end
+end
+
+function spawnBoss(e)
+	if isHosting then
+		if not e then
+			spawnEnemy("enemy_boss",8,8,100,1.5,2.5,getPlayerID())
+		end
+	end
+end
+
 function screen_ig_update()
 	mya_deltaUpdate()
+	updateEnemies()
+	updateBullets()
 
 	local ammt = 1
 	for k, v in pairs(world.players) do
 		if v.isOnline then
 			local speed = v.speed*(mya_getDelta()/1000)
 			
-			if v.w then v.y = v.y - speed end
-			if v.s then v.y = v.y + speed end
-			if v.a then v.x = v.x - speed end
-			if v.d then v.x = v.x + speed end
+			if v.w then 
+				if isLocationWalkable(v.x, v.y - speed) then
+					v.y = v.y - speed 
+				end
+			end
+			if v.s then 
+				if isLocationWalkable(v.x, v.y + 1 + speed) then
+					v.y = v.y + speed 
+				end
+			end
+			if v.a then 
+				if isLocationWalkable(v.x - speed, v.y) then
+					v.x = v.x - speed 
+				end
+			end
+			if v.d then 
+				if isLocationWalkable(v.x + 1 + speed, v.y) then
+					v.x = v.x + speed
+				end
+			end
 
 			sprite_players[ammt]:setX((v.x*tileSize)+offsetX)
 			sprite_players[ammt]:setY((v.y*tileSize)+offsetY)
@@ -101,8 +141,8 @@ function screen_ig_update()
 end
 
 function screen_ig_render()
-	renderDistH = 8
-	renderDistV = 4
+	renderDistH = tileSize_
+	renderDistV = tileSize_/2
 	
 	if getPlayer(getPlayerID()) ~= nil then
 		x = math.floor(getPlayer(getPlayerID()).x+.5)
@@ -116,7 +156,7 @@ function screen_ig_render()
 					sprite_tile:setTexture(assets:getTexture(tile.id))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), tileSize, tileSize)
+					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
 				end
 			end
 		end
@@ -129,7 +169,7 @@ function screen_ig_render()
 					sprite_tile:setTexture(assets:getTexture(tile.id))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), tileSize, tileSize)
+					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
 				end
 			end
 		end
@@ -144,6 +184,20 @@ function screen_ig_render()
 		end
 	end
 
+	--Render Enemies
+	for k, v in pairs(world.enemies) do
+		spr_boss:setTexture(assets:getTexture(v.id))
+		spr_boss:setX((v.x*tileSize)+offsetX)
+		spr_boss:setY((v.y*tileSize)+offsetY)
+		spr_boss:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
+	end
+
 	--Render Debug
 	screen_ig_debug:render(mya_getRenderer())
+
+	for k, v in pairs(world.bullets) do
+		spr_bullet:setX((v.x*tileSize)+offsetX)
+		spr_bullet:setY((v.y*tileSize)+offsetY)
+		spr_bullet:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
+	end
 end

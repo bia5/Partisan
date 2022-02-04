@@ -6,6 +6,7 @@ function registerBinds()
 	registerBind("a", "Left", player_left)
 	registerBind("d", "Right", player_right)
 	registerBind("esc", "Leave", client_leave)
+	registerBind("l", "Boss", spawnBoss)
 end
 
 function registerBind(key, name, _function)

@@ -41,6 +41,8 @@ function event_mouseButtonUp(btn)
 		screen_op_mouseButtonUp(btn)
 	elseif state == STATE_HOST then
 		screen_ho_mouseButtonUp(btn)
+	elseif state == STATE_INGAME then
+		screen_ig_mouseButtonUp(btn)
 	end
 end
 

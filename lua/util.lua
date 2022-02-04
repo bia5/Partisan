@@ -42,3 +42,13 @@ function clearTable(t)
 		end
 	end
 end
+
+--myself
+function isPointColliding(x,y,w,h,xx,yy)
+	if x<xx and xx<x+w then
+		if y<yy and yy<y+h then
+			return true
+		end
+	end
+	return false
+end
