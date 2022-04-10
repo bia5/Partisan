@@ -1,5 +1,5 @@
-local tileSize_ = 16
-local tileSize = mya_getHeight()/tileSize_
+tileSize_ = 16
+tileSize = mya_getHeight()/tileSize_
 
 local offsetX = 0
 local offsetY = 0
@@ -70,7 +70,25 @@ function player_right(isPressed)
 	end
 end
 
+shoot = false
+skip = false
 function screen_ig_tupdate()
+	if shoot then
+		skip = not skip
+		vx = (mouseX - (mya_getWidth()/2))
+		vy = (mouseY - (mya_getHeight()/2))
+		rad = math.atan2(vy, vx)
+		velX = math.cos(rad) * 25
+		velY = math.sin(rad) * 25
+		if getPlayer(getPlayerID()) ~= nil then
+			bx = getPlayer(getPlayerID()).x+.5
+			by = getPlayer(getPlayerID()).y+.5
+			if not skip then
+				spawnBullet(bx,by,velX,velY,0.2,getPlayerID(),10)
+			end
+		end
+	end
+
 	if not isHosting then
 		if getPlayer(getPlayerID()) ~= nil then
 			message("player",{getPlayerID(), getPlayer(getPlayerID()).x, getPlayer(getPlayerID()).y})
@@ -78,20 +96,18 @@ function screen_ig_tupdate()
 	end
 end
 
+function screen_ig_mouseButtonDown(btn)
+	shoot = true
+end
+
 function screen_ig_mouseButtonUp(btn)
-	vx = (mouseX - (mya_getWidth()/2))/30
-	vy = (mouseY - (mya_getHeight()/2))/30
-	if getPlayer(getPlayerID()) ~= nil then
-		bx = getPlayer(getPlayerID()).x+.5
-		by = getPlayer(getPlayerID()).y+.5
-		spawnBullet(bx,by,vx,vy,0.2,getPlayerID(),10)
-	end
+	shoot = false
 end
 
 function spawnBoss(e)
 	if isHosting then
 		if not e then
-			spawnEnemy("enemy_boss",8,8,100,1.5,2.5,getPlayerID())
+			spawnEnemy("quacken_0",8,8,690,1.5,2.5,getPlayerID())
 		end
 	end
 end
@@ -106,25 +122,34 @@ function screen_ig_update()
 		if v.isOnline then
 			local speed = v.speed*(mya_getDelta()/1000)
 			
+			x = 0
+			y = 0
+
 			if v.w then 
 				if isLocationWalkable(v.x, v.y - speed) then
-					v.y = v.y - speed 
+					y=y-1
 				end
 			end
 			if v.s then 
 				if isLocationWalkable(v.x, v.y + 1 + speed) then
-					v.y = v.y + speed 
+					y=y+1
 				end
 			end
 			if v.a then 
 				if isLocationWalkable(v.x - speed, v.y) then
-					v.x = v.x - speed 
+					x=x-1
 				end
 			end
 			if v.d then 
 				if isLocationWalkable(v.x + 1 + speed, v.y) then
-					v.x = v.x + speed
+					x=x+1
 				end
+			end
+
+			if x ~= 0 or y ~= 0 then
+				rad = math.atan2(y, x)
+				v.x = v.x + (math.cos(rad) * speed)
+				v.y = v.y + (math.sin(rad) * speed)
 			end
 
 			sprite_players[ammt]:setX((v.x*tileSize)+offsetX)
@@ -153,7 +178,7 @@ function screen_ig_render()
 			for i = x-renderDistH, x+renderDistH do
 				tile = world.undertiles[i.."-"..ii]
 				if tile ~= nil then
-					sprite_tile:setTexture(assets:getTexture(tile.id))
+					sprite_tile:setTexture(assets:getTexture(tile.tex))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
 					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
@@ -166,11 +191,23 @@ function screen_ig_render()
 			for i = x-renderDistH, x+renderDistH do
 				tile = world.tiles[i.."-"..ii]
 				if tile ~= nil then
-					sprite_tile:setTexture(assets:getTexture(tile.id))
+					sprite_tile:setTexture(assets:getTexture(tile.tex))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
 					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
 				end
+			end
+		end
+	end
+
+	--Render Objects
+	for k, v in pairs(world.objects) do
+		if type(v) == "table" then
+			if v.x >= x-renderDistH-1 and v.x <= x+renderDistH+1 and v.y >= y-renderDistV-1 and v.y <= y+renderDistV+1 then
+				sprite_tile:setTexture(assets:getTexture(v.tex))
+				sprite_tile:setX((v.x*tileSize)+offsetX)
+				sprite_tile:setY((v.y*tileSize)+offsetY)
+				sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize)
 			end
 		end
 	end

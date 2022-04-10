@@ -5,8 +5,8 @@ screen_js_ip:setColor(mya_getRenderer(), 16,16,16)
 local screen_js_ipbtn = Sprite.new(assets:getTexture("empty"))
 screen_js_ipbtn:setRenderOutline(true)
 screen_js_ipbtn:setOutlineColor(0, 0, 0, 32)
-local screen_js_join = Sprite.new(assets:getTexture("screen_js_button_leveleditor"))
-local screen_js_back = Sprite.new(assets:getTexture("screen_button_back"))
+local screen_js_join = Sprite.new(assets:getTexture("button_joinserver"))
+local screen_js_back = Sprite.new(assets:getTexture("button_back"))
 local isWriting = false
 
 ipe = loadTable(mya_getPath().."lastip.save")

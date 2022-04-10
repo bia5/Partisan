@@ -6,6 +6,7 @@ world.isLinked = false
 
 world.undertiles = {}
 world.tiles = {}
+world.objectIDs = 0
 world.objects = {}
 
 world.enemies = {}
@@ -127,13 +128,6 @@ function updateBullets()
 	end
 end
 
-function newTile(id)
-	tile = {}
-	tile.id = id
-	tile.walkable = true
-	return tile
-end
-
 function isLocationWalkable(x,y)
 	x = math.floor(x)
 	y = math.floor(y)
@@ -165,50 +159,87 @@ function isLocationCollision(x,y)
 	return false
 end
 
+function addObject(x,y,w,h,tile)
+	world.objectIDs = world.objectIDs+1
+	object = {}
+	object.x = x
+	object.y = y
+	object.id = tile.id
+	object.w = w
+	object.h = h
+	object.tex = tile.tex
+	while world.objects[world.objectIDs] do
+		world.objectIDs = world.objectIDs+1
+	end
+	world.objects[world.objectIDs] = object
+end
+
+function getObjectsColliding(x,y)
+	objects_ = {}
+	for k,v in pairs(world.objects) do
+		if isPointColliding(v.x,v.y,v.w,v.h,x,y) then
+			table.insert(objects_,k)
+		end
+	end
+	return objects_
+end
+
 function newWorld(worldsize) --creates an empty box world based on world size input
+	world = {} --In display order :D
+	world.isLinked = false
+	
+	world.undertiles = {}
+	world.tiles = {}
+	world.objects = {}
+	world.objectIDs = 0
+	
+	world.enemies = {}
+	world.enemyCount = 0
+	world.players = {}
+	
+	--Per client variables
+	world.bullets = {}
+
 	--generates left to right, then up to down
 	for ii=1,worldsize do
 		for i=1,worldsize do
-			world.undertiles[i.."-"..ii] = newTile("tile_grey") --create empty array
+			if i % 2 == 0 then
+				if ii % 2 == 0 then
+					world.undertiles[i.."-"..ii] = newTile("tile_blue")
+				else
+					world.undertiles[i.."-"..ii] = newTile("tile_purple")
+				end
+			else
+				if ii % 2 == 1 then
+					world.undertiles[i.."-"..ii] = newTile("tile_blue")
+				else
+					world.undertiles[i.."-"..ii] = newTile("tile_purple")
+				end
+			end
 		end
 	end
-
-	for i=1,worldsize do --top row of brick
-		world.tiles[i.."-1"] = newTile("tile_brick") --create empty array
-		tile = world.tiles[i.."-1"] --makes it easier to call
-		tile.walkable = false
-		tile.collision = true
-	end
-
-	for i=1,worldsize do --bottom row of brick
-		world.tiles[i.."-"..worldsize] = newTile("tile_brick") --create empty array
-		tile = world.tiles[i.."-"..worldsize] --makes it easier to call
-		tile.walkable = false
-		tile.collision = true
-	end
-
-	for i=1,worldsize do --left column of brick
-		world.tiles["1-"..i] = newTile("tile_brick") --create empty array
-		tile = world.tiles["1-"..i] --makes it easier to call
-		tile.walkable = false
-		tile.collision = true
-	end
-
-	for i=1,worldsize do --right column of brick
-		world.tiles[worldsize.."-"..i] = newTile("tile_brick") --create empty array
-		tile = world.tiles[worldsize.."-"..i] --makes it easier to call
-		tile.walkable = false
-		tile.collision = true
-	end
-
-	world.objects["null"] = 1
 end
 
 function saveWorld()
-	os.execute("mkdir "..mya_getPath().."/worlds/"..world_id)
-	saveTable(mya_getPath().."/worlds/"..world_id.."/world.world", world)
+	if not fileHandler:dirExists("worlds") then
+		fileHandler:createDir(mya_getPath().."worlds")
+	end
+	if not fileHandler:dirExists("worlds/"..world_id) then
+		fileHandler:createDir(mya_getPath().."worlds/"..world_id)
+	end
+	if not fileHandler:fileExists(mya_getPath().."/worlds/"..world_id.."/world.lua") then
+		fileHandler:createFile(mya_getPath().."/worlds/"..world_id.."/world.partisan")
+	end
+	tprint(world)
+	saveTable(mya_getPath().."/worlds/"..world_id.."/world.partisan", world)
+	print("Saved world: "..world_id)
 end
 
 function loadWorld()
-	world = loadTable(mya_getPath().."/worlds/"..world_id.."/world.world")
+	if fileHandler:fileExists(mya_getPath().."/worlds/"..world_id.."/world.partisan") then
+		world = loadTable(mya_getPath().."/worlds/"..world_id.."/world.partisan")
+		print("World loaded: "..world_id)
+	else
+		print("File doesn't exist")
+	end
 end

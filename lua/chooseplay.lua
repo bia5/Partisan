@@ -1,7 +1,7 @@
-local screen_cp_host = Sprite.new(assets:getTexture("screen_cp_button_host"))
-local screen_cp_join = Sprite.new(assets:getTexture("screen_cp_button_joinserver"))
-local screen_cp_back = Sprite.new(assets:getTexture("screen_button_back"))
-local screen_cp_lvleditor = Sprite.new(assets:getTexture("screen_cp_button_leveleditor"))
+local screen_cp_host = Sprite.new(assets:getTexture("button_host"))
+local screen_cp_join = Sprite.new(assets:getTexture("button_joinserver"))
+local screen_cp_back = Sprite.new(assets:getTexture("button_back"))
+local screen_cp_lvleditor = Sprite.new(assets:getTexture("button_leveleditor"))
 
 function screen_cp_windowResize(w, h)
     screen_cp_host:setX(mya_getWidth()/4)
@@ -29,9 +29,19 @@ function screen_cp_mouseButtonUp(btn)
             network_start()
             addClient("host", settings.player_name, getPlayerID())
             state = STATE_HOST
+
+            registerBind("w", "Up", player_up)
+            registerBind("s", "Down", player_down)
+            registerBind("a", "Left", player_left)
+            registerBind("d", "Right", player_right)
         end
         if screen_cp_join:isPointColliding(mouseX, mouseY) then
             state = STATE_JOINSERVER
+
+            registerBind("w", "Up", player_up)
+            registerBind("s", "Down", player_down)
+            registerBind("a", "Left", player_left)
+            registerBind("d", "Right", player_right)
         end
         if screen_cp_back:isPointColliding(mouseX, mouseY) then
             state = STATE_MAINMENU
@@ -39,6 +49,10 @@ function screen_cp_mouseButtonUp(btn)
         if devmode then
             if screen_cp_lvleditor:isPointColliding(mouseX, mouseY) then
                 state = STATE_LEVELEDITOR
+                registerBind("w", "Up", player_up_le)
+                registerBind("s", "Down", player_down_le)
+                registerBind("a", "Left", player_left_le)
+                registerBind("d", "Right", player_right_le)
             end
         end
     end

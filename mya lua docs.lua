@@ -65,21 +65,29 @@ textView:getWidth() --Gets width of the texture
 textView:getHeight() --Gets height of the texture
 
 sound = Sound.new("assets/sound.wav") --arg1: asset location
-sound:destroy()
-sound:play()
+sound:destroy() --Destroys the sound from memory.
+sound:play() --Plays the sound.
 sound:setVolume(64) --arg1: volume (0-128)
 sound:getVolume() --returns int, which is the volume
 
 music = Music.new("assets/music.wav") --arg1: asset location
-music:destroy()
-music:play()
-music:pause()
-music:resume()
-music:stop()
+music:destroy() --Destroys the music from memory.
+music:play() --Plays the music.
+music:pause() --Pauses the music.
+music:resume() --Resumes the music.
+music:stop() --Stops the music.
 music:isPlaying() --returns bool, whether music is playing
 music:setVolume(64) --arg1: volume (0-128)
 music:getVolume() --returns int, which is the volume
 
+fileHandler = FileHandler.new() --Generates a new FileHandler
+table = fileHandler:listDir(string) --Returns a table of all files in the directory
+fileHandler:getSize(table) --Returns a table's size
+fileHandler:get(table, int) --Returns a file's path from the table
+fileHandler:fileExists(path) --Returns a bool whether the file exists
+fileHandler:dirExists(path) --Returns a bool whether the directory exists
+fileHandler:createDir(path) --Creates a directory
+fileHandler:createFile(path) --Creates a file
 
 
 --Callbacks

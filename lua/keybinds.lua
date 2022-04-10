@@ -1,12 +1,10 @@
 keys = {}
 
 function registerBinds()
-	registerBind("w", "Up", player_up)
-	registerBind("s", "Down", player_down)
-	registerBind("a", "Left", player_left)
-	registerBind("d", "Right", player_right)
 	registerBind("esc", "Leave", client_leave)
 	registerBind("l", "Boss", spawnBoss)
+	registerBind("=", "Zoom Out", zoomOut)
+	registerBind("-", "Zoom In", zoomIn)
 end
 
 function registerBind(key, name, _function)

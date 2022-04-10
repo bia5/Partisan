@@ -11,11 +11,11 @@ local screen_ho_clientbkg4 = Sprite.new(assets:getTexture("empty"))
 screen_ho_clientbkg4:setRenderOutline(true)
 screen_ho_clientbkg4:setOutlineColor(0, 0, 0, 64)
 
-local screen_ho_bkg = Sprite.new(assets:getTexture("screen_art_tree"))
+local screen_ho_bkg = Sprite.new(assets:getTexture("art_tree"))
 screen_ho_bkg:setX(0)
 screen_ho_bkg:setY(0)
 
-local screen_ho_play = Sprite.new(assets:getTexture("screen_mm_button_play"))
+local screen_ho_play = Sprite.new(assets:getTexture("button_play"))
 screen_ho_play:setRenderOutline(true)
 screen_ho_play:setOutlineColor(0, 0, 0, 128)
 
@@ -117,7 +117,8 @@ function screen_ho_mouseButtonUp(btn)
 
 		if isHosting then
 			if screen_ho_play:isPointColliding(mouseX, mouseY) then
-				newWorld(16)
+				loadWorld()
+				addClient("host", settings.player_name, getPlayerID())
 				world.isLinked = true
 				server_message("ingame", {})
 			end

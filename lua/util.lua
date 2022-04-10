@@ -52,3 +52,24 @@ function isPointColliding(x,y,w,h,xx,yy)
 	end
 	return false
 end
+
+--https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
+function tprint (tbl, indent)
+	if type(tbl) == "table" then
+		if not indent then indent = 0 end
+			for k, v in pairs(tbl) do
+	  			formatting = string.rep("  ", indent) .. k .. ": "
+	  			if type(v) == "table" then
+				print(formatting)
+				tprint(v, indent+1)
+	  		elseif type(v) == 'boolean' then
+				print(formatting .. tostring(v))      
+	  		else
+				print(formatting .. v)
+	  		end
+		end
+	else
+		print("tprint value: "..type(tbl))
+	end
+end
+ 

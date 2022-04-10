@@ -2,6 +2,7 @@
 init = mya_init("Partisan", 1280, 720)
 
 math.randomseed(os.time()) math.random() math.random() math.random() --setup that random
+fileHandler = FileHandler.new()
 
 -- Import Files
 json = require "json"
@@ -17,8 +18,11 @@ require("joinserver")
 require("host")
 require("ingame")
 
+require("tileHandler")
 require("world")
 require("player")
+
+require("leveleditor")
 
 require("keybinds")
 function event_mouseMotion(x, y)
@@ -27,7 +31,11 @@ function event_mouseMotion(x, y)
 end
 
 function event_mouseButtonDown(btn)
-
+	if state == STATE_LEVELEDITOR then
+		screen_le_mouseButtonDown(btn)
+	elseif state == STATE_INGAME then
+		screen_ig_mouseButtonDown(btn)
+	end
 end
 
 function event_mouseButtonUp(btn)
@@ -43,6 +51,8 @@ function event_mouseButtonUp(btn)
 		screen_ho_mouseButtonUp(btn)
 	elseif state == STATE_INGAME then
 		screen_ig_mouseButtonUp(btn)
+	elseif state == STATE_LEVELEDITOR then
+		screen_le_mouseButtonUp(btn)
 	end
 end
 
@@ -69,11 +79,14 @@ function event_windowResize(w, h)
 	screen_op_windowResize(w, h)
 	screen_ho_windowResize(w, h)
 	screen_ig_windowResize(w, h)
+	screen_le_windowResize(w, h)
 end
 
 function event_update()
 	if state == STATE_INGAME then
 		screen_ig_update()
+	elseif state == STATE_LEVELEDITOR then
+		screen_le_update()
 	end
 end
 
@@ -90,6 +103,8 @@ function event_render()
 		screen_ho_render()
 	elseif state == STATE_INGAME then
 		screen_ig_render()
+	elseif state == STATE_LEVELEDITOR then
+		screen_le_render()
 	end
 end
 
@@ -112,6 +127,8 @@ function event_tupdate()
 
 	if state == STATE_INGAME then
 		screen_ig_tupdate()
+	elseif state == STATE_LEVELEDITOR then
+		screen_le_tupdate()
 	end
 end
 

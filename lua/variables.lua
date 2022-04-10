@@ -66,9 +66,9 @@ STATE_OPTIONS = "options"
 STATE_ABOUT = "about"
 STATE_CHOOSEPLAY = "chooseplay" -- done
 STATE_LEVELEDITOR = "leveleditor"
-STATE_HOST = "host"
+STATE_HOST = "host" --done
 STATE_JOINSERVER = "joinserver" --done
-STATE_INGAME = "ingame"
+STATE_INGAME = "ingame" --good enough
 state = STATE_MAINMENU
 
 -- Netcode
@@ -83,5 +83,5 @@ playerid = 0
 if settings.world_ids == nil then
 	settings.world_ids = 0
 end
-world_id = 0
+world_id = "default_world_id"
 local_player_id = 0

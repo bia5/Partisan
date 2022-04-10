@@ -247,6 +247,8 @@ function handlePacket()
 					if world.enemies[v.args.id] then
 						world.enemies[v.args.id].sx = v.args.sx
 						world.enemies[v.args.id].sy = v.args.sy
+					else
+						
 					end
 				end
 			elseif v.id == "enemy_dmg" then
