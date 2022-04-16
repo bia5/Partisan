@@ -12,10 +12,37 @@ local playerA = false
 local playerS = false
 local playerD = false
 
+local tilePopup = false
+tileButtons = {}
+
+function newTileButton(id, x, y, w, h)
+	btn = {}
+
+	btn.id = id
+	btn.x = x
+	btn.y = y
+	btn.w = w
+	btn.h = h
+
+	return btn
+end
+
+function getTileButton(x,y)
+	for k, v in pairs(tileButtons) do
+		if x >= v.x and x <= v.x+v.w and y >= v.y and y <= v.y+v.h then
+			return v.id
+		end
+	end
+end
+
 sprite_tile = Sprite.new(assets:getTexture("empty"))
 spr_boss = Sprite.new(assets:getTexture("empty"))
 
-buildTile = newTile("null", "tile_brick")
+sprite_tilePopup = Sprite.new(assets:getTexture("empty"))
+sprite_tilePopup:setRenderOutline(true)
+sprite_tilePopup:setOutlineColor(0, 0, 0, 128)
+
+buildTile = newTile("tile_grass_0")
 layer = "undertiles"
 
 function zoomOut()
@@ -44,7 +71,7 @@ local function newButton(id, x, y, text, size)
 end
 
 local function isButtonPressed(id)
-	if buttons[id] ~= nil then
+	if buttons[id] ~= nil and tilePopup == false then
 		return buttons[id].isPressed
 	end
 	return false
@@ -69,7 +96,6 @@ local function defineButtons()
 	newButton("save", mya_getWidth()/8*7, yval, "Save", 32)
 	newButton("load", mya_getWidth()/8*7, yval, "Load", 32)
 	newButton("worldid", mya_getWidth()/8*7, yval, "Set World ID", 32)
-	newButton("objids", mya_getWidth()/8*7, yval, "Set Obj ID", 32)
 end
 
 function getInput(type)
@@ -102,22 +128,22 @@ end
 screen_le_windowResize(mya_getWidth(), mya_getHeight())
 
 function player_up_le(isPressed)
-	if state == STATE_LEVELEDITOR then
+	if state == STATE_LEVELEDITOR and tilePopup == false then
 		playerW = isPressed
 	end
 end
 function player_down_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
+	if state == STATE_LEVELEDITOR and tilePopup == false then
 		playerS = isPressed
 	end
 end
 function player_left_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
+	if state == STATE_LEVELEDITOR and tilePopup == false then
 		playerA = isPressed
 	end
 end
 function player_right_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
+	if state == STATE_LEVELEDITOR and tilePopup == false then
 		playerD = isPressed
 	end
 end
@@ -139,109 +165,111 @@ function screen_le_mouseButtonUp(btn)
 	mouseDown = false
 	tilex = math.floor((mouseX-offsetX)/tileSize)
 	tiley = math.floor((mouseY-offsetY)/tileSize)
-
-	hovering = false
-	for k, v in pairs(buttons) do
-		if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
-			v.isPressed = true
-			hovering = true
-		else
-			v.isPressed = false
-		end
-	end
-
-	if not hovering then
-		if mode_dropper then
-			if layer == "undertiles" then
-				buildTile = world.undertiles[tilex.."-"..tiley]
-			elseif layer == "tiles" then
-				buildTile = world.tiles[tilex.."-"..tiley]
-			end
-			
-			print("Tile Dropped")
-
-			mode_dropper = false
-		end
-	end
-
-	-- 		Button Handlers		--
-
-	if isButtonPressed("newworld") then				-- Generate New World
-		print("Enter World Size: ")
-		--newWorld(getInput("number"))
-		newWorld(16)
-
-	elseif isButtonPressed("newtile") then			-- New Tile
-		print("Enter Tile Name: ")
-		buildTile = newTile(getInput("string"))
-	elseif isButtonPressed("edittile") then			-- Edit Tile Meta
-		print("Enter Tile Variable: ")
-		variable = getInput("string")
-		print("Enter Value: ")
-		buildTile[variable] = getInput(type(buildTile[variable]))
-	elseif isButtonPressed("tiledropper") then		-- Grabs an existing tile
-		print("dropper mode enabled")
-		mode_dropper = true
-	elseif isButtonPressed("gettile") then			-- Prints Tile Info
-		tprint(buildTile, 2)
 	
-	-- 		Right Buttons		--
-	elseif isButtonPressed("buildmode") then		-- Toggle Build Mode
-		mode_build = not mode_build
-		print("Build Mode: "..tostring(mode_build))
-	elseif isButtonPressed("destroymode") then		-- Toggle Destroy Mode
-		mode_destroy = not mode_destroy
-		print("Destroy Mode: "..tostring(mode_destroy))
-	elseif isButtonPressed("togglelayer") then		-- Toggle Layer
-		if layer == "undertiles" then
-			layer = "tiles"
-		elseif layer == "tiles" then
-			layer = "object"
-		else
-			layer = "undertiles"
+	if tilePopup == false then
+		hovering = false
+		for k, v in pairs(buttons) do
+			if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
+				v.isPressed = true
+				hovering = true
+			else
+				v.isPressed = false
+			end
 		end
-		print("Undertile: "..tostring(layer))
 
-	-- 		Bottom Right		--
-	elseif isButtonPressed("zoom") then				-- Enter Zoom
-		print("Enter Zoom Value (higher = futher out (def 16)): ")
-		tileSize_ = getInput("number")
-		tileSize = mya_getHeight()/tileSize_
-	elseif isButtonPressed("speed") then 			-- Enter Speed
-		print("Enter Speed Value (def 10): ")
-		playerSpeed = getInput("number")
-	elseif isButtonPressed("save") then				-- Save World
-		saveWorld()
-	elseif isButtonPressed("load") then				-- Load World
-		loadWorld()
-	elseif isButtonPressed("worldid") then			-- Set World ID
-		print("Enter World ID: ")
-		world_id = getInput("string")
-	elseif isButtonPressed("objids") then			-- Set Object ID
-		print("Enter Object ID: ")
-		world.objectIDs = getInput("number")
-	end
+		if not hovering then
+			if mode_dropper then
+				if layer == "undertiles" then
+					buildTile = world.undertiles[tilex.."-"..tiley]
+				elseif layer == "tiles" then
+					buildTile = world.tiles[tilex.."-"..tiley]
+				end
+				
+				print("Tile Dropped")
 
-	if mode_build then
-		if not mode_dropper then
+				mode_dropper = false
+			end
+		end
+
+		-- 		Button Handlers		--
+
+		if isButtonPressed("newworld") then				-- Generate New World
+			newWorld()
+
+		elseif isButtonPressed("newtile") then			-- New Tile
+			tilePopup = true
+		elseif isButtonPressed("edittile") then			-- Edit Tile Meta
+			print("Enter Tile Variable: ")
+			variable = getInput("string")
+			print("Enter Value: ")
+			buildTile[variable] = getInput(type(buildTile[variable]))
+		elseif isButtonPressed("tiledropper") then		-- Grabs an existing tile
+			print("dropper mode enabled")
+			mode_dropper = true
+		elseif isButtonPressed("gettile") then			-- Prints Tile Info
+			tprint(buildTile, 2)
+		
+		-- 		Right Buttons		--
+		elseif isButtonPressed("buildmode") then		-- Toggle Build Mode
+			mode_build = not mode_build
+			print("Build Mode: "..tostring(mode_build))
+		elseif isButtonPressed("destroymode") then		-- Toggle Destroy Mode
+			mode_destroy = not mode_destroy
+			print("Destroy Mode: "..tostring(mode_destroy))
+		elseif isButtonPressed("togglelayer") then		-- Toggle Layer
+			if layer == "undertiles" then
+				layer = "tiles"
+			elseif layer == "tiles" then
+				layer = "object"
+			else
+				layer = "undertiles"
+			end
+			print("Undertile: "..tostring(layer))
+
+		-- 		Bottom Right		--
+		elseif isButtonPressed("zoom") then				-- Enter Zoom
+			print("Enter Zoom Value (higher = futher out (def 16)): ")
+			tileSize_ = getInput("number")
+			tileSize = mya_getHeight()/tileSize_
+		elseif isButtonPressed("speed") then 			-- Enter Speed
+			print("Enter Speed Value (def 10): ")
+			playerSpeed = getInput("number")
+		elseif isButtonPressed("save") then				-- Save World
+			saveWorld()
+		elseif isButtonPressed("load") then				-- Load World
+			loadWorld()
+		elseif isButtonPressed("worldid") then			-- Set World ID
+			print("Enter World ID: ")
+			world_id = getInput("string")
+		end
+
+		if mode_build then
+			if not mode_dropper then
+				if not hovering then
+					if layer == "object" then
+						offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
+						offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
+						addObject((mouseX-offsetX)/tileSize, (mouseY-offsetY)/tileSize, 1, 1, buildTile)
+					end
+				end
+			end
+		elseif mode_destroy then
 			if not hovering then
 				if layer == "object" then
 					offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
 					offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
-					addObject((mouseX-offsetX)/tileSize, (mouseY-offsetY)/tileSize, 1, 1, buildTile)
+					objs = getObjectsColliding((mouseX-offsetX)/tileSize, (mouseY-offsetY)/tileSize, 1, 1)
+					for k, v in pairs(objs) do
+						world.objects[v] = nil
+					end
 				end
 			end
 		end
-	elseif mode_destroy then
-		if not hovering then
-			if layer == "object" then
-				offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
-				offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
-				objs = getObjectsColliding((mouseX-offsetX)/tileSize, (mouseY-offsetY)/tileSize, 1, 1)
-				for k, v in pairs(objs) do
-					world.objects[v] = nil
-				end
-			end
+	else
+		eid = getTileButton(mouseX, mouseY)
+		if eid ~= nil then
+			buildTile = newTile(eid)
+			tilePopup = false
 		end
 	end
 end
@@ -252,54 +280,59 @@ end
 
 function screen_le_update()
 	mya_deltaUpdate()
-	updateEnemies()
-	updateBullets()
 
-	local speed = playerSpeed*(mya_getDelta()/1000)
-		
-	if playerW then 
-		playerY = playerY - speed 
-	end
-	if playerS then 
-		playerY = playerY + speed 
-	end
-	if playerA then 
-		playerX = playerX - speed 
-	end
-	if playerD then 
-		playerX = playerX + speed
-	end
-	
-	offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
-	offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
-	tilex = math.floor((mouseX-offsetX)/tileSize)
-	tiley = math.floor((mouseY-offsetY)/tileSize)
+	if tilePopup == false then
+		updateEnemies()
+		updateBullets()
 
-
-	hovering = false
-	for k, v in pairs(buttons) do
-		if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
-			v.isPressed = true
-			hovering = true
-		else
-			v.isPressed = false
+		local speed = playerSpeed*(mya_getDelta()/1000)
+			
+		if playerW then 
+			playerY = playerY - speed 
 		end
-	end
-	if mode_build then
-		if not mode_dropper then
-			if not hovering then
-				if mouseDown then
-					if layer == "undertiles" then
-						world.undertiles[tilex.."-"..tiley] = buildTile
-					elseif layer == "tiles" then
-						world.tiles[tilex.."-"..tiley] = buildTile
+		if playerS then 
+			playerY = playerY + speed 
+		end
+		if playerA then 
+			playerX = playerX - speed 
+		end
+		if playerD then 
+			playerX = playerX + speed
+		end
+		
+		offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
+		offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
+		tilex = math.floor((mouseX-offsetX)/tileSize)
+		tiley = math.floor((mouseY-offsetY)/tileSize)
+
+
+		hovering = false
+		for k, v in pairs(buttons) do
+			if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
+				v.isPressed = true
+				hovering = true
+			else
+				v.isPressed = false
+			end
+		end
+		if mode_build then
+			if not mode_dropper then
+				if not hovering then
+					if mouseDown then
+						if layer == "undertiles" then
+							world.undertiles[tilex.."-"..tiley] = buildTile
+						elseif layer == "tiles" then
+							world.tiles[tilex.."-"..tiley] = buildTile
+						end
 					end
 				end
 			end
 		end
+	else
+		sprite_tilePopup:setX(mya_getWidth()/20)
+		sprite_tilePopup:setY(mya_getHeight()/20)
 	end
-
-	screen_le_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(playerX*100)/100)..", Y: "..tostring(math.floor(playerY*100)/100)..", Delta: "..(mya_getDelta()/1000)..", tileX: "..tilex..", tileY: "..tiley, mya_getRenderer())
+	screen_le_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(playerX*100)/100)..", Y: "..tostring(math.floor(playerY*100)/100)..", Delta: "..(mya_getDelta()/1000)..", tileX: "..tilex..", tileY: "..tiley..", Zoom: "..tileSize_, mya_getRenderer())
 end
 
 function screen_le_render()
@@ -318,12 +351,7 @@ function screen_le_render()
 				sprite_tile:setY((ii*tileSize)+offsetY)
 				sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
 			end
-		end
-	end
 
-	--Render Tiles
-	for ii = y-renderDistV, y+renderDistV do
-		for i = x-renderDistH, x+renderDistH do
 			tile = world.tiles[i.."-"..ii]
 			if tile ~= nil then
 				sprite_tile:setTexture(assets:getTexture(tile.tex))
@@ -372,5 +400,36 @@ function screen_le_render()
 
 	for k, v in pairs(buttons) do
 		v.tv:render(mya_getRenderer())
+	end
+
+	if tilePopup then
+		ex = mya_getWidth()/20+(tileSize/4)
+		ey = mya_getHeight()/20+(tileSize/4)
+		tileButtons = {}
+		sprite_tilePopup:render(mya_getRenderer(), mya_getWidth()/20*18, mya_getHeight()/20*18)
+		for k,v in pairs(assets_tiles) do
+			if ex > mya_getWidth()/20*18 then
+				ex = mya_getWidth()/20+(tileSize/4)
+				ey = ey+tileSize+(tileSize/4)
+			end
+			table.insert(tileButtons,newTileButton(v, ex,ey,tileSize,tileSize))
+			sprite_tile:setTexture(assets:getTexture(v))
+			sprite_tile:setX(ex)
+			sprite_tile:setY(ey)
+			sprite_tile:render(mya_getRenderer(), tileSize, tileSize)
+			ex=ex+tileSize+(tileSize/4)
+		end
+		for k,v in pairs(assets_objects) do
+			if ex > mya_getWidth()/20*18 then
+				ex = mya_getWidth()/20+(tileSize/4)
+				ey = ey+tileSize+(tileSize/4)
+			end
+			table.insert(tileButtons,newTileButton(v, ex,ey,tileSize,tileSize))
+			sprite_tile:setTexture(assets:getTexture(v))
+			sprite_tile:setX(ex)
+			sprite_tile:setY(ey)
+			sprite_tile:render(mya_getRenderer(), tileSize, tileSize)
+			ex=ex+tileSize+(tileSize/4)
+		end
 	end
 end

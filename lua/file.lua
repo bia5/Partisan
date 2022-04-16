@@ -5,6 +5,12 @@ function saveTable(file, tablee)
 	test:close()
 end
 
+function saveString(file, str)
+	local test = assert(io.open(file, "w"))
+	test:write(str)
+	test:close()
+end
+
 function file_exists(name)
 	local f=io.open(name,"r")
 	if f~=nil then io.close(f) return true else return false end
@@ -18,6 +24,16 @@ function loadTable(file)
 		result = json.decode(readjson)
 		test:close()
 		return result
+	end
+	return nil
+end
+
+function loadString(file)
+	if file_exists(file) then
+		local test = io.open(file, "r")
+		local readjson= test:read("*a")
+		test:close()
+		return readjson
 	end
 	return nil
 end

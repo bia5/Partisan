@@ -1,20 +1,124 @@
---TODO
---redo tile generation
+world_standard = "0.0.1"
+function newWorld() --creates an empty box world based on world size input
+	world = {} --In display order :D
+	world.isLinked = false
+	world.version = world_standard
 
-world = {} --In display order :D
-world.isLinked = false
+	world.undertiles = {}
+	world.tiles = {}
+	world.objectIDs = 0
+	world.objects = {}
 
-world.undertiles = {}
-world.tiles = {}
-world.objectIDs = 0
-world.objects = {}
+	world.enemies = {}
+	world.enemyCount = 0
+	world.players = {}
 
-world.enemies = {}
-world.enemyCount = 0
-world.players = {}
+	--Per client variables
+	world.bullets = {}
+end
+newWorld()
 
---Per client variables
-world.bullets = {}
+function worldToString()
+	--variables
+	local splitter0 = "|"
+	local splitter1 = "="
+	local splitter2 = ","
+	local splitter3 = "&"
+	local str = ""
+	
+	--world details
+	str = str.."v="..world.version..splitter0
+	str = str.."oid="..world.objectIDs..splitter0
+	
+	--undertiles
+	str = str.."ut"..splitter1
+	for k,v in pairs(world.undertiles) do
+		str = str..k..splitter3..tileToString(v)..splitter2
+	end
+	str = str..splitter0
+	
+	--tiles
+	str = str.."t"..splitter1
+	for k,v in pairs(world.tiles) do
+		str = str..k..splitter3..tileToString(v)..splitter2
+	end
+	str = str..splitter0
+
+	--objects & id
+	str = str.."o"..splitter1
+	for k,v in pairs(world.objects) do
+		str = str..k..splitter3..tileToString(v)..splitter2
+	end
+	str = str..splitter0
+
+	--enemies	--TODO: update enemy
+	str = str.."e"..splitter1
+	for k,v in pairs(world.enemies) do
+		
+	end
+	str = str..splitter0
+
+	--players	--TODO: update player
+	str = str.."p"..splitter1
+	for k,v in pairs(world.players) do
+		
+	end
+	str = str..splitter0
+
+	--bullets	--TODO: update bullet
+	str = str.."b"..splitter1
+	for k,v in pairs(world.bullets) do
+		
+	end
+	str = str..splitter0
+
+	return str
+end
+
+function stringToWorld(str)
+	newWorld()
+	local splitter0 = "|"
+	local splitter1 = "="
+	local splitter2 = ","
+	local splitter3 = "&"
+	local inputs = mysplit(str, splitter0)
+
+	for k, v in pairs(inputs) do
+		local inputs2 = mysplit(v, splitter1)
+		if inputs2[1] == "v" then
+			world.version = inputs2[2]
+		elseif inputs2[1] == "oid" then
+			world.objectIDs = tonumber(inputs2[2])
+		elseif inputs2[1] == "ut" then
+			if inputs2[2] ~= nil then
+				local inputs3 = mysplit(inputs2[2], splitter2)
+				for k2, v2 in pairs(inputs3) do
+					local inputs4 = mysplit(v2, splitter3)
+					world.undertiles[inputs4[1]] = stringToTile(inputs4[2])
+				end
+			end
+		elseif inputs2[1] == "t" then
+			if inputs2[2] ~= nil then
+				local inputs3 = mysplit(inputs2[2], splitter2)
+				for k2, v2 in pairs(inputs3) do
+					local inputs4 = mysplit(v2, splitter3)
+					world.tiles[inputs4[1]] = stringToTile(inputs4[2])
+				end
+			end
+		elseif inputs2[1] == "o" then
+			if inputs2[2] ~= nil then
+				local inputs3 = mysplit(inputs2[2], splitter2)
+				for k2, v2 in pairs(inputs3) do
+					local inputs4 = mysplit(v2, splitter3)
+					world.objects[inputs4[1]] = stringToTile(inputs4[2])
+				end
+			end
+		elseif inputs2[1] == "e" then
+		elseif inputs2[1] == "p" then
+		elseif inputs2[1] == "b" then
+		end
+	end
+end
 
 function spawnEnemy(id,x,y,hp,speed,size)
 	if not isHosting then
@@ -161,7 +265,7 @@ end
 
 function addObject(x,y,w,h,tile)
 	world.objectIDs = world.objectIDs+1
-	object = {}
+	object = newTile(tile)
 	object.x = x
 	object.y = y
 	object.id = tile.id
@@ -184,42 +288,6 @@ function getObjectsColliding(x,y)
 	return objects_
 end
 
-function newWorld(worldsize) --creates an empty box world based on world size input
-	world = {} --In display order :D
-	world.isLinked = false
-	
-	world.undertiles = {}
-	world.tiles = {}
-	world.objects = {}
-	world.objectIDs = 0
-	
-	world.enemies = {}
-	world.enemyCount = 0
-	world.players = {}
-	
-	--Per client variables
-	world.bullets = {}
-
-	--generates left to right, then up to down
-	for ii=1,worldsize do
-		for i=1,worldsize do
-			if i % 2 == 0 then
-				if ii % 2 == 0 then
-					world.undertiles[i.."-"..ii] = newTile("tile_blue")
-				else
-					world.undertiles[i.."-"..ii] = newTile("tile_purple")
-				end
-			else
-				if ii % 2 == 1 then
-					world.undertiles[i.."-"..ii] = newTile("tile_blue")
-				else
-					world.undertiles[i.."-"..ii] = newTile("tile_purple")
-				end
-			end
-		end
-	end
-end
-
 function saveWorld()
 	if not fileHandler:dirExists("worlds") then
 		fileHandler:createDir(mya_getPath().."worlds")
@@ -230,14 +298,13 @@ function saveWorld()
 	if not fileHandler:fileExists(mya_getPath().."/worlds/"..world_id.."/world.lua") then
 		fileHandler:createFile(mya_getPath().."/worlds/"..world_id.."/world.partisan")
 	end
-	tprint(world)
-	saveTable(mya_getPath().."/worlds/"..world_id.."/world.partisan", world)
+	saveString(mya_getPath().."/worlds/"..world_id.."/world.partisan", worldToString())
 	print("Saved world: "..world_id)
 end
 
 function loadWorld()
 	if fileHandler:fileExists(mya_getPath().."/worlds/"..world_id.."/world.partisan") then
-		world = loadTable(mya_getPath().."/worlds/"..world_id.."/world.partisan")
+		stringToWorld(loadString(mya_getPath().."/worlds/"..world_id.."/world.partisan"))
 		print("World loaded: "..world_id)
 	else
 		print("File doesn't exist")
