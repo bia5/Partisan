@@ -61,11 +61,11 @@ mouseX = 0
 mouseY = 0
 
 -- States
-STATE_MAINMENU = "mainmenu" -- done
+STATE_MAINMENU = "mainmenu" --done
 STATE_OPTIONS = "options"
 STATE_ABOUT = "about"
-STATE_CHOOSEPLAY = "chooseplay" -- done
-STATE_LEVELEDITOR = "leveleditor"
+STATE_CHOOSEPLAY = "chooseplay" --done
+STATE_LEVELEDITOR = "leveleditor" --good enough
 STATE_HOST = "host" --done
 STATE_JOINSERVER = "joinserver" --done
 STATE_INGAME = "ingame" --good enough

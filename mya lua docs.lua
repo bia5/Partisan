@@ -40,7 +40,7 @@ sprite = Sprite.new(texture) --Generates a new sprite. Arg1 is the texture for i
 sprite:destroy() --Destroys the sprite from memory. Only run it when your done using it.
 sprite:update() --Updates the sprite. (Pretty much usless for most cases.)
 sprite:render(mya_getRenderer(), 10, 10) --Renders the sprite. Arg1 is mya's renderer. Arg2 is the sprite's width. Arg3 is the sprite's height.
-sprite:renderFlip(mya_getRenderer(), 10, 10, true) --Renders the sprite but flipped horizontally. Arg1 is mya's renderer. Arg2 is the sprite's width. Arg3 is the sprite's height. Arg4, if true, will render it flipped horizontally, if false will render normally.
+sprite:renderFlip(mya_getRenderer(), 10, 10, 0.0, true) --Renders the sprite but flipped horizontally. Arg1 is mya's renderer. Arg2 is the sprite's width. Arg3 is the sprite's height. Arg4, if true, will render it flipped horizontally, if false will render normally.
 sprite:renderDefault(mya_getRenderer()) --Renders the sprite with the given texture's width and height.
 sprite:setX(0) --Sets the sprite's x ccords.
 sprite:setY(0) --Sets the sprite's y ccords.
@@ -51,6 +51,8 @@ sprite:isPointColliding(0, 0) --Returns a bool whether the given coords collide 
 sprite:setRenderOutline(true) --Should the sprite render the overlay colors. true will render, false will not.
 sprite:setOutlineColor(255, 255, 255, 255) --Sets the overlay color to the values (rgb with a scale of 0-255 for args 1-3) and arg4 is the alpha.
 sprite:setTexture(texture) --Will update the sprite's texture to arg1. (It can be nil but it wont render anything)
+
+std::string texid, int framess, int fpss, Assets* ass
 
 --TextView hasn't been tested much and might not work properly
 textView = TextView.new(assets:getFont(), "Text", 0, 0, mya_getRenderer()) --Generates a new TextView. Arg1 is the font. Arg2 is the text that is going to be shown. Arg3 is the x coord. Arg4 is the y coord. Arg5 is mya's current renderer.

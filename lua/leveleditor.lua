@@ -96,6 +96,7 @@ local function defineButtons()
 	newButton("save", mya_getWidth()/8*7, yval, "Save", 32)
 	newButton("load", mya_getWidth()/8*7, yval, "Load", 32)
 	newButton("worldid", mya_getWidth()/8*7, yval, "Set World ID", 32)
+	newButton("objectid", mya_getWidth()/8*7, yval, "Set Object ID", 32)
 end
 
 function getInput(type)
@@ -241,6 +242,9 @@ function screen_le_mouseButtonUp(btn)
 		elseif isButtonPressed("worldid") then			-- Set World ID
 			print("Enter World ID: ")
 			world_id = getInput("string")
+		elseif isButtonPressed("objectid") then			-- Set Object ID
+			print("Enter Object ID: ")
+			world.objectIDs = getInput("number")
 		end
 
 		if mode_build then
@@ -282,9 +286,6 @@ function screen_le_update()
 	mya_deltaUpdate()
 
 	if tilePopup == false then
-		updateEnemies()
-		updateBullets()
-
 		local speed = playerSpeed*(mya_getDelta()/1000)
 			
 		if playerW then 
@@ -323,6 +324,18 @@ function screen_le_update()
 							world.undertiles[tilex.."-"..tiley] = buildTile
 						elseif layer == "tiles" then
 							world.tiles[tilex.."-"..tiley] = buildTile
+						end
+					end
+				end
+			end
+		elseif mode_destroy then
+			if not mode_dropper then
+				if not hovering then
+					if mouseDown then
+						if layer == "undertiles" then
+							world.undertiles[tilex.."-"..tiley] = nil
+						elseif layer == "tiles" then
+							world.tiles[tilex.."-"..tiley] = nil
 						end
 					end
 				end
@@ -374,18 +387,12 @@ function screen_le_render()
 		end
 	end
 
-	--Render Enemies
-	for k, v in pairs(world.enemies) do
+	--Render Entities
+	for k, v in pairs(world.entities) do
 		spr_boss:setTexture(assets:getTexture(v.id))
 		spr_boss:setX((v.x*tileSize)+offsetX)
 		spr_boss:setY((v.y*tileSize)+offsetY)
-		spr_boss:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
-	end
-
-	for k, v in pairs(world.bullets) do
-		spr_bullet:setX((v.x*tileSize)+offsetX)
-		spr_bullet:setY((v.y*tileSize)+offsetY)
-		spr_bullet:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
+		spr_boss:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
 	end
 
 	if buildTile ~= nil then

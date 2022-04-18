@@ -7,6 +7,12 @@ function getTileFunction(name)
     return tileFunctions[name]
 end
 
+function exeTileFunction(name, ...)
+    if tileFunctions[name] ~= nil then
+        tileFunctions[name](...)
+    end
+end
+
 function newTile(id, tex)
 	if tex == nil then
 		tex = id;
@@ -29,10 +35,6 @@ function newTile(id, tex)
     tile.onColEntity = "nil"
 
     tile.onUpdate = "nil"
-    tile.onDraw = "nil"
-    tile.onClick = "nil"
-    tile.oneRelease = "nil"
-    tile.onMouseOver = "nil"
 
 	return tile
 end
@@ -42,34 +44,53 @@ function tileToString(v)
     local splitter0 = "]"
     local splitter1 = "["
 
+    print(v.x.." "..v.y.." "..v.w.." "..v.h.." "..v.tex.." "..tostring(v.walkable).." "..v.data)
+
     str = str .. "i" .. splitter1 .. v.id .. splitter0          --id
-    str = str .. "x" .. splitter1 .. v.x .. splitter0           --x
-    str = str .. "y" .. splitter1 .. v.y .. splitter0           --y
-    str = str .. "w" .. splitter1 .. v.w .. splitter0           --y
-    str = str .. "h" .. splitter1 .. v.h .. splitter0           --y
+    if v.x ~= 0 then
+        str = str .. "x" .. splitter1 .. v.x .. splitter0           --x
+    end
+    if v.y ~= 0 then
+        str = str .. "y" .. splitter1 .. v.y .. splitter0           --y
+    end
+    if v.w ~= 1 then
+        str = str .. "w" .. splitter1 .. v.w .. splitter0           --w
+    end
+    if v.h ~= 1 then
+        str = str .. "h" .. splitter1 .. v.h .. splitter0           --h
+    end
     str = str .. "t" .. splitter1 .. v.tex .. splitter0         --tex
-    str = str .. "wk" .. splitter1 .. tostring(v.walkable) .. splitter0    --walkable
-    str = str .. "d" .. splitter1 .. v.data .. splitter0        --data
+    if v.walkable ~= true then
+        str = str .. "wk" .. splitter1 .. tostring(v.walkable) .. splitter0  --walkable
+    end
+    if v.data ~= "" then
+        str = str .. "dt" .. splitter1 .. type(v.data) .. splitter0        --data
+        str = str .. "d" .. splitter1 .. tostring(v.data) .. splitter0        --data
+    end
+    
+    if v.onColBullet ~= "nil" then
+        str = str .. "ocb" .. splitter1 .. v.onColBullet .. splitter0 --onColBullet
+    end
+    if v.onColBullet ~= "nil" then
+        str = str .. "ocp" .. splitter1 .. v.onColPlayer .. splitter0 --onColPlayer
+    end
+    if v.onColBullet ~= "nil" then
+        str = str .. "oce" .. splitter1 .. v.onColEntity .. splitter0 --onColEntity
+    end
 
-    str = str .. "ocb" .. splitter1 .. v.onColBullet .. splitter0 --onColBullet
-    str = str .. "ocp" .. splitter1 .. v.onColPlayer .. splitter0 --onColPlayer
-    str = str .. "oce" .. splitter1 .. v.onColEntity .. splitter0 --onColEntity
-
-    str = str .. "ou" .. splitter1 .. v.onUpdate .. splitter0   --onUpdate
-    str = str .. "od" .. splitter1 .. v.onDraw .. splitter0     --onDraw
-    str = str .. "oc" .. splitter1 .. v.onClick .. splitter0    --onClick
-    str = str .. "or" .. splitter1 .. v.oneRelease .. splitter0 --oneRelease
-    str = str .. "om" .. splitter1 .. v.onMouseOver .. splitter0--onMouseOver
+    if v.onUpdate ~= "nil" then
+        str = str .. "ou" .. splitter1 .. v.onUpdate .. splitter0 --onUpdate
+    end
 
 	return str
 end
 
 function stringToTile(str)
-    tile = {}
+    tile = newTile("null")  --create a blank to allow for forward compatibility
     local splitter0 = "]"
     local splitter1 = "["
     local inputs = mysplit(str, splitter0)
-
+    local dtype = ""
     for k, v in pairs(inputs) do
         local key = mysplit(v, splitter1)[1]
         local value = mysplit(v, splitter1)[2]
@@ -89,11 +110,11 @@ function stringToTile(str)
             tile.tex = value
         elseif key == "wk" then
             tile.walkable = toboolean(value)
+        elseif key == "dt" then
+            dtype = value
         elseif key == "d" then
-            if value == nil then
-                tile.data = ""
-            else
-                tile.data = value
+            if value ~= nil then
+                tile.data = stringToValue(value, dtype)
             end
 
         elseif key == "ocb" then
@@ -105,14 +126,6 @@ function stringToTile(str)
 
         elseif key == "ou" then
             tile.onUpdate = value
-        elseif key == "od" then
-            tile.onDraw = value
-        elseif key == "oc" then
-            tile.onClick = value
-        elseif key == "or" then
-            tile.oneRelease = value
-        elseif key == "om" then
-            tile.onMouseOver = value
         end
     end
 

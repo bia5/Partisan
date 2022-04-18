@@ -81,3 +81,21 @@ function toboolean(str)
     end
     return bool
 end
+
+function stringToValue(input, type)
+	if type == "number" then
+		return tonumber(input)
+	elseif type == "string" then
+		return input
+	elseif type == "boolean" then
+		if input == "true" then
+			return true
+		elseif input == "false" then
+			return false
+		end
+	end
+end
+
+function radToDeg(rad)
+	return rad*180/math.pi
+end

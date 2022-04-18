@@ -10,22 +10,11 @@ spr_bullet = Sprite.new(assets:getTexture("tile_brick"))
 
 spr_boss = Sprite.new(assets:getTexture("empty"))
 
+eff_swipe = Animation.new("effect_sword_", 5, 20, assets)
+
 local sprite_players = {}
 for i=1,4 do
-	sprite_players[i] = Sprite.new(assets:getTexture("empty"))
-	if i == 1 then
-	sprite_players[i]:setRenderOutline(true)
-	sprite_players[i]:setOutlineColor(255, 0, 0, 128)
-	elseif i == 2 then
-	sprite_players[i]:setRenderOutline(true)
-	sprite_players[i]:setOutlineColor(0, 255, 0, 128)
-	elseif i == 3 then
-	sprite_players[i]:setRenderOutline(true)
-	sprite_players[i]:setOutlineColor(0, 0, 255, 128)
-	elseif i == 4 then
-	sprite_players[i]:setRenderOutline(true)
-	sprite_players[i]:setOutlineColor(0, 0, 0, 128)
-	end
+	sprite_players[i] = Sprite.new(assets:getTexture("entity_ninja_0"))
 end
 
 local screen_ig_debug = TextView.new(font[32], "Debug", 0, 0, mya_getRenderer())
@@ -71,20 +60,22 @@ function player_right(isPressed)
 end
 
 shoot = false
-skip = false
+skip = 0
+mSkip = 10
 function screen_ig_tupdate()
 	if shoot then
-		skip = not skip
+		skip = skip+1
 		vx = (mouseX - (mya_getWidth()/2))
 		vy = (mouseY - (mya_getHeight()/2))
 		rad = math.atan2(vy, vx)
-		velX = math.cos(rad) * 25
-		velY = math.sin(rad) * 25
+		velX = math.cos(rad) * 10
+		velY = math.sin(rad) * 10
 		if getPlayer(getPlayerID()) ~= nil then
 			bx = getPlayer(getPlayerID()).x+.5
 			by = getPlayer(getPlayerID()).y+.5
-			if not skip then
-				spawnBullet(bx,by,velX,velY,0.2,getPlayerID(),10)
+			if skip > mSkip then
+				skip = 0
+				entity_add(spawnBullet(bx, by, velX, velY, .25, 1, 5, "entity_arrow_0", radToDeg(rad)+90))
 			end
 		end
 	end
@@ -104,18 +95,9 @@ function screen_ig_mouseButtonUp(btn)
 	shoot = false
 end
 
-function spawnBoss(e)
-	if isHosting then
-		if not e then
-			spawnEnemy("quacken_0",8,8,690,1.5,2.5,getPlayerID())
-		end
-	end
-end
-
 function screen_ig_update()
 	mya_deltaUpdate()
-	updateEnemies()
-	updateBullets()
+	updateWorld()
 
 	local ammt = 1
 	for k, v in pairs(world.players) do
@@ -126,24 +108,16 @@ function screen_ig_update()
 			y = 0
 
 			if v.w then 
-				if isLocationWalkable(v.x, v.y - speed) then
-					y=y-1
-				end
+				y=y-1
 			end
 			if v.s then 
-				if isLocationWalkable(v.x, v.y + 1 + speed) then
-					y=y+1
-				end
+				y=y+1
 			end
 			if v.a then 
-				if isLocationWalkable(v.x - speed, v.y) then
-					x=x-1
-				end
+				x=x-1
 			end
 			if v.d then 
-				if isLocationWalkable(v.x + 1 + speed, v.y) then
-					x=x+1
-				end
+				x=x+1
 			end
 
 			if x ~= 0 or y ~= 0 then
@@ -218,23 +192,20 @@ function screen_ig_render()
 		if v.isOnline then
 			sprite_players[ammt]:render(mya_getRenderer(), tileSize, tileSize)
 			ammt=ammt+1
+			eff_swipe:setX((v.x*tileSize)+offsetX-(tileSize/2))
+			eff_swipe:setY((v.y*tileSize)+offsetY-(tileSize/2))
+			eff_swipe:renderFlip(mya_getRenderer(), tileSize*2, tileSize*2, 0, false)
 		end
 	end
 
-	--Render Enemies
-	for k, v in pairs(world.enemies) do
-		spr_boss:setTexture(assets:getTexture(v.id))
+	--Render Entities
+	for k, v in pairs(world.entities) do
+		spr_boss:setTexture(assets:getTexture(v.tex))
 		spr_boss:setX((v.x*tileSize)+offsetX)
 		spr_boss:setY((v.y*tileSize)+offsetY)
-		spr_boss:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
+		spr_boss:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h,v.deg,false)
 	end
 
 	--Render Debug
 	screen_ig_debug:render(mya_getRenderer())
-
-	for k, v in pairs(world.bullets) do
-		spr_bullet:setX((v.x*tileSize)+offsetX)
-		spr_bullet:setY((v.y*tileSize)+offsetY)
-		spr_bullet:render(mya_getRenderer(), tileSize*v.size, tileSize*v.size)
-	end
 end
