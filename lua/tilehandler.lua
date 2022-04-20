@@ -44,8 +44,6 @@ function tileToString(v)
     local splitter0 = "]"
     local splitter1 = "["
 
-    print(v.x.." "..v.y.." "..v.w.." "..v.h.." "..v.tex.." "..tostring(v.walkable).." "..v.data)
-
     str = str .. "i" .. splitter1 .. v.id .. splitter0          --id
     if v.x ~= 0 then
         str = str .. "x" .. splitter1 .. v.x .. splitter0           --x

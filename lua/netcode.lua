@@ -1,3 +1,5 @@
+--TODO: REDO
+
 network = Network.new()
 local net_ping_tick = 0
 local net_ask_tick = 0
@@ -92,7 +94,7 @@ function addClient(_ip, _name, _id)
 	clients[_id].ping_ = 0
 	clients[_id].ping_r = true
 
-	newPlayer(_id, _name, 2.5, 2.5)
+	world.players[_id] = newPlayer(_id, _name, world.spawnX, world.spawnY)
 	var = getPlayer(_id)
 	var.isOnline = true
 

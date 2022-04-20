@@ -1,9 +1,12 @@
-local tileSize_ = 16
-local tileSize = mya_getHeight()/tileSize_
+--Tile Size Variable (Determines the size of everything)
+tileSize_ = 16
+tileSize = mya_getHeight()/tileSize_
 
+--Offset variables, moves based on the camera
 local offsetX = 0
 local offsetY = 0
 
+--Camera Movement
 local playerX = 0
 local playerY = 0
 local playerSpeed = 10
@@ -12,9 +15,11 @@ local playerA = false
 local playerS = false
 local playerD = false
 
+--New Tile Screen
 local tilePopup = false
 tileButtons = {}
 
+--New Tile Buttons
 function newTileButton(id, x, y, w, h)
 	btn = {}
 
@@ -27,6 +32,7 @@ function newTileButton(id, x, y, w, h)
 	return btn
 end
 
+--Get tile button based on screen x,y
 function getTileButton(x,y)
 	for k, v in pairs(tileButtons) do
 		if x >= v.x and x <= v.x+v.w and y >= v.y and y <= v.y+v.h then
@@ -35,16 +41,20 @@ function getTileButton(x,y)
 	end
 end
 
+--Various Sprites
 sprite_tile = Sprite.new(assets:getTexture("empty"))
-spr_boss = Sprite.new(assets:getTexture("empty"))
+sprite_entity = Sprite.new(assets:getTexture("empty"))
 
+--New Tile Sprites
 sprite_tilePopup = Sprite.new(assets:getTexture("empty"))
 sprite_tilePopup:setRenderOutline(true)
 sprite_tilePopup:setOutlineColor(0, 0, 0, 128)
 
+--Build Tiles Info
 buildTile = newTile("tile_grass_0")
 layer = "undertiles"
 
+--Easy Zoom functions for keybinds
 function zoomOut()
 	tileSize_ = tileSize_ + 5
 	tileSize = mya_getHeight()/tileSize_
@@ -54,9 +64,8 @@ function zoomIn()
 	tileSize = mya_getHeight()/tileSize_
 end
 
---buttons
+--Button Handlers
 local buttons = {}
-
 local yval = mya_getHeight()/20
 local function newButton(id, x, y, text, size)
 	button = {}
@@ -77,6 +86,7 @@ local function isButtonPressed(id)
 	return false
 end
 
+--Define all debug buttons
 local function defineButtons()
 	yval = mya_getHeight()/20
 	newButton("newworld", 0, yval, "New World", 32)
@@ -99,23 +109,7 @@ local function defineButtons()
 	newButton("objectid", mya_getWidth()/8*7, yval, "Set Object ID", 32)
 end
 
-function getInput(type)
-	print("Value Type: "..type)
-	input = io.read()
-	if type == "number" then
-		return tonumber(input)
-	elseif type == "string" then
-		return input
-	elseif type == "boolean" then
-		if input == "true" then
-			return true
-		elseif input == "false" then
-			return false
-		end
-	end
-	return nil
-end
-
+--Debug Text
 local screen_le_debug = TextView.new(font[32], "Debug", 0, 0, mya_getRenderer())
 
 function screen_le_windowResize(w, h)
@@ -123,11 +117,13 @@ function screen_le_windowResize(w, h)
 
 	screen_le_debug:setFont(font[32], mya_getRenderer())
 	
+	--Resize all buttons
 	buttons = {}
 	defineButtons()
 end
 screen_le_windowResize(mya_getWidth(), mya_getHeight())
 
+--Player movement keybind functions
 function player_up_le(isPressed)
 	if state == STATE_LEVELEDITOR and tilePopup == false then
 		playerW = isPressed
@@ -149,8 +145,8 @@ function player_right_le(isPressed)
 	end
 end
 
+--Update every engine tick
 function screen_le_tupdate()
-	
 end
 
 tilex = 0
@@ -354,7 +350,7 @@ function screen_le_render()
 	x = math.floor(playerX+.5)
 	y = math.floor(playerY+.5)
 	
-	--Render Undertiles
+	--Render Tiles
 	for ii = y-renderDistV, y+renderDistV do
 		for i = x-renderDistH, x+renderDistH do
 			tile = world.undertiles[i.."-"..ii]
@@ -389,10 +385,10 @@ function screen_le_render()
 
 	--Render Entities
 	for k, v in pairs(world.entities) do
-		spr_boss:setTexture(assets:getTexture(v.id))
-		spr_boss:setX((v.x*tileSize)+offsetX)
-		spr_boss:setY((v.y*tileSize)+offsetY)
-		spr_boss:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
+		sprite_entity:setTexture(assets:getTexture(v.id))
+		sprite_entity:setX((v.x*tileSize)+offsetX)
+		sprite_entity:setY((v.y*tileSize)+offsetY)
+		sprite_entity:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
 	end
 
 	if buildTile ~= nil then

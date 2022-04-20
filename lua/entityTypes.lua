@@ -1,5 +1,5 @@
 function spawnBullet(x,y,velX,velY,size,hp,dmg,tex,deg)
-    local bullet = newEntity("bullet",0)
+    local bullet = newEntity("bullet")
     bullet.x = x
     bullet.y = y
     bullet.w = size
@@ -11,8 +11,8 @@ function spawnBullet(x,y,velX,velY,size,hp,dmg,tex,deg)
     bullet.hp = hp
     bullet.data = 0
     bullet.tex = tex
-    bullet.maxhp = dmg
-    bullet.deg = deg
+    bullet.maxhp = dmg --Entity's maxhp = bullet damage
+    bullet.deg = deg --Degrees
 
     return bullet
 end

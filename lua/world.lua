@@ -1,6 +1,11 @@
+--TODO: Entity cleaner
+
+--World version to help with debugging
 world_standard = "0.0.1"
-function newWorld() --creates an empty box world based on world size input
-	world = {} --In display order :D
+
+--creates an empty box world based on world size input
+function newWorld()
+	world = {}
 	world.isLinked = false
 	world.version = world_standard
 
@@ -19,6 +24,7 @@ function newWorld() --creates an empty box world based on world size input
 end
 newWorld()
 
+--Converts world to a string
 function worldToString()
 	--variables
 	local splitter0 = "|"
@@ -75,6 +81,7 @@ function worldToString()
 	return str
 end
 
+--Converts a string to world
 function stringToWorld(str)
 	newWorld()
 	local splitter0 = "|"
@@ -114,11 +121,14 @@ function stringToWorld(str)
 				end
 			end
 		elseif inputs2[1] == "e" then
+
 		elseif inputs2[1] == "p" then
+
 		end
 	end
 end
 
+--Help to easily add an object to the world
 function addObject(x,y,w,h,tile)
 	local newTile = newTile(tile.id)
 	newTile.x = math.floor(x*100)/100
@@ -129,6 +139,7 @@ function addObject(x,y,w,h,tile)
 	world.objectIDs = world.objectIDs+1
 end
 
+--Gets all the objects in a world x,y
 function getObjectsColliding(x,y)
 	objects_ = {}
 	for k,v in pairs(world.objects) do
@@ -139,6 +150,7 @@ function getObjectsColliding(x,y)
 	return objects_
 end
 
+--Saves the world to a file
 function saveWorld()
 	if not fileHandler:dirExists("worlds") then
 		fileHandler:createDir(mya_getPath().."worlds")
@@ -153,6 +165,7 @@ function saveWorld()
 	print("Saved world: "..world_id)
 end
 
+--Loads the world from a file
 function loadWorld()
 	if fileHandler:fileExists(mya_getPath().."/worlds/"..world_id.."/world.partisan") then
 		stringToWorld(loadString(mya_getPath().."/worlds/"..world_id.."/world.partisan"))
@@ -162,6 +175,7 @@ function loadWorld()
 	end
 end
 
+--Gets if x,y is colliding with any tile or object and returns the tile
 function isTileCollision(x,y)
 	--under
 	local tile = world.undertiles[math.floor(x).."-"..math.floor(y)]
@@ -191,12 +205,14 @@ function isTileCollision(x,y)
 	return false
 end
 
+--Easily adds an entity to the world
 function entity_add(entity)
 	entity.spawnID = world.entityIDs
 	world.entities[world.entityIDs] = entity
 	world.entityIDs = world.entityIDs+1
 end
 
+--World updater
 function updateWorld()
 	for k,v in pairs(world.entities) do
 		exeEntityFunction(v.onUpdate,v)

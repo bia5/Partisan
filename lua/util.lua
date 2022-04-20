@@ -73,7 +73,7 @@ function tprint (tbl, indent)
 	end
 end
  
-
+--myself
 function toboolean(str)
     local bool = false
     if str == "true" then
@@ -82,6 +82,7 @@ function toboolean(str)
     return bool
 end
 
+--myself
 function stringToValue(input, type)
 	if type == "number" then
 		return tonumber(input)
@@ -94,8 +95,16 @@ function stringToValue(input, type)
 			return false
 		end
 	end
+	return nil
 end
 
+--myself
+function getInput(type)
+	print("Value Type: "..type)
+	return stringToValue(io.read(), type)
+end
+
+--myself
 function radToDeg(rad)
 	return rad*180/math.pi
 end

@@ -1,22 +1,17 @@
+--Tile Size Variable (Determines the size of everything)
 tileSize_ = 16
 tileSize = mya_getHeight()/tileSize_
 
+--Offset variables, moves based on the camera
 local offsetX = 0
 local offsetY = 0
 
+--Various Sprites
+sprite_player = Sprite.new(assets:getTexture("empty"))
 sprite_tile = Sprite.new(assets:getTexture("empty"))
+sprite_entity = Sprite.new(assets:getTexture("empty"))
 
-spr_bullet = Sprite.new(assets:getTexture("tile_brick"))
-
-spr_boss = Sprite.new(assets:getTexture("empty"))
-
-eff_swipe = Animation.new("effect_sword_", 5, 20, assets)
-
-local sprite_players = {}
-for i=1,4 do
-	sprite_players[i] = Sprite.new(assets:getTexture("entity_ninja_0"))
-end
-
+--Debug stats
 local screen_ig_debug = TextView.new(font[32], "Debug", 0, 0, mya_getRenderer())
 
 function screen_ig_windowResize(w, h)
@@ -26,6 +21,8 @@ function screen_ig_windowResize(w, h)
 end
 screen_ig_windowResize(mya_getWidth(), mya_getHeight())
 
+--Player movement functions
+--I want this to become player based
 function player_up(isPressed)
 	if state == STATE_INGAME then
 		message("w",{getPlayerID(),isPressed})
@@ -59,27 +56,13 @@ function player_right(isPressed)
 	end
 end
 
+--Player Attack Functions
+--I want this to become player based
 shoot = false
 skip = 0
 mSkip = 10
 function screen_ig_tupdate()
-	if shoot then
-		skip = skip+1
-		vx = (mouseX - (mya_getWidth()/2))
-		vy = (mouseY - (mya_getHeight()/2))
-		rad = math.atan2(vy, vx)
-		velX = math.cos(rad) * 10
-		velY = math.sin(rad) * 10
-		if getPlayer(getPlayerID()) ~= nil then
-			bx = getPlayer(getPlayerID()).x+.5
-			by = getPlayer(getPlayerID()).y+.5
-			if skip > mSkip then
-				skip = 0
-				entity_add(spawnBullet(bx, by, velX, velY, .25, 1, 5, "entity_arrow_0", radToDeg(rad)+90))
-			end
-		end
-	end
-
+	--Update the player's netcode
 	if not isHosting then
 		if getPlayer(getPlayerID()) ~= nil then
 			message("player",{getPlayerID(), getPlayer(getPlayerID()).x, getPlayer(getPlayerID()).y})
@@ -88,18 +71,17 @@ function screen_ig_tupdate()
 end
 
 function screen_ig_mouseButtonDown(btn)
-	shoot = true
 end
 
 function screen_ig_mouseButtonUp(btn)
-	shoot = false
 end
 
 function screen_ig_update()
 	mya_deltaUpdate()
 	updateWorld()
 
-	local ammt = 1
+	--Update Player
+	--Once again, move to player based
 	for k, v in pairs(world.players) do
 		if v.isOnline then
 			local speed = v.speed*(mya_getDelta()/1000)
@@ -122,16 +104,14 @@ function screen_ig_update()
 
 			if x ~= 0 or y ~= 0 then
 				rad = math.atan2(y, x)
+				v.deg = radToDeg(rad)-90
 				v.x = v.x + (math.cos(rad) * speed)
 				v.y = v.y + (math.sin(rad) * speed)
 			end
-
-			sprite_players[ammt]:setX((v.x*tileSize)+offsetX)
-			sprite_players[ammt]:setY((v.y*tileSize)+offsetY)
-			ammt=ammt+1
 		end
 	end
 
+	--Update offset based on main player
 	if getPlayer(getPlayerID()) ~= nil then
 		offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)-tileSize/2
 		offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)-tileSize/2
@@ -140,6 +120,7 @@ function screen_ig_update()
 end
 
 function screen_ig_render()
+	--Get render distance for tiles
 	renderDistH = tileSize_
 	renderDistV = tileSize_/2
 	
@@ -147,7 +128,7 @@ function screen_ig_render()
 		x = math.floor(getPlayer(getPlayerID()).x+.5)
 		y = math.floor(getPlayer(getPlayerID()).y+.5)
 
-		--Render Undertiles
+		--Render Tiles
 		for ii = y-renderDistV, y+renderDistV do
 			for i = x-renderDistH, x+renderDistH do
 				tile = world.undertiles[i.."-"..ii]
@@ -157,12 +138,7 @@ function screen_ig_render()
 					sprite_tile:setY((ii*tileSize)+offsetY)
 					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
 				end
-			end
-		end
 
-		--Render Tiles
-		for ii = y-renderDistV, y+renderDistV do
-			for i = x-renderDistH, x+renderDistH do
 				tile = world.tiles[i.."-"..ii]
 				if tile ~= nil then
 					sprite_tile:setTexture(assets:getTexture(tile.tex))
@@ -172,40 +148,40 @@ function screen_ig_render()
 				end
 			end
 		end
-	end
 
-	--Render Objects
-	for k, v in pairs(world.objects) do
-		if type(v) == "table" then
-			if v.x >= x-renderDistH-1 and v.x <= x+renderDistH+1 and v.y >= y-renderDistV-1 and v.y <= y+renderDistV+1 then
-				sprite_tile:setTexture(assets:getTexture(v.tex))
-				sprite_tile:setX((v.x*tileSize)+offsetX)
-				sprite_tile:setY((v.y*tileSize)+offsetY)
-				sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize)
+		--Render Objects
+		for k, v in pairs(world.objects) do
+			if type(v) == "table" then
+				if v.x >= x-renderDistH-1 and v.x <= x+renderDistH+1 and v.y >= y-renderDistV-1 and v.y <= y+renderDistV+1 then
+					sprite_tile:setTexture(assets:getTexture(v.tex))
+					sprite_tile:setX((v.x*tileSize)+offsetX)
+					sprite_tile:setY((v.y*tileSize)+offsetY)
+					sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize)
+				end
 			end
 		end
 	end
 
 	--Render Players
-	local ammt = 1
 	for k, v in pairs(world.players) do
 		if v.isOnline then
-			sprite_players[ammt]:render(mya_getRenderer(), tileSize, tileSize)
-			ammt=ammt+1
-			eff_swipe:setX((v.x*tileSize)+offsetX-(tileSize/2))
-			eff_swipe:setY((v.y*tileSize)+offsetY-(tileSize/2))
-			eff_swipe:renderFlip(mya_getRenderer(), tileSize*2, tileSize*2, 0, false)
+			sprite_player:setTexture(assets:getTexture(v.tex))
+			sprite_player:setX((v.x*tileSize)+offsetX)
+			sprite_player:setY((v.y*tileSize)+offsetY)
+			sprite_player:renderFlip(mya_getRenderer(), tileSize, tileSize, v.deg, false)
 		end
 	end
 
 	--Render Entities
 	for k, v in pairs(world.entities) do
-		spr_boss:setTexture(assets:getTexture(v.tex))
-		spr_boss:setX((v.x*tileSize)+offsetX)
-		spr_boss:setY((v.y*tileSize)+offsetY)
-		spr_boss:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h,v.deg,false)
+		sprite_entity:setTexture(assets:getTexture(v.tex))
+		sprite_entity:setX((v.x*tileSize)+offsetX)
+		sprite_entity:setY((v.y*tileSize)+offsetY)
+		sprite_entity:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h,v.deg,false)
 	end
 
 	--Render Debug
-	screen_ig_debug:render(mya_getRenderer())
+	if devmode then
+		screen_ig_debug:render(mya_getRenderer())
+	end
 end

@@ -1,3 +1,5 @@
+--TODO: SAVING/LOADING
+
 entityFucntions = {}
 function newEntityFunction(name, func)
     entityFucntions[name] = func

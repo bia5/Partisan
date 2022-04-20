@@ -52,9 +52,6 @@ sprite:setRenderOutline(true) --Should the sprite render the overlay colors. tru
 sprite:setOutlineColor(255, 255, 255, 255) --Sets the overlay color to the values (rgb with a scale of 0-255 for args 1-3) and arg4 is the alpha.
 sprite:setTexture(texture) --Will update the sprite's texture to arg1. (It can be nil but it wont render anything)
 
-std::string texid, int framess, int fpss, Assets* ass
-
---TextView hasn't been tested much and might not work properly
 textView = TextView.new(assets:getFont(), "Text", 0, 0, mya_getRenderer()) --Generates a new TextView. Arg1 is the font. Arg2 is the text that is going to be shown. Arg3 is the x coord. Arg4 is the y coord. Arg5 is mya's current renderer.
 textView:render(mya_getRenderer()) --Renders the textView with the suggested width and height. Arg1 is mya's current renderer.
 textView:renderWH(mya_getRenderer(), 10, 10) --Renders the textView with the given width and height. Arg1 is mya's current renderer. Arg2 is the width. Arg3 is the height.

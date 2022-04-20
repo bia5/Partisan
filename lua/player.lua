@@ -1,24 +1,42 @@
+--TODO: SAVING/LOADING
+--TODO: Functions
+
 function newPlayer(id, name, x, y)
-	if world.players[id] == nil then
-		world.players[id] = {}
+	player = {}
 
-		world.players[id].name = name
+	--Info
+	player.id = id
+	player.name = name
+	player.tex = "entity_ninja_0"
 
-		world.players[id].x = x
-		world.players[id].y = y
+	--Position
+	player.x = x
+	player.y = y
+	player.deg = 0 --Degrees
 
-		world.players[id].speed = 5
+	--Movement
+	player.velX = 0
+	player.velY = 0
 
-		world.players[id].w = false
-		world.players[id].s = false
-		world.players[id].a = false
-		world.players[id].d = false
+	player.speed = 5
 
-		world.players[id].online = false
+	player.w = false
+	player.a = false
+	player.s = false
+	player.d = false
 
-		world.players[id].hp = 100
-		world.players[id].maxhp = 100
-	end
+	--Stats
+	player.health = 100
+	player.maxHealth = 100
+
+	--Netcode
+	player.isOnline = false
+
+	--Functions
+	player.onUpdate = "nil"
+	player.onCollision = "nil"
+
+	return player
 end
 
 function getPlayer(id)
