@@ -94,6 +94,7 @@ local function defineButtons()
 	newButton("newtile", 0, yval, "New Tile", 32)
 	newButton("edittile", 0, yval, "Edit Tile", 32)
 	newButton("gettile", 0, yval, "Get Tile", 32)
+	newButton("togglewalkable", 0, yval, "Toggle Walkable", 32)
 
 	yval = tileSize
 	newButton("buildmode", mya_getWidth()/8*7, yval, "Build Mode", 32)
@@ -149,22 +150,29 @@ end
 function screen_le_tupdate()
 end
 
+--x,y coords of mouse in world
 tilex = 0
 tiley = 0
 
+--Mouse click handler
 mouseDown = false
+--Button click handler
 hovering = false
 
+--Various mode variables
 mode_dropper = false
 mode_build = false
 mode_destroy = false
 function screen_le_mouseButtonUp(btn)
 	mouseDown = false
+	--Update mouse coords
 	tilex = math.floor((mouseX-offsetX)/tileSize)
 	tiley = math.floor((mouseY-offsetY)/tileSize)
 	
+	--If new tile context isn't open
 	if tilePopup == false then
 		hovering = false
+		--Button click handler
 		for k, v in pairs(buttons) do
 			if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
 				v.isPressed = true
@@ -174,6 +182,7 @@ function screen_le_mouseButtonUp(btn)
 			end
 		end
 
+		--Tile Dropper
 		if not hovering then
 			if mode_dropper then
 				if layer == "undertiles" then
@@ -205,6 +214,9 @@ function screen_le_mouseButtonUp(btn)
 			mode_dropper = true
 		elseif isButtonPressed("gettile") then			-- Prints Tile Info
 			tprint(buildTile, 2)
+		elseif isButtonPressed("togglewalkable") then	-- Toggles Walkable
+			buildTile.walkable = not buildTile.walkable
+			print("Walkable: "..tostring(buildTile.walkable))
 		
 		-- 		Right Buttons		--
 		elseif isButtonPressed("buildmode") then		-- Toggle Build Mode
@@ -242,7 +254,9 @@ function screen_le_mouseButtonUp(btn)
 			print("Enter Object ID: ")
 			world.objectIDs = getInput("number")
 		end
+		-- 		End Button Handlers		--
 
+		--Place Object
 		if mode_build then
 			if not mode_dropper then
 				if not hovering then
@@ -253,6 +267,7 @@ function screen_le_mouseButtonUp(btn)
 					end
 				end
 			end
+		--Destroy Object
 		elseif mode_destroy then
 			if not hovering then
 				if layer == "object" then
@@ -265,7 +280,7 @@ function screen_le_mouseButtonUp(btn)
 				end
 			end
 		end
-	else
+	else --If new tile context is open
 		eid = getTileButton(mouseX, mouseY)
 		if eid ~= nil then
 			buildTile = newTile(eid)
@@ -281,7 +296,9 @@ end
 function screen_le_update()
 	mya_deltaUpdate()
 
+	--If new tile context isn't open
 	if tilePopup == false then
+		--Handle camera movement
 		local speed = playerSpeed*(mya_getDelta()/1000)
 			
 		if playerW then 
@@ -297,21 +314,23 @@ function screen_le_update()
 			playerX = playerX + speed
 		end
 		
+		--Update Camera Offset
 		offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
 		offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
+
+		--Update x,y coords in world
 		tilex = math.floor((mouseX-offsetX)/tileSize)
 		tiley = math.floor((mouseY-offsetY)/tileSize)
 
-
+		--Update button hovering
 		hovering = false
 		for k, v in pairs(buttons) do
 			if mouseX < v.x + v.w and mouseX > v.x and mouseY < v.y + v.h and mouseY > v.y then
-				v.isPressed = true
 				hovering = true
-			else
-				v.isPressed = false
 			end
 		end
+
+		--Build mode place tiles
 		if mode_build then
 			if not mode_dropper then
 				if not hovering then
@@ -324,6 +343,7 @@ function screen_le_update()
 					end
 				end
 			end
+		--Destroy mode destroy tiles
 		elseif mode_destroy then
 			if not mode_dropper then
 				if not hovering then
@@ -338,13 +358,16 @@ function screen_le_update()
 			end
 		end
 	else
+		--Update new tile context pos
 		sprite_tilePopup:setX(mya_getWidth()/20)
 		sprite_tilePopup:setY(mya_getHeight()/20)
 	end
+	--Update debug text
 	screen_le_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(playerX*100)/100)..", Y: "..tostring(math.floor(playerY*100)/100)..", Delta: "..(mya_getDelta()/1000)..", tileX: "..tilex..", tileY: "..tiley..", Zoom: "..tileSize_, mya_getRenderer())
 end
 
 function screen_le_render()
+	--Get render distance for tiles
 	renderDistH = tileSize_
 	renderDistV = tileSize_/2
 	x = math.floor(playerX+.5)
@@ -391,6 +414,7 @@ function screen_le_render()
 		sprite_entity:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
 	end
 
+	--Display build tile @ top right
 	if buildTile ~= nil then
 		sprite_tile:setTexture(assets:getTexture(buildTile.tex))
 		sprite_tile:setX(mya_getWidth()-tileSize)
@@ -405,6 +429,7 @@ function screen_le_render()
 		v.tv:render(mya_getRenderer())
 	end
 
+	--Display new tile context
 	if tilePopup then
 		ex = mya_getWidth()/20+(tileSize/4)
 		ey = mya_getHeight()/20+(tileSize/4)

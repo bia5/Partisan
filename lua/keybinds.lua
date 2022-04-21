@@ -1,7 +1,7 @@
 keys = {}
 
 function registerBinds()
-	registerBind("esc", "Leave", client_leave)
+	registerBind("esc", "Leave", mya_exit)
 	registerBind("=", "Zoom Out", zoomOut)
 	registerBind("-", "Zoom In", zoomIn)
 end

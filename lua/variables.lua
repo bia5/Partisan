@@ -74,7 +74,7 @@ state = STATE_MAINMENU
 -- Netcode
 net_ip = "localhost"
 net_port = 9999
-net_max = 4
+net_max = 2
 net_split1 = "|"
 
 -- Game Variables
@@ -83,5 +83,5 @@ playerid = 0
 if settings.world_ids == nil then
 	settings.world_ids = 0
 end
-world_id = "default_world_id"
+world_id = "world_partisan_1"
 local_player_id = 0
