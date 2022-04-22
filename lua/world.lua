@@ -35,6 +35,8 @@ function worldToString()
 	
 	--world details
 	str = str.."v="..world.version..splitter0
+	str = str.."sx="..world.spawnX..splitter0
+	str = str.."sy="..world.spawnY..splitter0
 	str = str.."oid="..world.objectIDs..splitter0
 	
 	--undertiles
@@ -94,6 +96,10 @@ function stringToWorld(str)
 		local inputs2 = mysplit(v, splitter1)
 		if inputs2[1] == "v" then
 			world.version = inputs2[2]
+		elseif inputs2[1] == "sx" then
+			world.spawnX = tonumber(inputs2[2])
+		elseif inputs2[1] == "sy" then
+			world.spawnY = tonumber(inputs2[2])
 		elseif inputs2[1] == "oid" then
 			world.objectIDs = tonumber(inputs2[2])
 		elseif inputs2[1] == "ut" then
@@ -177,9 +183,11 @@ end
 
 --Gets if x,y is colliding with any tile or object and returns the tile
 function isTileCollision(x,y)
+	noTile = true
 	--under
 	local tile = world.undertiles[math.floor(x).."-"..math.floor(y)]
 	if tile ~= nil then
+		noTile = false
 		if not tile.walkable then
 			return tile
 		end
@@ -188,6 +196,7 @@ function isTileCollision(x,y)
 	--tiles
 	tile = world.tiles[math.floor(x).."-"..math.floor(y)]
 	if tile ~= nil then
+		noTile = false
 		if not tile.walkable then
 			return tile
 		end
@@ -196,12 +205,36 @@ function isTileCollision(x,y)
 	--objects
 	for k,v in pairs(world.objects) do
 		if x >= v.x and x <= v.x+v.w and y >= v.y and y <= v.y+v.h then
+			noTile = false
 			if not v.walkable then
 				return v
 			end
 		end
 	end
 
+	if noTile then
+		return true
+	end
+
+	return false
+end
+
+--Entity collision detection with tile
+function isEntityCollision(entity,offX,offY)
+	local x = entity.x+offX
+	local y = entity.y+offY
+	local w = entity.w
+	local h = entity.h
+
+	if isTileCollision(x,y) then
+		return true
+	elseif isTileCollision(x+w,y+h) then
+		return true
+	elseif isTileCollision(x+w,y) then
+		return true
+	elseif isTileCollision(x,y+h) then
+		return true
+	end
 	return false
 end
 

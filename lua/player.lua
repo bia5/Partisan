@@ -12,6 +12,8 @@ function newPlayer(id, name, x, y)
 	--Position
 	player.x = x
 	player.y = y
+	player.w = .99
+	player.h = .99
 	player.deg = 0 --Degrees
 
 	--Movement
@@ -20,10 +22,10 @@ function newPlayer(id, name, x, y)
 
 	player.speed = 5
 
-	player.w = false
-	player.a = false
-	player.s = false
-	player.d = false
+	player.key_w = false
+	player.key_a = false
+	player.key_s = false
+	player.key_d = false
 
 	--Stats
 	player.health = 100

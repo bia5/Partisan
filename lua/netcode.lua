@@ -14,21 +14,16 @@ packet_inc = {}
 packet_out_s = {}
 packet_inc_s = {}
 
+--Disconnect without network message
 function removeMyself()
 	network:close()
 	state = STATE_JOINSERVER
 
 	--Reset world to empty
-	world = {} --In display order :D
-	world.isLinked = false
-
-	world.undertiles = {}
-	world.tiles = {}
-	world.objects = {}
-
-	world.players = {}
+	newWorld()
 end
 
+--Disconnect
 function client_leave()
 	message("remove", {getPlayerID()})
 	network_update()
@@ -36,16 +31,10 @@ function client_leave()
 	state = STATE_JOINSERVER
 
 	--Reset world to empty
-	world = {} --In display order :D
-	world.isLinked = false
-
-	world.undertiles = {}
-	world.tiles = {}
-	world.objects = {}
-
-	world.players = {}
+	newWorld()
 end
 
+--message to server
 function message(_id, _args)
 	if not packet_out["messages"] then
 		packet_out["messages"] = {}
@@ -56,6 +45,7 @@ function message(_id, _args)
 	table.insert(packet_out["messages"], pack)
 end
 
+--Message to client from server
 function server_message(_id, _args)
 	if not packet_out_s["messages"] then
 		packet_out_s["messages"] = {}
@@ -66,6 +56,7 @@ function server_message(_id, _args)
 	table.insert(packet_out_s["messages"], pack)
 end
 
+--Network startup
 function network_start()
 	network:setServerName(net_ip)
 	network:setPort(net_port)
@@ -79,6 +70,7 @@ function network_start()
 	end
 end
 
+--Add client
 function addClient(_ip, _name, _id)
 	net_connected = net_connected + 1
 	if _ip == "host" then
@@ -94,7 +86,9 @@ function addClient(_ip, _name, _id)
 	clients[_id].ping_ = 0
 	clients[_id].ping_r = true
 
-	world.players[_id] = newPlayer(_id, _name, world.spawnX, world.spawnY)
+	if world.players[_id] == nil then
+		world.players[_id] = newPlayer(_id, _name, world.spawnX, world.spawnY)
+	end
 	var = getPlayer(_id)
 	var.isOnline = true
 
@@ -106,6 +100,7 @@ function addClient(_ip, _name, _id)
 	packet_out_s["clients_simplified"] = clients_simplified
 end
 
+--Make client offline if disconnected
 function removeClient(_id)
 	net_connected = net_connected - 1
 	print("Client Leaving: "..clients[_id].name)
@@ -127,6 +122,7 @@ function removeClient(_id)
 	end
 end
 
+--Find client
 function findClient(_ip)
 	for k,v in pairs(clients) do
 		if v.ip == _ip then
@@ -135,27 +131,10 @@ function findClient(_ip)
 	end
 end
 
-function sendWorld()
-	server_message("world",{json.encode(world)})
-end
-function sendPlayers()
-	server_message("players",{json.encode(world.players)})
-end
-function sendUndertiles()
-	server_message("undertiles",{json.encode(world.undertiles)})
-end
-function sendTiles()
-	server_message("tiles",{json.encode(world.tiles)})
-end
-function sendObjects()
-	server_message("objects",{json.encode(world.objects)})
-end
-
+--Server packet handler
 function server_handlePacket()
 	if packet_inc_s["messages"] then
 		for k, v in pairs(packet_inc_s["messages"]) do
-			--print("server: "..json.encode(v))
-
 			if v.id == "join" then
 				if net_connected ~= net_max then
 					addClient(ip, v.args[1], v.args[2])
@@ -177,47 +156,18 @@ function server_handlePacket()
 					clients_simplified[2][v.args[1]].ping = clients[v.args[1]].ping
 					packet_out_s["clients_simplified"] = clients_simplified
 				end
-			elseif v.id == "bullet" then
-				server_message("bullet",v.args)
-			elseif v.id == "w" then
-				getPlayer(v.args[1]).w = v.args[2]
-				server_message(v.id,v.args)
-			elseif v.id == "s" then
-				getPlayer(v.args[1]).s = v.args[2]
-				server_message(v.id,v.args)
-			elseif v.id == "a" then
-				getPlayer(v.args[1]).a = v.args[2]
-				server_message(v.id,v.args)
-			elseif v.id == "d" then
-				getPlayer(v.args[1]).d = v.args[2]
-				server_message(v.id,v.args)
-			elseif v.id == "enemy_dmg" then
-				server_message(v.id,v.args)
 			elseif v.id == "player" then
 				getPlayer(v.args[1]).x = v.args[2]
 				getPlayer(v.args[1]).y = v.args[3]
-			elseif v.id == "gib_players" then
-				sendPlayers()
-				print("sending players...")
-			elseif v.id == "gib_undertiles" then
-				sendUndertiles()
-				print("sending undertiles...")
-			elseif v.id == "gib_tiles" then
-				sendTiles()
-				print("sending tiles...")
-			elseif v.id == "gib_objects" then
-				sendObjects()
-				print("sending objects...")
 			end
 		end
 	end
 end
 
+--Client packet handler
 function handlePacket()
 	if packet_inc["messages"] then
 		for k,v in pairs(packet_inc["messages"]) do
-			--print(json.encode(v))
-
 			if v.id == "remove" then
 				if v.args[1] == getPlayerID() then
 					removeMyself()
@@ -227,59 +177,12 @@ function handlePacket()
 				clients_simplified = {}
 				state = STATE_JOINSERVER
 			elseif v.id == "ingame" then
+				loadWorld()
+				addClient("host", settings.player_name, getPlayerID())
 				state = STATE_INGAME
-			elseif v.id == "world" then
-				world = json.decode(v.args[1])
-			elseif v.id == "players" then
-				world.players = json.decode(v.args[1])
-			elseif v.id == "undertiles" then
-				world.undertiles = json.decode(v.args[1])
-			elseif v.id == "tiles" then
-				world.tiles = json.decode(v.args[1])
-			elseif v.id == "objects" then
-				world.objects = json.decode(v.args[1])
-			elseif v.id == "bullet" then
-				spawnBullet(v.args)
-			elseif v.id == "enemy" then
-				if not isHosting then
-					spawnEnemy(v.args)
-				end
-			elseif v.id == "enemy_loc" then
-				if not isHosting then
-					if world.enemies[v.args.id] then
-						world.enemies[v.args.id].sx = v.args.sx
-						world.enemies[v.args.id].sy = v.args.sy
-					else
-						
-					end
-				end
-			elseif v.id == "enemy_dmg" then
-				if world.enemies[v.args.id] ~= nil then
-					world.enemies[v.args.id].hp = world.enemies[v.args.id].hp - v.args.hp
-					print("Enemy "..v.args.id..": "..world.enemies[v.args.id].hp.."/"..world.enemies[v.args.id].maxhp)
-					if world.enemies[v.args.id].hp < 1 then
-						world.enemies[v.args.id] = nil
-					end
-				end
 			elseif v.args[1] ~= getPlayerID() then
 				if getPlayer(v.args[1]) ~= nil then
-					if v.id == "w" then
-						if v.args[1] ~= getPlayerID() then
-							getPlayer(v.args[1]).w = v.args[2]
-						end
-					elseif v.id == "s" then
-						if v.args[1] ~= getPlayerID() then
-							getPlayer(v.args[1]).s = v.args[2]
-						end
-					elseif v.id == "a" then
-						if v.args[1] ~= getPlayerID() then
-							getPlayer(v.args[1]).a = v.args[2]
-						end
-					elseif v.id == "d" then
-						if v.args[1] ~= getPlayerID() then
-							getPlayer(v.args[1]).d = v.args[2]
-						end
-					elseif v.id == "player" then
+					if v.id == "player" then
 						if getPlayer(v.args[1]) ~= nil then
 							getPlayer(v.args[1]).x = v.args[2]
 							getPlayer(v.args[1]).y = v.args[3]
@@ -291,6 +194,7 @@ function handlePacket()
 	end
 end
 
+--Actual network packet handler
 function event_networkMessage(clientMessage)
 	msg = network:getDataFromClientMessage(clientMessage)
 	ip = network:getIPFromClientMessage(clientMessage)
@@ -324,6 +228,7 @@ function event_networkMessage(clientMessage)
 	end
 end
 
+--On network update
 function network_update()
 	if isHosting then
 		if tablelength(packet_out_s) > 0 then
@@ -332,10 +237,8 @@ function network_update()
 					packet_inc = packet_out_s
 					handlePacket()
 				else
-					--print(string.len("packet"..net_split1..json.encode(packet_out_s)).." - ".."packet"..net_split1..json.encode(packet_out_s))
 					network:sendMessage("packet"..net_split1..json.encode(packet_out_s), v.ip)
 				end
-				--print(json.encode(packet_out_s))
 			end
 			packet_out_s = {}
 		end
@@ -347,10 +250,8 @@ function network_update()
 
 			--update player location
 			if state == STATE_INGAME then
-				server_message("ingame", {})
 				for k, v in pairs(world.players) do
 					server_message("player",{k,v.x,v.y})
-					--print(v.name..": "..v.x..", "..v.y)
 				end
 			end
 
@@ -359,8 +260,6 @@ function network_update()
 					if v.ip ~= "host" then
 						v.ping_r = false
 						v.ping_ = 0
-						--server_message("ping", {k})
-						--network:sendMessage("_ping"..net_split1..k, v.ip)
 					end
 				end
 			end
@@ -372,37 +271,6 @@ function network_update()
 		-- END OF TEST PING
 	end
 
-	if isHosting == false then
-		if world.isLinked == false then
-			net_ask_tick = net_ask_tick + 1
-			if net_ask_tick == mya_getUPS() then
-				net_ask_tick = 0
-				if tablelength(world.players) < 2 then
-					print("gib players")
-					message("gib_players",{})
-				else
-					if tablelength(world.undertiles) < 1 then
-						print("gib undertiles")
-						message("gib_undertiles",{})
-					else
-						if tablelength(world.tiles) < 1 then
-							print("gib tiles")
-							message("gib_tiles",{})
-						else
-							if tablelength(world.objects) < 1 then
-								print("gib objects")
-								message("gib_objects",{})
-							else
-								print("linked :D")
-								world.isLinked = true
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-
 	-- Sends Packet_out to server
 	if tablelength(packet_out) > 0 then
 		if isHosting then
@@ -410,7 +278,6 @@ function network_update()
 			server_handlePacket()
 		else
 			local pack = "packet_s"..net_split1..json.encode(packet_out)
-			--print(pack)
 			network:sendMessage(pack, network:getIP())
 		end
 		packet_out = {}

@@ -27,7 +27,7 @@ function player_up(isPressed)
 	if state == STATE_INGAME then
 		message("w",{getPlayerID(),isPressed})
 		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).w = isPressed
+			getPlayer(getPlayerID()).key_w = isPressed
 		end
 	end
 end
@@ -35,7 +35,7 @@ function player_down(isPressed)
 	if state == STATE_INGAME then
 		message("s",{getPlayerID(),isPressed})
 		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).s = isPressed
+			getPlayer(getPlayerID()).key_s = isPressed
 		end
 	end
 end
@@ -43,7 +43,7 @@ function player_left(isPressed)
 	if state == STATE_INGAME then
 		message("a",{getPlayerID(),isPressed})
 		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).a = isPressed
+			getPlayer(getPlayerID()).key_a = isPressed
 		end
 	end
 end
@@ -51,7 +51,7 @@ function player_right(isPressed)
 	if state == STATE_INGAME then
 		message("d",{getPlayerID(),isPressed})
 		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).d = isPressed
+			getPlayer(getPlayerID()).key_d = isPressed
 		end
 	end
 end
@@ -89,17 +89,25 @@ function screen_ig_update()
 			x = 0
 			y = 0
 
-			if v.w then 
-				y=y-1
+			if v.key_w then 
+				if not isEntityCollision(v, 0, -speed) then
+					y=y-1
+				end
 			end
-			if v.s then 
-				y=y+1
+			if v.key_s then
+				if not isEntityCollision(v, 0, speed) then
+					y=y+1
+				end
 			end
-			if v.a then 
-				x=x-1
+			if v.key_a then 
+				if not isEntityCollision(v, -speed, 0) then
+					x=x-1
+				end
 			end
-			if v.d then 
-				x=x+1
+			if v.key_d then 
+				if not isEntityCollision(v, speed, 0) then
+					x=x+1
+				end
 			end
 
 			if x ~= 0 or y ~= 0 then
