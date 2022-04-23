@@ -75,7 +75,14 @@ state = STATE_MAINMENU
 net_ip = "localhost"
 net_port = 9999
 net_max = 2
-net_split1 = "|"
+net_hasInit = false
+--Netcode messages
+NET_MSG_JOIN = "join"
+NET_MSG_FULL = "full"
+NET_MSG_DISCONNECT = "disconnect"
+NET_MSG_ALLCLIENTS = "clients"
+NET_MSG_REMOVECLIENT = "rmclient"
+NET_MSG_ = ""
 
 -- Game Variables
 isHosting = true

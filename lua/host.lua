@@ -105,7 +105,7 @@ function screen_ho_mouseButtonUp(btn)
 
 		if isHosting then
 			if screen_ho_play:isPointColliding(mouseX, mouseY) then
-				server_message("ingame", {})
+				
 			end
 		end
 	end

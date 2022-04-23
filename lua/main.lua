@@ -115,13 +115,10 @@ end
 
 function event_quit()
 	if isHosting then
-		server_message("quitting", {})
+		--Remove all clients
 	else
-		message("remove", {getPlayerID()})
+		removeMyselfSafe()
 	end
-
-	network_update()
-	network:close()
 end
 
 mya_setUPS(20)
