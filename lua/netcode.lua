@@ -34,9 +34,20 @@ function server_message(msg, args)
 	table.insert(packets_s, packet)
 end
 
+--Alerts all clients and closes server
+function close_server()
+	server_message(NET_MSG_SERVERSHUTDOWN, {})
+	if net_hasInit then
+		net_hasInit = false
+		network_update()
+	end
+	removeMyselfSafe()
+end
+
 --Disconnect without network message
 function removeMyself()
 	network:close()
+	net_hasInit = false
 	state = STATE_JOINSERVER
 
 	--Reset world to empty
@@ -46,12 +57,11 @@ end
 --Disconnect
 function removeMyselfSafe()
 	if net_hasInit then
-		local arg = {}
-		arg.id = getPlayerID()
-		message(NET_MSG_DISCONNECT, arg)
+		message(NET_MSG_DISCONNECT, {id = getPlayerID()})
 		network_update() --Send last packet before network closes
 	end
 	network:close()
+	net_hasInit = false
 	state = STATE_JOINSERVER
 
 	--Reset world to empty
@@ -66,6 +76,7 @@ function client_join(id, name, ip)
 		client.name = name
 		client.ip = ip
 		client.ping = 0
+		client.isMainPlayer = (ip == "host")
 		clients[id] = client
 		print("(Server): New client: "..id.." ("..name..")")
 	else
@@ -122,6 +133,7 @@ end
 
 --Server packet handler
 function server_handlePacket(packet)
+	--Client join
 	if packet.msg == NET_MSG_JOIN then
 		if tablelength(clients) < net_max then
 			--Add client to clients
@@ -137,12 +149,18 @@ function server_handlePacket(packet)
 			_packet.msg = NET_MSG_SERVERFULL
 			network:sendMessage(json.encode({_packet}), packet.ip)
 		end
+
+	--Client disconnect
 	elseif packet.msg == NET_MSG_DISCONNECT then
 		--Remove client from clients
 		client_remove(packet.args.id)
 
 		--Notify clients
-		server_message(NET_MSG_REMOVECLIENT, {packet.args.id})
+		server_message(NET_MSG_REMOVECLIENT, packet.args)
+
+	--Update player info
+	elseif packet.msg == NET_MSG_UPDATEPLAYER then
+		server_message(NET_MSG_UPDATEPLAYER, packet.args)
 	end
 end
 
@@ -169,6 +187,43 @@ function handlePacket(packet)
 		print("Server is full")
 		removeMyselfSafe()
 		state = STATE_JOINSERVER
+
+	--Server Shutdown Handler
+	elseif packet.msg == NET_MSG_SERVERSHUTDOWN then
+		print("Server shutdown")
+		if not isHosting then
+			removeMyselfSafe()
+		end
+		state = STATE_JOINSERVER
+	
+	--Load level msg
+	elseif packet.msg == NET_MSG_LOADLEVEL then
+		world_id = packet.args.world_id
+		loadWorld()
+		if isHosting then
+			--Server creates players
+			for k, v in pairs(clients) do
+				if v.isMainPlayer then
+					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn1X, world.spawn1Y)})
+				else
+					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn2X, world.spawn2Y)})
+				end
+			end
+		end
+	
+	--Switch screen
+	elseif packet.msg == NET_MSG_SWITCHSCREEN then
+		state = packet.args.state
+	
+	--Player Update Override
+	elseif packet.msg == NET_MSG_PLAYER then
+		world.players[packet.args.player.id] = packet.args.player
+	
+	--Player Update
+	elseif packet.msg == NET_MSG_UPDATEPLAYER then
+		if packet.args.player.id ~= getPlayerID() then
+			world.players[packet.args.player.id] = packet.args.player
+		end
 	end
 end
 
@@ -206,16 +261,22 @@ function network_update()
 					network:sendMessage(json.encode(packets_s), v.ip)
 				end
 			end
+			packets_s = {}
+		end
+
+		--Server-client send packets to server
+		if tablelength(packets) > 0 then
+			for k, v in pairs(packets) do
+				server_handlePacket(v)
+			end
+			packets = {}
 		end
 	else
 		--Check if there is a packet to send
 		if tablelength(packets) > 0 then
 			--Send packet
 			network:sendMessage(json.encode(packets), network:getIP())
+			packets = {}
 		end
 	end
-
-	--Clear packets
-	packets_s = {}
-	packets = {}
 end

@@ -9,8 +9,10 @@ function newWorld()
 	world.isLinked = false
 	world.version = world_standard
 
-	world.spawnX = 0
-	world.spawnY = 0
+	world.spawn1X = 0
+	world.spawn1Y = 0
+	world.spawn2X = 0
+	world.spawn2Y = 0
 
 	world.undertiles = {}
 	world.tiles = {}
@@ -35,8 +37,10 @@ function worldToString()
 	
 	--world details
 	str = str.."v="..world.version..splitter0
-	str = str.."sx="..world.spawnX..splitter0
-	str = str.."sy="..world.spawnY..splitter0
+	str = str.."s1x="..world.spawn1X..splitter0
+	str = str.."s1y="..world.spawn1Y..splitter0
+	str = str.."s2x="..world.spawn2X..splitter0
+	str = str.."s2y="..world.spawn2Y..splitter0
 	str = str.."oid="..world.objectIDs..splitter0
 	
 	--undertiles
@@ -66,20 +70,6 @@ function worldToString()
 	end
 	str = str..splitter0
 
-	--enemies	--TODO: update enemy
-	str = str.."e"..splitter1
-	for k,v in pairs(world.entities) do
-		
-	end
-	str = str..splitter0
-
-	--players	--TODO: update player
-	str = str.."p"..splitter1
-	for k,v in pairs(world.players) do
-		
-	end
-	str = str..splitter0
-
 	return str
 end
 
@@ -96,10 +86,14 @@ function stringToWorld(str)
 		local inputs2 = mysplit(v, splitter1)
 		if inputs2[1] == "v" then
 			world.version = inputs2[2]
-		elseif inputs2[1] == "sx" then
-			world.spawnX = tonumber(inputs2[2])
-		elseif inputs2[1] == "sy" then
-			world.spawnY = tonumber(inputs2[2])
+		elseif inputs2[1] == "s1x" then
+			world.spawn1X = tonumber(inputs2[2])
+		elseif inputs2[1] == "s1y" then
+			world.spawn1Y = tonumber(inputs2[2])
+		elseif inputs2[1] == "s2x" then
+			world.spawn2X = tonumber(inputs2[2])
+		elseif inputs2[1] == "s2y" then
+			world.spawn2Y = tonumber(inputs2[2])
 		elseif inputs2[1] == "oid" then
 			world.objectIDs = tonumber(inputs2[2])
 		elseif inputs2[1] == "ut" then
@@ -126,10 +120,6 @@ function stringToWorld(str)
 					world.objects[tonumber(inputs4[1])] = stringToTile(inputs4[2])
 				end
 			end
-		elseif inputs2[1] == "e" then
-
-		elseif inputs2[1] == "p" then
-
 		end
 	end
 end

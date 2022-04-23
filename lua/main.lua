@@ -115,7 +115,7 @@ end
 
 function event_quit()
 	if isHosting then
-		--Remove all clients
+		close_server()
 	else
 		removeMyselfSafe()
 	end

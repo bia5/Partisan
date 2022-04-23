@@ -381,7 +381,7 @@ function screen_le_render()
 				sprite_tile:setTexture(assets:getTexture(tile.tex))
 				sprite_tile:setX((i*tileSize)+offsetX)
 				sprite_tile:setY((ii*tileSize)+offsetY)
-				sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
+				sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
 			end
 
 			tile = world.tiles[i.."-"..ii]
@@ -389,7 +389,7 @@ function screen_le_render()
 				sprite_tile:setTexture(assets:getTexture(tile.tex))
 				sprite_tile:setX((i*tileSize)+offsetX)
 				sprite_tile:setY((ii*tileSize)+offsetY)
-				sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
+				sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
 			end
 		end
 	end
@@ -401,7 +401,7 @@ function screen_le_render()
 				sprite_tile:setTexture(assets:getTexture(v.tex))
 				sprite_tile:setX((v.x*tileSize)+offsetX)
 				sprite_tile:setY((v.y*tileSize)+offsetY)
-				sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize)
+				sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize,v.deg, false)
 			end
 		end
 	end

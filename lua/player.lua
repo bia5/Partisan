@@ -16,10 +16,6 @@ function newPlayer(id, name, x, y)
 	player.h = .99
 	player.deg = 0 --Degrees
 
-	--Movement
-	player.velX = 0
-	player.velY = 0
-
 	player.speed = 5
 
 	player.key_w = false
@@ -30,9 +26,6 @@ function newPlayer(id, name, x, y)
 	--Stats
 	player.health = 100
 	player.maxHealth = 100
-
-	--Netcode
-	player.isOnline = false
 
 	--Functions
 	player.onUpdate = "nil"

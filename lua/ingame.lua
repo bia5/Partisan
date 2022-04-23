@@ -63,11 +63,7 @@ skip = 0
 mSkip = 10
 function screen_ig_tupdate()
 	--Update the player's netcode
-	if not isHosting then
-		if getPlayer(getPlayerID()) ~= nil then
-			message("player",{getPlayerID(), getPlayer(getPlayerID()).x, getPlayer(getPlayerID()).y})
-		end
-	end
+	message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
 end
 
 function screen_ig_mouseButtonDown(btn)
@@ -83,39 +79,37 @@ function screen_ig_update()
 	--Update Player
 	--Once again, move to player based
 	for k, v in pairs(world.players) do
-		if v.isOnline then
-			local speed = v.speed*(mya_getDelta()/1000)
+		local speed = v.speed*(mya_getDelta()/1000)
 			
-			x = 0
-			y = 0
+		x = 0
+		y = 0
 
-			if v.key_w then 
-				if not isEntityCollision(v, 0, -speed) then
-					y=y-1
-				end
+		if v.key_w then 
+			if not isEntityCollision(v, 0, -speed) then
+				y=y-1
 			end
-			if v.key_s then
-				if not isEntityCollision(v, 0, speed) then
-					y=y+1
-				end
+		end
+		if v.key_s then
+			if not isEntityCollision(v, 0, speed) then
+				y=y+1
 			end
-			if v.key_a then 
-				if not isEntityCollision(v, -speed, 0) then
-					x=x-1
-				end
+		end
+		if v.key_a then 
+			if not isEntityCollision(v, -speed, 0) then
+				x=x-1
 			end
-			if v.key_d then 
-				if not isEntityCollision(v, speed, 0) then
-					x=x+1
-				end
+		end
+		if v.key_d then 
+			if not isEntityCollision(v, speed, 0) then
+				x=x+1
 			end
+		end
 
-			if x ~= 0 or y ~= 0 then
-				rad = math.atan2(y, x)
-				v.deg = radToDeg(rad)-90
-				v.x = v.x + (math.cos(rad) * speed)
-				v.y = v.y + (math.sin(rad) * speed)
-			end
+		if x ~= 0 or y ~= 0 then
+			rad = math.atan2(y, x)
+			v.deg = radToDeg(rad)-90
+			v.x = v.x + (math.cos(rad) * speed)
+			v.y = v.y + (math.sin(rad) * speed)
 		end
 	end
 
@@ -123,7 +117,7 @@ function screen_ig_update()
 	if getPlayer(getPlayerID()) ~= nil then
 		offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)-tileSize/2
 		offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)-tileSize/2
-		screen_ig_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(getPlayer(getPlayerID()).x*100)/100)..", Y: "..tostring(math.floor(getPlayer(getPlayerID()).y*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_, mya_getRenderer())
+		screen_ig_debug:setText("FPS: "..mya_getFPS()..", X: "..tostring(math.floor(getPlayer(getPlayerID()).x*100)/100)..", Y: "..tostring(math.floor(getPlayer(getPlayerID()).y*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_..", bps: "..network:getTotalBitsSent()..", tbps: "..network:getTimedBitsSent(), mya_getRenderer())
 	end
 end
 
@@ -144,7 +138,7 @@ function screen_ig_render()
 					sprite_tile:setTexture(assets:getTexture(tile.tex))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
+					sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
 				end
 
 				tile = world.tiles[i.."-"..ii]
@@ -152,7 +146,7 @@ function screen_ig_render()
 					sprite_tile:setTexture(assets:getTexture(tile.tex))
 					sprite_tile:setX((i*tileSize)+offsetX)
 					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
+					sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
 				end
 			end
 		end
@@ -164,7 +158,7 @@ function screen_ig_render()
 					sprite_tile:setTexture(assets:getTexture(v.tex))
 					sprite_tile:setX((v.x*tileSize)+offsetX)
 					sprite_tile:setY((v.y*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize)
+					sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize,v.deg, false)
 				end
 			end
 		end
@@ -172,12 +166,10 @@ function screen_ig_render()
 
 	--Render Players
 	for k, v in pairs(world.players) do
-		if v.isOnline then
-			sprite_player:setTexture(assets:getTexture(v.tex))
-			sprite_player:setX((v.x*tileSize)+offsetX)
-			sprite_player:setY((v.y*tileSize)+offsetY)
-			sprite_player:renderFlip(mya_getRenderer(), tileSize, tileSize, v.deg, false)
-		end
+		sprite_player:setTexture(assets:getTexture(v.tex))
+		sprite_player:setX((v.x*tileSize)+offsetX)
+		sprite_player:setY((v.y*tileSize)+offsetY)
+		sprite_player:renderFlip(mya_getRenderer(), tileSize, tileSize, v.deg, false)
 	end
 
 	--Render Entities

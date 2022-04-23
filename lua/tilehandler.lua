@@ -23,6 +23,7 @@ function newTile(id, tex)
     tile.y = 0
     tile.w = 1
     tile.h = 1
+    tile.deg = 0
 	tile.tex = tex
 	tile.walkable = true
     
@@ -56,6 +57,9 @@ function tileToString(v)
     end
     if v.h ~= 1 then
         str = str .. "h" .. splitter1 .. v.h .. splitter0           --h
+    end
+    if v.deg ~= 0 then
+        str = str .. "deg" .. splitter1 .. v.deg .. splitter0           --h
     end
     str = str .. "t" .. splitter1 .. v.tex .. splitter0         --tex
     if v.walkable ~= true then
@@ -106,6 +110,8 @@ function stringToTile(str)
             tile.h = tonumber(value)
         elseif key == "t" then
             tile.tex = value
+        elseif key == "deg" then
+            tile.deg = tonumber(value)
         elseif key == "wk" then
             tile.walkable = toboolean(value)
         elseif key == "dt" then
