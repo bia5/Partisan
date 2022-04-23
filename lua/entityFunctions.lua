@@ -1,4 +1,3 @@
-
 --Bullet update
 function ef_bullet_update(bullet)
     --Move Bullet

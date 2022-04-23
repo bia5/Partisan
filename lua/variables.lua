@@ -79,14 +79,15 @@ net_hasInit = false
 --Netcode messages
 NET_MSG_JOIN = "join"
 NET_MSG_FULL = "full"
-NET_MSG_DISCONNECT = "disconnect"
-NET_MSG_ALLCLIENTS = "clients"
-NET_MSG_REMOVECLIENT = "rmclient"
-NET_MSG_SERVERSHUTDOWN = "shutdown"
+NET_MSG_DISCONNECT = "dsc"
+NET_MSG_ALLCLIENTS = "cl"
+NET_MSG_REMOVECLIENT = "rmcl"
+NET_MSG_SERVERSHUTDOWN = "stdwn"
 NET_MSG_LOADLEVEL = "loadlvl"
 NET_MSG_SWITCHSCREEN = "scr_switch"
-NET_MSG_PLAYER = "player"
-NET_MSG_UPDATEPLAYER = "uplayer"
+NET_MSG_PLAYER = "pl"
+NET_MSG_UPDATEPLAYER = "upl"
+NET_MSG_TILEUPDATE = "tu"
 NET_MSG_ = ""
 
 -- Game Variables

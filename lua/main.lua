@@ -19,6 +19,8 @@ require("host")
 require("ingame")
 
 require("tileHandler")
+require("tileFunctions")
+require("tileTypes")
 
 require("entityHandler")
 require("entityFunctions")

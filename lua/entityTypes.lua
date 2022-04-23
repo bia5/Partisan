@@ -16,3 +16,7 @@ function spawnBullet(x,y,velX,velY,size,hp,dmg,tex,deg)
 
     return bullet
 end
+
+function arrow(x,y,velX,velY,deg)
+    spawnBullet(x,y,velX,velY,0.2,1,10,"entity_arrow_0",deg)
+end

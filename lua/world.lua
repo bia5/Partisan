@@ -237,7 +237,21 @@ end
 
 --World updater
 function updateWorld()
+	for k,v in pairs(world.players) do
+		exeEntityFunction(v.onUpdate,v)
+	end
+
 	for k,v in pairs(world.entities) do
 		exeEntityFunction(v.onUpdate,v)
+	end
+
+	for k,v in pairs(world.undertiles) do
+		exeTileFunction(v.onUpdate,v)
+	end
+	for k,v in pairs(world.tiles) do
+		exeTileFunction(v.onUpdate,v)
+	end
+	for k,v in pairs(world.objects) do
+		exeTileFunction(v.onUpdate,v)
 	end
 end

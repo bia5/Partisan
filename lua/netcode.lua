@@ -161,6 +161,10 @@ function server_handlePacket(packet)
 	--Update player info
 	elseif packet.msg == NET_MSG_UPDATEPLAYER then
 		server_message(NET_MSG_UPDATEPLAYER, packet.args)
+
+	--Tile Update
+	elseif packet.msg == NET_MSG_UPDATE_TILE then
+		server_message(NET_MSG_UPDATE_TILE, packet.args)
 	end
 end
 
@@ -223,6 +227,19 @@ function handlePacket(packet)
 	elseif packet.msg == NET_MSG_UPDATEPLAYER then
 		if packet.args.player.id ~= getPlayerID() then
 			world.players[packet.args.player.id] = packet.args.player
+		end
+
+	--Tile Update
+	elseif packet.msg == NET_MSG_UPDATE_TILE then
+		if packet.args.layer == "under" then
+			world.undertiles[packet.args.tile.x.."-"..packet.args.tile.y] = packet.args.tile
+		elseif packet.args.layer == "tile" then
+			world.tiles[packet.args.tile.x.."-"..packet.args.tile.y] = packet.args.tile
+		--elseif packet.args.layer == "obj" then
+		
+		--		NOT READY FOR OBJECTS
+
+		--
 		end
 	end
 end

@@ -31,11 +31,9 @@ function newTile(id, tex)
     tile.data = ""
 
     -- Functions
-    tile.onColBullet = "nil"
-    tile.onColPlayer = "nil"
-    tile.onColEntity = "nil"
-
     tile.onUpdate = "nil"
+    tile.onUse = "nil"
+    tile.onRender = "nil"
 
 	return tile
 end
@@ -69,19 +67,15 @@ function tileToString(v)
         str = str .. "dt" .. splitter1 .. type(v.data) .. splitter0        --data
         str = str .. "d" .. splitter1 .. tostring(v.data) .. splitter0        --data
     end
-    
-    if v.onColBullet ~= "nil" then
-        str = str .. "ocb" .. splitter1 .. v.onColBullet .. splitter0 --onColBullet
-    end
-    if v.onColBullet ~= "nil" then
-        str = str .. "ocp" .. splitter1 .. v.onColPlayer .. splitter0 --onColPlayer
-    end
-    if v.onColBullet ~= "nil" then
-        str = str .. "oce" .. splitter1 .. v.onColEntity .. splitter0 --onColEntity
-    end
 
     if v.onUpdate ~= "nil" then
-        str = str .. "ou" .. splitter1 .. v.onUpdate .. splitter0 --onUpdate
+        str = str .. "oup" .. splitter1 .. v.onUpdate .. splitter0 --onUpdate
+    end
+    if v.onUse ~= "nil" then
+        str = str .. "ous" .. splitter1 .. v.onUse .. splitter0 --onUpdate
+    end
+    if v.onRender ~= "nil" then
+        str = str .. "ore" .. splitter1 .. v.onUse .. splitter0 --onUpdate
     end
 
 	return str
@@ -121,15 +115,12 @@ function stringToTile(str)
                 tile.data = stringToValue(value, dtype)
             end
 
-        elseif key == "ocb" then
-            tile.onColBullet = value
-        elseif key == "ocp" then
-            tile.onColPlayer = value
-        elseif key == "oce" then
-            tile.onColEntity = value
-
-        elseif key == "ou" then
+        elseif key == "oup" then
             tile.onUpdate = value
+        elseif key == "ous" then
+            tile.onUse = value
+        elseif key == "ore" then
+            tile.onRender = value
         end
     end
 
