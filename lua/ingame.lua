@@ -87,27 +87,30 @@ function screen_ig_update()
 		if v.key_w then 
 			if not isEntityCollision(v, 0, -speed) then
 				y=y-1
+				v.deg = 270
 			end
 		end
 		if v.key_s then
 			if not isEntityCollision(v, 0, speed) then
 				y=y+1
+				v.deg = 0
 			end
 		end
 		if v.key_a then 
 			if not isEntityCollision(v, -speed, 0) then
 				x=x-1
+				v.deg = 180
 			end
 		end
 		if v.key_d then 
 			if not isEntityCollision(v, speed, 0) then
 				x=x+1
+				v.deg = 90
 			end
 		end
 
 		if x ~= 0 or y ~= 0 then
 			rad = math.atan2(y, x)
-			v.deg = radToDeg(rad)-90
 			v.x = v.x + (math.cos(rad) * speed)
 			v.y = v.y + (math.sin(rad) * speed)
 		end
@@ -135,18 +138,26 @@ function screen_ig_render()
 			for i = x-renderDistH, x+renderDistH do
 				tile = world.undertiles[i.."-"..ii]
 				if tile ~= nil then
-					sprite_tile:setTexture(assets:getTexture(tile.tex))
-					sprite_tile:setX((i*tileSize)+offsetX)
-					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+					if tile.onRender ~= "nil" then
+						exeTileFunction(tile.onRender, tile)
+					else
+						sprite_tile:setTexture(assets:getTexture(tile.tex))
+						sprite_tile:setX((i*tileSize)+offsetX)
+						sprite_tile:setY((ii*tileSize)+offsetY)
+						sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+					end
 				end
 
 				tile = world.tiles[i.."-"..ii]
 				if tile ~= nil then
-					sprite_tile:setTexture(assets:getTexture(tile.tex))
-					sprite_tile:setX((i*tileSize)+offsetX)
-					sprite_tile:setY((ii*tileSize)+offsetY)
-					sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+					if tile.onRender ~= "nil" then
+						exeTileFunction(tile.onRender, tile)
+					else
+						sprite_tile:setTexture(assets:getTexture(tile.tex))
+						sprite_tile:setX((i*tileSize)+offsetX)
+						sprite_tile:setY((ii*tileSize)+offsetY)
+						sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+					end
 				end
 			end
 		end
@@ -166,10 +177,14 @@ function screen_ig_render()
 
 	--Render Players
 	for k, v in pairs(world.players) do
-		sprite_player:setTexture(assets:getTexture(v.tex))
-		sprite_player:setX((v.x*tileSize)+offsetX)
-		sprite_player:setY((v.y*tileSize)+offsetY)
-		sprite_player:renderFlip(mya_getRenderer(), tileSize, tileSize, v.deg, false)
+		if v ~= nil then
+			if v.number ~= nil then
+				sprite_player:setTexture(assets:getTexture("player"..v.number.."_"..v.deg.."_0"))
+				sprite_player:setX((v.x*tileSize)+offsetX)
+				sprite_player:setY((v.y*tileSize)+offsetY)
+				sprite_player:render(mya_getRenderer(), tileSize, tileSize)
+			end
+		end
 	end
 
 	--Render Entities

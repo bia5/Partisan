@@ -1,13 +1,13 @@
 --TODO: SAVING/LOADING
 --TODO: Functions
 
-function newPlayer(id, name, x, y)
+function newPlayer(id, name, x, y, number)
 	player = {}
 
 	--Info
 	player.id = id
 	player.name = name
-	player.tex = "entity_ninja_0"
+	--player.tex = "player" --Cleaned for netcode optimization
 
 	--Position
 	player.x = x
@@ -15,6 +15,7 @@ function newPlayer(id, name, x, y)
 	player.w = .99
 	player.h = .99
 	player.deg = 0 --Degrees
+	player.number = number
 
 	player.speed = 5
 
@@ -25,12 +26,8 @@ function newPlayer(id, name, x, y)
 
 	--Stats
 	player.health = 100
-	player.maxHealth = 100
-
-	--Functions
-	player.onUpdate = "nil"
-	player.onCollision = "nil"
-
+	--player.maxHealth = 100
+	
 	return player
 end
 

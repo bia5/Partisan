@@ -16,7 +16,7 @@ function ef_bullet_update(bullet)
         if v.id ~= bullet.id then
             if bullet.x > v.x and bullet.x < v.x+v.w and bullet.y > v.y and bullet.y < v.y+v.h then
                 exeEntityFunction(bullet.onCollision, bullet)
-                exeEntityFunction(v.onCollision, v, bullet)
+                v.hp = v.hp - bullet.maxhp
             end
         end
     end

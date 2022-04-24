@@ -208,9 +208,9 @@ function handlePacket(packet)
 			--Server creates players
 			for k, v in pairs(clients) do
 				if v.isMainPlayer then
-					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn1X, world.spawn1Y)})
+					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn1X, world.spawn1Y, 1)})
 				else
-					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn2X, world.spawn2Y)})
+					server_message(NET_MSG_PLAYER, {player = newPlayer(v.id, v.name, world.spawn2X, world.spawn2Y, 2)})
 				end
 			end
 		end
@@ -222,7 +222,10 @@ function handlePacket(packet)
 	--Player Update Override
 	elseif packet.msg == NET_MSG_PLAYER then
 		world.players[packet.args.player.id] = packet.args.player
-	
+		print("New player: "..packet.args.player.id.." ("..packet.args.player.name..")")
+		tprint(packet.args.player)
+		print("\n")
+
 	--Player Update
 	elseif packet.msg == NET_MSG_UPDATEPLAYER then
 		if packet.args.player.id ~= getPlayerID() then
