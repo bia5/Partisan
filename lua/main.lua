@@ -11,9 +11,12 @@ require("util")
 require("variables")
 require("netcode")
 require("assets")
-require("mainmenu")
-require("options")
-require("chooseplay")
+require("screen")
+
+require("screen_mainmenu")
+require("screen_chooseplay")
+require("screen_options")
+
 require("joinserver")
 require("host")
 require("ingame")
@@ -32,9 +35,11 @@ require("player")
 require("leveleditor")
 
 require("keybinds")
+
 function event_mouseMotion(x, y)
 	mouseX = x
 	mouseY = y
+	mouseMotion(getScreen(state), x, y)
 end
 
 function event_mouseButtonDown(btn)
@@ -43,17 +48,13 @@ function event_mouseButtonDown(btn)
 	elseif state == STATE_INGAME then
 		screen_ig_mouseButtonDown(btn)
 	end
+
+	mouseButtonDown(getScreen(state), btn)
 end
 
 function event_mouseButtonUp(btn)
-	if state == STATE_MAINMENU then
-		screen_mm_mouseButtonUp(btn)
-	elseif state == STATE_CHOOSEPLAY then
-		screen_cp_mouseButtonUp(btn)
-	elseif state == STATE_JOINSERVER then
+	if state == STATE_JOINSERVER then
 		screen_js_mouseButtonUp(btn)
-	elseif state == STATE_OPTIONS then
-		screen_op_mouseButtonUp(btn)
 	elseif state == STATE_HOST then
 		screen_ho_mouseButtonUp(btn)
 	elseif state == STATE_INGAME then
@@ -61,6 +62,8 @@ function event_mouseButtonUp(btn)
 	elseif state == STATE_LEVELEDITOR then
 		screen_le_mouseButtonUp(btn)
 	end
+	
+	mouseButtonUp(getScreen(state), btn)
 end
 
 function event_keyDown(key)
@@ -72,18 +75,13 @@ function event_keyUp(key)
 
 	if state == STATE_JOINSERVER then
 		screen_js_keyUp(key)
-	elseif state == STATE_OPTIONS then
-		screen_op_keyUp(key)
 	end
 end
 
 function event_windowResize(w, h)
 	asset_updateFonts()
 
-	screen_mm_windowResize(w, h)
-	screen_cp_windowResize(w, h)
 	screen_js_windowResize(w, h)
-	screen_op_windowResize(w, h)
 	screen_ho_windowResize(w, h)
 	screen_ig_windowResize(w, h)
 	screen_le_windowResize(w, h)
@@ -98,14 +96,8 @@ function event_update()
 end
 
 function event_render()
-	if state == STATE_MAINMENU then
-		screen_mm_render()
-	elseif state == STATE_CHOOSEPLAY then
-		screen_cp_render()
-	elseif state == STATE_JOINSERVER then
+	if state == STATE_JOINSERVER then
 		screen_js_render()
-	elseif state == STATE_OPTIONS then
-		screen_op_render()
 	elseif state == STATE_HOST then
 		screen_ho_render()
 	elseif state == STATE_INGAME then
@@ -113,6 +105,8 @@ function event_render()
 	elseif state == STATE_LEVELEDITOR then
 		screen_le_render()
 	end
+
+	render(getScreen(state))
 end
 
 function event_quit()

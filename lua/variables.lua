@@ -69,7 +69,10 @@ STATE_LEVELEDITOR = "leveleditor" --good enough
 STATE_HOST = "host" --done
 STATE_JOINSERVER = "joinserver" --done
 STATE_INGAME = "ingame" --good enough
-state = STATE_MAINMENU
+
+STATE_TEST = STATE_MAINMENU
+
+state = STATE_TEST
 
 -- Netcode
 net_ip = "localhost"
