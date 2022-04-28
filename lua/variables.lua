@@ -36,7 +36,16 @@ function variables_save()
 	saveTable(mya_getPath().."/options.save", settings)
 end
 
+
+function newVariables()
+	settings = {}
+	settings.snd_music_v = {name="Music Volume",value=0.5}
+	settings.snd_effects_v = {name="Effect Volume",value=0.5}
+	settings.player_name = {name="Player Name",value="Player"}
+end
+
 function variables_load()
+	newVariables()
 	local setting = loadTable(mya_getPath().."/options.save")
 	if setting then
 		settings = setting
@@ -44,35 +53,22 @@ function variables_load()
 end
 variables_load()
 
--- Sound Variables
-if settings.snd_music_v == nil then
-	settings.snd_music_v = 0.5
-end
-if settings.snd_effects_v == nil then
-	settings.snd_effects_v = 0.5
-end
-
-if settings.player_name == nil then
-	settings.player_name = "Player"
-end
-
 -- Mouse Coords
 mouseX = 0
 mouseY = 0
 
 -- States
 STATE_MAINMENU = "mainmenu" --done
-STATE_OPTIONS = "options"
-STATE_ABOUT = "about"
 STATE_CHOOSEPLAY = "chooseplay" --done
-STATE_LEVELEDITOR = "leveleditor" --good enough
-STATE_HOST = "host" --done
-STATE_JOINSERVER = "joinserver" --done
-STATE_INGAME = "ingame" --good enough
+STATE_OPTIONS = "options"
 
-STATE_TEST = STATE_MAINMENU
+STATE_ABOUT = "about"
+STATE_LEVELEDITOR = "leveleditor"
+STATE_HOST = "host"
+STATE_JOINSERVER = "joinserver"
+STATE_INGAME = "ingame"
 
-state = STATE_TEST
+state = STATE_MAINMENU
 
 -- Netcode
 net_ip = "localhost"
@@ -96,8 +92,5 @@ NET_MSG_ = ""
 -- Game Variables
 isHosting = true
 playerid = 0
-if settings.world_ids == nil then
-	settings.world_ids = 0
-end
 world_id = "world_partisan_1"
 local_player_id = 0

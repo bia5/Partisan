@@ -1,6 +1,6 @@
 assets = mya_getAssets()
 
-fontSizes = {16,32,48,64,96}
+fontSizes = {16,32,48,64}
 font = {}
 
 assets_tiles = {}

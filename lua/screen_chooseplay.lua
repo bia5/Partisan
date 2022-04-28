@@ -8,9 +8,9 @@ function scr_leveleditor()
 
     state = STATE_LEVELEDITOR
 end
-screen["debug_leveleditor"] = newButton("button_leveleditor", 0, 0, 120, 68, scr_leveleditor)
+screen_add(screen, "debug_leveleditor", newButton("button_leveleditor", 0, 0, 120, 68, scr_leveleditor))
 
-screen["buttons"] = newChild("center", "center", 960, 864)
+screen_add(screen, "buttons", newChild("center", "center", 960, 864))
 
 function scr_joinServer()
     registerBind("w", "Up", player_up)
@@ -20,7 +20,7 @@ function scr_joinServer()
 
     state = STATE_JOINSERVER 
 end
-screen["buttons"]["join"] = newButton("button_joinserver", "center", "center", 960, 216, scr_joinServer)
+screen_add(screen["buttons"], "join", newButton("button_joinserver", "center", "center", 960, 216, scr_joinServer))
 
 function scr_host()
     isHosting = true
@@ -37,5 +37,7 @@ screen_addTop(screen["buttons"], "host", newButton("button_host", "center", 0, 9
 
 function scr_back() state = STATE_MAINMENU end
 screen_addBottom(screen["buttons"], "back", newButton("button_back", "center", "center", 960, 216, scr_back))
+
+screen_add(screen, "bkgrd", newSprite("art_tree", 0, 0, 1920, 1080))
 
 addScreen(STATE_CHOOSEPLAY, screen)

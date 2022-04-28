@@ -39,7 +39,6 @@ require("keybinds")
 function event_mouseMotion(x, y)
 	mouseX = x
 	mouseY = y
-	mouseMotion(getScreen(state), x, y)
 end
 
 function event_mouseButtonDown(btn)
@@ -63,11 +62,12 @@ function event_mouseButtonUp(btn)
 		screen_le_mouseButtonUp(btn)
 	end
 	
-	mouseButtonUp(getScreen(state), btn)
+	mouseButtonUp(getScreen(state), btn, 0, 0)
 end
 
 function event_keyDown(key)
 	callBind(key, true)
+	keyDown(getScreen(state), key)
 end
 
 function event_keyUp(key)
@@ -76,6 +76,8 @@ function event_keyUp(key)
 	if state == STATE_JOINSERVER then
 		screen_js_keyUp(key)
 	end
+
+	keyUp(getScreen(state), key)
 end
 
 function event_windowResize(w, h)
@@ -93,6 +95,8 @@ function event_update()
 	elseif state == STATE_LEVELEDITOR then
 		screen_le_update()
 	end
+
+	update(getScreen(state))
 end
 
 function event_render()
