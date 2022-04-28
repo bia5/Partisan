@@ -1,4 +1,5 @@
 --Partisan by Alex Cooper Aug-4-2021
+--Hi from April 28th 2022
 init = mya_init("Partisan", 1280, 720)
 
 math.randomseed(os.time()) math.random() math.random() math.random() --setup that random
@@ -16,8 +17,8 @@ require("screen")
 require("screen_mainmenu")
 require("screen_chooseplay")
 require("screen_options")
+require("screen_joinserver")
 
-require("joinserver")
 require("host")
 require("ingame")
 
@@ -48,13 +49,11 @@ function event_mouseButtonDown(btn)
 		screen_ig_mouseButtonDown(btn)
 	end
 
-	mouseButtonDown(getScreen(state), btn)
+	mouseButtonDown(getScreen(state), btn, 0, 0)
 end
 
 function event_mouseButtonUp(btn)
-	if state == STATE_JOINSERVER then
-		screen_js_mouseButtonUp(btn)
-	elseif state == STATE_HOST then
+	if state == STATE_HOST then
 		screen_ho_mouseButtonUp(btn)
 	elseif state == STATE_INGAME then
 		screen_ig_mouseButtonUp(btn)
@@ -72,18 +71,12 @@ end
 
 function event_keyUp(key)
 	callBind(key, false)
-
-	if state == STATE_JOINSERVER then
-		screen_js_keyUp(key)
-	end
-
 	keyUp(getScreen(state), key)
 end
 
 function event_windowResize(w, h)
 	asset_updateFonts()
 
-	screen_js_windowResize(w, h)
 	screen_ho_windowResize(w, h)
 	screen_ig_windowResize(w, h)
 	screen_le_windowResize(w, h)
@@ -100,9 +93,7 @@ function event_update()
 end
 
 function event_render()
-	if state == STATE_JOINSERVER then
-		screen_js_render()
-	elseif state == STATE_HOST then
+	if state == STATE_HOST then
 		screen_ho_render()
 	elseif state == STATE_INGAME then
 		screen_ig_render()

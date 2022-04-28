@@ -102,7 +102,7 @@ function network_start()
 	if isHosting then
 		network:init(isHosting)
 
-		client_join(getPlayerID(), settings.player_name, "host")
+		client_join(getPlayerID(), settings.player_name.value, "host")
 
 		--Send clients all clients
 		sendAllClients()
