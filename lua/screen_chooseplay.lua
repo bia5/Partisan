@@ -10,7 +10,7 @@ function scr_leveleditor()
 end
 screen_add(screen, "debug_leveleditor", newButton("button_leveleditor", 0, 0, 120, 68, scr_leveleditor))
 
-screen_add(screen, "buttons", newChild("center", "center", 960, 864))
+screen_add(screen, "buttons", newChild("center", "center", 500, 864))
 
 function scr_joinServer()
     registerBind("W", "Up", player_up)

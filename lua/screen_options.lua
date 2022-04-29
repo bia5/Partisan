@@ -16,7 +16,7 @@ function scrBack()
     variables_save()
     state = STATE_MAINMENU
 end
-screen_add(screen["bottom_buttons"], "back", newButton("button_back", "center", "center", 380, 100, scrBack))
+screen_add(screen["bottom_buttons"], "back", newTextButton("Back", "center", "center", 230, 100, font[64], {96, 48, 16}, scrBack))
 
 function _update(screen)
     settings.player_name.value = screen["settings"]["player_name"]["value"].text
