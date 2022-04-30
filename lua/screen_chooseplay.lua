@@ -10,6 +10,7 @@ function scr_leveleditor()
 end
 screen_add(screen, "debug_leveleditor", newTextButton("Level Editor", 0, 0, 200, 75, {96, 48, 16}, scr_leveleditor))
 screen["debug_leveleditor"].textRatio = .45
+screen["debug_leveleditor"].render = devmode
 
 screen_add(screen, "buttons", newChild("center", "center", 500, 864))
 

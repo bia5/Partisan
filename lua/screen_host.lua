@@ -1,6 +1,5 @@
-local selected_level = "world_partisan_1" --selected world level
-
 screen = newChild(0, 0, 1920, 1080)
+local selected_level = "world_partisan_1" --selected world level
 
 screen_addTop(screen, "tv_host", newText("Host Server", "center", 10, 350, 80, {255, 128, 50}))
 
@@ -73,7 +72,7 @@ function screen_host_update()
         end
     end
 end
-screen.update = screen_host_update
+screen.onUpdate = screen_host_update
 
 screen_add(screen, "bkgrd", newSprite("art_tree", 0, 0, 1920, 1080))
 addScreen(STATE_HOST, screen)

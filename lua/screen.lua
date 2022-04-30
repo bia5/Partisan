@@ -99,12 +99,23 @@ end
 
 function render(screen)
     renderChild(screen, 0, 0)
+    if screen.onRender then
+        screen:onRender()
+    end
 end
 
 function update(screen)
     if screen ~= nil then
-        if screen.update then
-            screen:update()
+        if screen.onUpdate then
+            screen:onUpdate()
+        end
+    end
+end
+
+function tupdate(screen)
+    if screen ~= nil then
+        if screen.onTUpdate then
+            screen:onTUpdate()
         end
     end
 end
@@ -333,7 +344,9 @@ function newChild(x, y, w, h)
 
     child.render = true
 
-    child.update = nil
+    child.onUpdate = nil
+    child.onTUpdate = nil
+    child.onRender = nil
 
     return child
 end

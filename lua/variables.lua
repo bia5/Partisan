@@ -64,9 +64,8 @@ STATE_CHOOSEPLAY = "chooseplay" --done
 STATE_OPTIONS = "options" --Mostly done :D
 STATE_JOINSERVER = "joinserver" --done
 STATE_HOST = "host" --Mostly done :D
-
+STATE_INGAME = "ingame" --Mostly done :D
 STATE_LEVELEDITOR = "leveleditor"
-STATE_INGAME = "ingame"
 
 state = STATE_MAINMENU
 
