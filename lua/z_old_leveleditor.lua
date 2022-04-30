@@ -89,24 +89,24 @@ end
 --Define all debug buttons
 local function defineButtons()
 	yval = mya_getHeight()/20
-	newButton("newworld", 0, yval, "New World", 32)
-	newButton("tiledropper", 0, yval, "Tile Dropper", 32)
+	--newButton("newworld", 0, yval, "New World", 32)
+	--newButton("tiledropper", 0, yval, "Tile Dropper", 32)
 	newButton("newtile", 0, yval, "New Tile", 32)
 	newButton("edittile", 0, yval, "Edit Tile", 32)
-	newButton("gettile", 0, yval, "Get Tile", 32)
-	newButton("togglewalkable", 0, yval, "Toggle Walkable", 32)
+	--newButton("gettile", 0, yval, "Get Tile", 32)
+	--newButton("togglewalkable", 0, yval, "Toggle Walkable", 32)
 
 	yval = tileSize
-	newButton("buildmode", mya_getWidth()/8*7, yval, "Build Mode", 32)
-	newButton("destroymode", mya_getWidth()/8*7, yval, "Destroy Mode", 32)
+	--newButton("buildmode", mya_getWidth()/8*7, yval, "Build Mode", 32)
+	--newButton("destroymode", mya_getWidth()/8*7, yval, "Destroy Mode", 32)
 	newButton("togglelayer", mya_getWidth()/8*7, yval, "Toggle Layer", 32)
 
 	yval = mya_getHeight()/2
 	newButton("zoom", mya_getWidth()/8*7, yval, "Zoom", 32)
 	newButton("speed", mya_getWidth()/8*7, yval, "Speed", 32)
-	newButton("save", mya_getWidth()/8*7, yval, "Save", 32)
-	newButton("load", mya_getWidth()/8*7, yval, "Load", 32)
-	newButton("worldid", mya_getWidth()/8*7, yval, "Set World ID", 32)
+	--newButton("save", mya_getWidth()/8*7, yval, "Save", 32)
+	--newButton("load", mya_getWidth()/8*7, yval, "Load", 32)
+	--newButton("worldid", mya_getWidth()/8*7, yval, "Set World ID", 32)
 	newButton("objectid", mya_getWidth()/8*7, yval, "Set Object ID", 32)
 end
 

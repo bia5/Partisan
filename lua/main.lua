@@ -10,7 +10,6 @@ json = require "util_json"
 require("util")
 require("util_file")
 require("util_assets")
-require("util_keybinds")
 require("variables")
 require("netcode")
 require("screen")
@@ -32,6 +31,8 @@ require("screen_joinserver")
 require("screen_host")
 require("screen_ingame")
 require("screen_leveleditor")
+
+require("util_keybinds")
 
 function event_mouseMotion(x, y)
 	mouseX = x

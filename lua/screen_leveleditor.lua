@@ -1,5 +1,49 @@
 screen = newChild(0, 0, 1920, 1080)
 
+screen_add(screen, "debug_tv", newText("Debug", 0, 0, 1920, 50, {16,16,16}))
+
+screen_addLeft(screen, "left_buttons", newChild(0,60,200,1020))
+screen_addRight(screen, "right_buttons", newChild(0,60,200,1020))
+
+--World Info
+function screen_leveleditor_init()
+    screen["worldinfo"].render = not screen["worldinfo"].render
+end
+screen_addTop(screen["left_buttons"], "worldinfotoggle", newTextButton("World Info", 0,0,200,50, {16,16,16}, screen_leveleditor_init))
+screen["left_buttons"]["worldinfotoggle"].textRatio = .75
+screen_add(screen, "worldinfo", newChild("center","center",1280,720))
+screen["worldinfo"].render = false
+screen_add(screen["worldinfo"], "bkg", newSprite("context", 0, 0, 1280, 720))
+screen_add(screen["worldinfo"], "context", newChild("center","center",1210,650))
+screen_addTop(screen["worldinfo"]["context"], "worldinfo_title", newText("World Info", "center", 0, 200, 50, {16,16,16}))
+screen_addTop(screen["worldinfo"]["context"], "worldidcontext", newChild("center",0,1210,60))
+screen_addLeft(screen["worldinfo"]["context"]["worldidcontext"], "worldid_tv", newText("World ID: ", 0,"center",200,60,{16,16,16}))
+screen_addRight(screen["worldinfo"]["context"]["worldidcontext"], "worldid_et", newEditText(world_id, 0,"center",950,60,{16,16,16}))
+screen_addBottom(screen["worldinfo"]["context"], "buttons", newChild("center",0,1210,60))
+screen_addLeft(screen["worldinfo"]["context"]["buttons"], "load_button", newTextButton("Load", 0,"center",150,50, {16,16,16}, loadWorld))
+screen_addRight(screen["worldinfo"]["context"]["buttons"], "save_button", newTextButton("Save", 0,"center",150,50, {16,16,16}, saveWorld))
+screen_add(screen["worldinfo"]["context"]["buttons"], "empty_button", newTextButton("New World", "center","center",250,50, {16,16,16}, newWorld))
+screen_addTop(screen["left_buttons"], "empty1", newEmpty(0,0,200,10))
+
+--Mode Buttons
+screen_addTop(screen["right_buttons"], "build_mode", newTextToggleButton("Build Mode", 0,0,200,50, {16,16,16}, nil))
+screen["right_buttons"]["build_mode"].textRatio = .75
+screen_addTop(screen["right_buttons"], "empty1", newEmpty(0,0,200,10))
+screen_addTop(screen["right_buttons"], "destroy_mode", newTextToggleButton("Destroy Mode", 0,0,200,50, {16,16,16}, nil))
+screen["right_buttons"]["destroy_mode"].textRatio = .65
+screen_addTop(screen["right_buttons"], "empty2", newEmpty(0,0,200,10))
+screen_addTop(screen["right_buttons"], "dropper_mode", newTextToggleButton("Dropper Mode", 0,0,200,50, {16,16,16}, nil))
+screen["right_buttons"]["dropper_mode"].textRatio = .65
+screen_addTop(screen["right_buttons"], "empty3", newEmpty(0,0,200,10))
+
+--new tile
+--edit tile
+--toggle layer
+
+--zoom
+--speed
+--object id
+
 tileSize_ = 16
 tileSize = mya_getHeight()/tileSize_
 
@@ -28,26 +72,27 @@ end
 function zoomIn()
 	tileSize_ = tileSize_ - 5
 	tileSize = mya_getHeight()/tileSize_
+    loadWorld()
 end
 
 --Player movement keybind functions
 function player_up_le(isPressed)
-	if state == STATE_LEVELEDITOR and tilePopup == false then
+	if state == STATE_LEVELEDITOR then
 		playerW = isPressed
 	end
 end
 function player_down_le(isPressed) 
-	if state == STATE_LEVELEDITOR and tilePopup == false then
+	if state == STATE_LEVELEDITOR then
 		playerS = isPressed
 	end
 end
 function player_left_le(isPressed) 
-	if state == STATE_LEVELEDITOR and tilePopup == false then
+	if state == STATE_LEVELEDITOR then
 		playerA = isPressed
 	end
 end
 function player_right_le(isPressed) 
-	if state == STATE_LEVELEDITOR and tilePopup == false then
+	if state == STATE_LEVELEDITOR then
 		playerD = isPressed
 	end
 end
@@ -58,11 +103,16 @@ end
 screen.onTUpdate = scr_leveleditor_tupdate
 
 function scr_leveleditor_update()
+    mya_deltaUpdate()
+
+    tilex = math.floor((mouseX-offsetX)/tileSize)
+	tiley = math.floor((mouseY-offsetY)/tileSize)
+
     --Handle camera movement
 	local speed = playerSpeed*(mya_getDelta()/1000)
 		
 	if playerW then 
-		playerY = playerY - speed 
+		playerY = playerY - speed
 	end
 	if playerS then 
 		playerY = playerY + speed 
@@ -77,6 +127,9 @@ function scr_leveleditor_update()
 	--Update Camera Offset
 	offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
 	offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
+
+    scr = getScreen(STATE_LEVELEDITOR)
+    scr["debug_tv"].text = "FPS: "..mya_getFPS()..", X: "..tostring(math.floor(playerX*100)/100)..", Y: "..tostring(math.floor(playerY*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_
 end
 screen.onUpdate = scr_leveleditor_update
 

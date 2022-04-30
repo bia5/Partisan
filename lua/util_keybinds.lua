@@ -1,8 +1,7 @@
 keys = {}
 
 function registerBinds()
-	registerBind("=", "Zoom Out", zoomOut)
-	registerBind("-", "Zoom In", zoomIn)
+	
 end
 
 function registerBind(key, name, _function)

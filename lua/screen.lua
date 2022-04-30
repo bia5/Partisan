@@ -45,6 +45,20 @@ function renderChild(child, offsetX, offsetY)
                         v.sprite:setX((v.x + offsetX) * width_ratio)
                         v.sprite:setY((v.y + offsetY) * height_ratio)
                         v.sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                    elseif v.id == "togglebutton" then
+                        if screen_debug then
+                            child_sprite:setX((v.x + offsetX) * width_ratio)
+                            child_sprite:setY((v.y + offsetY) * height_ratio)
+                            child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        end
+                        v.sprite:setX((v.x + offsetX) * width_ratio)
+                        v.sprite:setY((v.y + offsetY) * height_ratio)
+                        v.sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        if v.toggle then
+                            child_sprite:setX((v.x + offsetX) * width_ratio)
+                            child_sprite:setY((v.y + offsetY) * height_ratio)
+                            child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        end
                     elseif v.id == "text" then
                         hR = ((v.h * height_ratio) / v.tv:getHeight())
                         if screen_debug then
@@ -69,6 +83,9 @@ function renderChild(child, offsetX, offsetY)
                             child_sprite:setY((v.y + offsetY) * height_ratio)
                             child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
                         end
+                        child_sprite:setX((v.x + offsetX) * width_ratio)
+                        child_sprite:setY((v.y + offsetY) * height_ratio)
+                        child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
                         v.tv:setText(v.text, mya_getRenderer())
                         v.tv:setXY((v.x + offsetX) * width_ratio, (v.y + offsetY) * height_ratio)
                         v.tv:renderWH(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
@@ -90,6 +107,30 @@ function renderChild(child, offsetX, offsetY)
                             child_sprite:setY(((v.y + offsetY) * height_ratio)+(((v.h*height_ratio)/2)-((v.tv:getHeight() * hR)/2)))
                             child_sprite:render(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
                         end
+                    elseif v.id == "ttbutton" then
+                        hR = (((v.h * height_ratio) / v.tv:getHeight()))*v.textRatio
+                        v.sprite:setX((v.x + offsetX) * width_ratio)
+                        v.sprite:setY((v.y + offsetY) * height_ratio)
+                        v.sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        
+                        if v.toggle then
+                            child_sprite:setX((v.x + offsetX) * width_ratio)
+                            child_sprite:setY((v.y + offsetY) * height_ratio)
+                            child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        end
+
+                        v.tv:setText(v.text, mya_getRenderer())
+                        v.tv:setXY(((v.x + offsetX) * width_ratio)+(((v.w * width_ratio)/2)-((v.tv:getWidth() * hR)/2)), ((v.y + offsetY) * height_ratio)+(((v.h*height_ratio)/2)-((v.tv:getHeight() * hR)/2)))
+                        v.tv:renderWH(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
+                        
+                        if screen_debug then
+                            child_sprite:setX((v.x + offsetX) * width_ratio)
+                            child_sprite:setY((v.y + offsetY) * height_ratio)
+                            child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                            child_sprite:setX(((v.x + offsetX) * width_ratio)+(((v.w * width_ratio)/2)-((v.tv:getWidth() * hR)/2)))
+                            child_sprite:setY(((v.y + offsetY) * height_ratio)+(((v.h*height_ratio)/2)-((v.tv:getHeight() * hR)/2)))
+                            child_sprite:render(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
+                        end
                     end
                 end
             end
@@ -98,10 +139,10 @@ function renderChild(child, offsetX, offsetY)
 end
 
 function render(screen)
-    renderChild(screen, 0, 0)
     if screen.onRender then
         screen:onRender()
     end
+    renderChild(screen, 0, 0)
 end
 
 function update(screen)
@@ -130,7 +171,7 @@ function mouseButtonDown(screen, button, offsetX, offsetY)
                 if v.render then
                     if v.id == "child" then
                         mouseButtonDown(v, button, offsetX + v.x, offsetY + v.y)
-                    elseif v.id == "button" or v.id == "tbutton" then
+                    elseif v.id == "button" or v.id == "tbutton" or v.id == "togglebutton" or v.id == "ttbutton" then
                         x = (v.x + offsetX)*width_ratio
                         y = (v.y + offsetY)*height_ratio
                         w = (v.x + v.w + offsetX)*width_ratio
@@ -155,8 +196,11 @@ function mouseButtonUp(screen, button, offsetX, offsetY)
             if type(v) == "table" then
                 if v.id == "child" then
                     mouseButtonUp(v, button, offsetX + v.x, offsetY + v.y)
-                elseif v.id == "button" or v.id == "tbutton" then
+                elseif v.id == "button" or v.id == "tbutton" or v.id == "togglebutton" or v.id == "ttbutton" then
                     if v.clicked then
+                        if v.id == "togglebutton" or v.id == "ttbutton" then
+                            v.toggle = not v.toggle
+                        end
                         v.clicked = false
                         v.sprite:setRenderOutline(false)
                         if v.render and v.onClick then
@@ -473,6 +517,56 @@ function newTextButton(defaultText, x, y, w, h, color, onClick)
     button.y = y
     button.w = w
     button.h = h
+
+    button.render = true
+
+    button.hovering = false
+    button.clicked = false
+    button.onClick = onClick
+    
+    return button
+end
+
+function newTextToggleButton(defaultText, x, y, w, h, color, onClick)
+    button = {}
+
+    button.id = "ttbutton"
+    button.sprite = Sprite.new(assets:getTexture("button"))
+    button.sprite:setOutlineColor(0, 0, 0, 64)
+
+    button.tv = TextView.new(font, defaultText, xx, yy, mya_getRenderer())
+    button.tv:setColor(mya_getRenderer(), color[1], color[2], color[3])
+    button.textRatio = 1
+
+    button.text = defaultText
+    button.x = x
+    button.y = y
+    button.w = w
+    button.h = h
+    button.toggle = false
+
+    button.render = true
+
+    button.hovering = false
+    button.clicked = false
+    button.onClick = onClick
+    
+    return button
+end
+
+function newToggleButton(tex, x, y, width, height, onClick)
+    button = {}
+
+    button.id = "togglebutton"
+    button.sprite = Sprite.new(assets:getTexture(tex))
+    button.sprite:setOutlineColor(0, 0, 0, 64)
+
+    button.tex = tex
+    button.x = x
+    button.y = y
+    button.w = width
+    button.h = height
+    button.toggle = false
 
     button.render = true
 
