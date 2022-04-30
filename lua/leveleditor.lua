@@ -70,7 +70,7 @@ local yval = mya_getHeight()/20
 local function newButton(id, x, y, text, size)
 	button = {}
 	button.isPressed = false
-	button.tv = TextView.new(font[size], text, x, y, mya_getRenderer())
+	button.tv = TextView.new(font, text, x, y, mya_getRenderer())
 	button.x = x
 	button.y = y
 	button.w = button.tv:getWidth()
@@ -111,12 +111,12 @@ local function defineButtons()
 end
 
 --Debug Text
-local screen_le_debug = TextView.new(font[32], "Debug", 0, 0, mya_getRenderer())
+local screen_le_debug = TextView.new(font, "Debug", 0, 0, mya_getRenderer())
 
 function screen_le_windowResize(w, h)
 	tileSize = mya_getHeight()/tileSize_
 
-	screen_le_debug:setFont(font[32], mya_getRenderer())
+	screen_le_debug:setFont(font, mya_getRenderer())
 	
 	--Resize all buttons
 	buttons = {}

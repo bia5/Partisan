@@ -182,7 +182,8 @@ local function decode_error(str, idx, msg)
       col_count = 1
     end
   end
-  error( string.format("%s at line %d col %d", msg, line_count, col_count) )
+  print("json oopsie: "..str.." ["..string.format("%s at line %d col %d", msg, line_count, col_count).."]")
+  --error( string.format("%s at line %d col %d", msg, line_count, col_count) )
 end
 
 
@@ -324,6 +325,7 @@ local function parse_object(str, i)
     i = next_char(str, i, space_chars, true)
     if str:sub(i, i) ~= ":" then
       decode_error(str, i, "expected ':' after key")
+      return nil
     end
     i = next_char(str, i + 1, space_chars, true)
     -- Read value

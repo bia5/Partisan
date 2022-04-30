@@ -22,6 +22,7 @@ packets = {} --Packets to server
 function message(msg, args)
 	local packet = {}
 	packet.msg = msg
+	packet.id = getPlayerID()
 	packet.args = args
 	table.insert(packets, packet)
 end
@@ -30,6 +31,7 @@ end
 function server_message(msg, args)
 	local packet = {}
 	packet.msg = msg
+	packet.id = getPlayerID()
 	packet.args = args
 	table.insert(packets_s, packet)
 end
@@ -110,7 +112,7 @@ function network_start()
 		network:init(isHosting)
 
 		local args = {}
-		args.name = settings.player_name
+		args.name = settings.player_name.value
 		args.id = getPlayerID()
 
 		message(NET_MSG_JOIN, args)
@@ -126,6 +128,7 @@ function sendAllClients()
 		client.id = v.id
 		client.name = v.name
 		client.ping = v.ping
+		client.isMainPlayer = v.isMainPlayer
 		table.insert(args, client)
 	end
 	server_message(NET_MSG_ALLCLIENTS, args)
@@ -165,6 +168,13 @@ function server_handlePacket(packet)
 	--Tile Update
 	elseif packet.msg == NET_MSG_UPDATE_TILE then
 		server_message(NET_MSG_UPDATE_TILE, packet.args)
+
+	--Update players
+	elseif packet.msg == NET_MSG_SENDPLAYER then
+		print("player count mismatch")
+		for k,v in pairs(world.players) do
+			server_message(NET_MSG_PLAYER, {player=v})
+		end
 	end
 end
 
@@ -223,13 +233,13 @@ function handlePacket(packet)
 	elseif packet.msg == NET_MSG_PLAYER then
 		world.players[packet.args.player.id] = packet.args.player
 		print("New player: "..packet.args.player.id.." ("..packet.args.player.name..")")
-		tprint(packet.args.player)
-		print("\n")
 
 	--Player Update
 	elseif packet.msg == NET_MSG_UPDATEPLAYER then
-		if packet.args.player.id ~= getPlayerID() then
-			world.players[packet.args.player.id] = packet.args.player
+		if packet.args.player then
+			if packet.args.player.id ~= getPlayerID() then
+				world.players[packet.args.player.id] = packet.args.player
+			end
 		end
 
 	--Tile Update
@@ -238,11 +248,6 @@ function handlePacket(packet)
 			world.undertiles[packet.args.tile.x.."-"..packet.args.tile.y] = packet.args.tile
 		elseif packet.args.layer == "tile" then
 			world.tiles[packet.args.tile.x.."-"..packet.args.tile.y] = packet.args.tile
-		--elseif packet.args.layer == "obj" then
-		
-		--		NOT READY FOR OBJECTS
-
-		--
 		end
 	end
 end

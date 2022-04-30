@@ -13,19 +13,11 @@ require("variables")
 require("netcode")
 require("assets")
 require("screen")
-
-require("screen_mainmenu")
-require("screen_chooseplay")
-require("screen_options")
-require("screen_joinserver")
-
-require("host")
-require("ingame")
+require("keybinds")
 
 require("tileHandler")
 require("tileFunctions")
 require("tileTypes")
-
 require("entityHandler")
 require("entityFunctions")
 require("entityTypes")
@@ -33,9 +25,14 @@ require("entityTypes")
 require("world")
 require("player")
 
-require("leveleditor")
+require("screen_mainmenu")
+require("screen_chooseplay")
+require("screen_options")
+require("screen_joinserver")
+require("screen_host")
 
-require("keybinds")
+require("ingame")
+require("leveleditor")
 
 function event_mouseMotion(x, y)
 	mouseX = x
@@ -53,9 +50,7 @@ function event_mouseButtonDown(btn)
 end
 
 function event_mouseButtonUp(btn)
-	if state == STATE_HOST then
-		screen_ho_mouseButtonUp(btn)
-	elseif state == STATE_INGAME then
+	if state == STATE_INGAME then
 		screen_ig_mouseButtonUp(btn)
 	elseif state == STATE_LEVELEDITOR then
 		screen_le_mouseButtonUp(btn)
@@ -75,9 +70,6 @@ function event_keyUp(key)
 end
 
 function event_windowResize(w, h)
-	asset_updateFonts()
-
-	screen_ho_windowResize(w, h)
 	screen_ig_windowResize(w, h)
 	screen_le_windowResize(w, h)
 end
@@ -93,9 +85,7 @@ function event_update()
 end
 
 function event_render()
-	if state == STATE_HOST then
-		screen_ho_render()
-	elseif state == STATE_INGAME then
+	if state == STATE_INGAME then
 		screen_ig_render()
 	elseif state == STATE_LEVELEDITOR then
 		screen_le_render()

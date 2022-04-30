@@ -12,14 +12,11 @@ sprite_tile = Sprite.new(assets:getTexture("empty"))
 sprite_entity = Sprite.new(assets:getTexture("empty"))
 
 --Debug stats
-local screen_ig_debug = TextView.new(font[32], "Debug", 0, 0, mya_getRenderer())
+local screen_ig_debug = TextView.new(font, "Debug", 0, 0, mya_getRenderer())
 
 function screen_ig_windowResize(w, h)
 	tileSize = mya_getHeight()/tileSize_
-
-	screen_ig_debug:setFont(font[32], mya_getRenderer())
 end
-screen_ig_windowResize(mya_getWidth(), mya_getHeight())
 
 --Player movement functions
 --I want this to become player based
@@ -63,7 +60,13 @@ skip = 0
 mSkip = 10
 function screen_ig_tupdate()
 	--Update the player's netcode
-	message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
+	if getPlayer(getPlayerID()) then
+		message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
+	end
+	if tablelength(clients_simplified) ~= tablelength(world.players) then
+		print("Player count mismatch")
+		message(NET_MSG_SENDPLAYER, {})
+	end
 end
 
 function screen_ig_mouseButtonDown(btn)
@@ -176,7 +179,7 @@ function screen_ig_render()
 	end
 
 	--Render Players
-	for k, v in pairs(world.players) do
+	for k, v in spairs(world.players, function(t, a, b) return t[a].y+t[a].h < t[b].y+t[b].h end) do
 		if v ~= nil then
 			if v.number ~= nil then
 				sprite_player:setTexture(assets:getTexture("player"..v.number.."_"..v.deg.."_0"))

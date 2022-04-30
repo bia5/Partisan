@@ -1,5 +1,3 @@
-screen_debug = false
-
 --SCREEN HANDLER
 screens = {}
 
@@ -391,7 +389,7 @@ function newButton(tex, x, y, width, height, onClick)
     return button
 end
 
-function newText(_text, x, y, width, height, _font, color)
+function newText(_text, x, y, width, height, color)
     text = {}
 
     xx = x
@@ -404,7 +402,7 @@ function newText(_text, x, y, width, height, _font, color)
     end
 
     text.id = "text"
-    text.tv = TextView.new(_font, _text, xx, yy, mya_getRenderer())
+    text.tv = TextView.new(font, _text, xx, yy, mya_getRenderer())
     text.tv:setColor(mya_getRenderer(), color[1], color[2], color[3])
 
     text.text = _text
@@ -418,7 +416,7 @@ function newText(_text, x, y, width, height, _font, color)
     return text
 end
 
-function newEditText(defaultText, x, y, width, height, _font, color)
+function newEditText(defaultText, x, y, width, height, color)
     text = {}
 
     xx = x
@@ -431,7 +429,7 @@ function newEditText(defaultText, x, y, width, height, _font, color)
     end
 
     text.id = "etext"
-    text.tv = TextView.new(_font, defaultText, xx, yy, mya_getRenderer())
+    text.tv = TextView.new(font, defaultText, xx, yy, mya_getRenderer())
     text.tv:setColor(mya_getRenderer(), color[1], color[2], color[3])
 
     text.text = defaultText
@@ -446,14 +444,14 @@ function newEditText(defaultText, x, y, width, height, _font, color)
     return text
 end
 
-function newTextButton(defaultText, x, y, w, h, _font, color, onClick)
+function newTextButton(defaultText, x, y, w, h, color, onClick)
     button = {}
 
     button.id = "tbutton"
     button.sprite = Sprite.new(assets:getTexture("button"))
     button.sprite:setOutlineColor(0, 0, 0, 64)
 
-    button.tv = TextView.new(_font, defaultText, xx, yy, mya_getRenderer())
+    button.tv = TextView.new(font, defaultText, xx, yy, mya_getRenderer())
     button.tv:setColor(mya_getRenderer(), color[1], color[2], color[3])
     button.textRatio = 1
 

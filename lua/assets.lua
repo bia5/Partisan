@@ -1,19 +1,8 @@
 assets = mya_getAssets()
-
-fontSizes = {16,32,48,64}
-font = {}
+font = Font.new("assets/font.ttf",64)
 
 assets_tiles = {}
 assets_objects = {}
-
-function asset_updateFonts()
-	font = {}
-	for k, v in pairs(fontSizes) do
-		font[v] = Font.new("assets/font.ttf",v*(mya_getHeight()/720))
-	end
-	print("Loaded "..tablelength(fontSizes).." fonts.")
-end
-asset_updateFonts()
 
 files = fileHandler:listDir("assets\\")
 for i = 0, fileHandler:getSize(files)-1 do
