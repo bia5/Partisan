@@ -7,7 +7,7 @@ screen_add(screen, "footer", newChild(0, 930, 1920, 150))
 
 screen_addLeft(screen["footer"], "left", newChild(0, "center", 960, 150))
 function scr_host_back() 
-    removeMyselfSafe()
+    event_quit()
     state = STATE_CHOOSEPLAY 
 end
 screen_add(screen["footer"]["left"], "back", newTextButton("Back", "center", "center", 230, 100, {96, 48, 16}, scr_host_back))

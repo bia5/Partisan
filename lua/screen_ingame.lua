@@ -141,18 +141,6 @@ function scr_ingame_render()
 				end
 			end
 		end
-
-		--Render Objects
-		for k, v in pairs(world.objects) do
-			if type(v) == "table" then
-				if v.x >= x-renderDistH-1 and v.x <= x+renderDistH+1 and v.y >= y-renderDistV-1 and v.y <= y+renderDistV+1 then
-					sprite_tile:setTexture(assets:getTexture(v.tex))
-					sprite_tile:setX((v.x*tileSize)+offsetX)
-					sprite_tile:setY((v.y*tileSize)+offsetY)
-					sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize,v.deg, false)
-				end
-			end
-		end
 	end
 
 	--Render Players

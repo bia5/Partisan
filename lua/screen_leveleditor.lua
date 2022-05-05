@@ -1,3 +1,10 @@
+tileSize_ = 16
+tileSize = mya_getHeight()/tileSize_
+
+--build tile
+buildTile = newTile("tile_grass_0")
+layer = 1
+
 screen = newChild(0, 0, 1920, 1080)
 
 screen_add(screen, "debug_tv", newText("Debug", 0, 0, 1920, 50, {16,16,16}))
@@ -7,6 +14,7 @@ screen_addRight(screen, "right_buttons", newChild(0,60,200,1020))
 
 --World Info
 function screen_leveleditor_init()
+    world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
     screen["worldinfo"].render = not screen["worldinfo"].render
 end
 screen_addTop(screen["left_buttons"], "worldinfotoggle", newTextButton("World Info", 0,0,200,50, {16,16,16}, screen_leveleditor_init))
@@ -20,9 +28,21 @@ screen_addTop(screen["worldinfo"]["context"], "worldidcontext", newChild("center
 screen_addLeft(screen["worldinfo"]["context"]["worldidcontext"], "worldid_tv", newText("World ID: ", 0,"center",200,60,{16,16,16}))
 screen_addRight(screen["worldinfo"]["context"]["worldidcontext"], "worldid_et", newEditText(world_id, 0,"center",950,60,{16,16,16}))
 screen_addBottom(screen["worldinfo"]["context"], "buttons", newChild("center",0,1210,60))
-screen_addLeft(screen["worldinfo"]["context"]["buttons"], "load_button", newTextButton("Load", 0,"center",150,50, {16,16,16}, loadWorld))
-screen_addRight(screen["worldinfo"]["context"]["buttons"], "save_button", newTextButton("Save", 0,"center",150,50, {16,16,16}, saveWorld))
-screen_add(screen["worldinfo"]["context"]["buttons"], "empty_button", newTextButton("New World", "center","center",250,50, {16,16,16}, newWorld))
+function scr_leveleditor_loadWorld()
+    world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
+    loadWorld()
+end
+screen_addLeft(screen["worldinfo"]["context"]["buttons"], "load_button", newTextButton("Load", 0,"center",150,50, {16,16,16}, scr_leveleditor_loadWorld))
+function scr_leveleditor_saveWorld()
+    world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
+    saveWorld()
+end
+screen_addRight(screen["worldinfo"]["context"]["buttons"], "save_button", newTextButton("Save", 0,"center",150,50, {16,16,16}, scr_leveleditor_saveWorld))
+function scr_leveleditor_newWorld()
+    world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
+    newWorld()
+end
+screen_add(screen["worldinfo"]["context"]["buttons"], "empty_button", newTextButton("New World", "center","center",250,50, {16,16,16}, scr_leveleditor_newWorld))
 screen_addTop(screen["left_buttons"], "empty1", newEmpty(0,0,200,10))
 
 --Mode Buttons
@@ -36,16 +56,47 @@ screen_addTop(screen["right_buttons"], "dropper_mode", newTextToggleButton("Drop
 screen["right_buttons"]["dropper_mode"].textRatio = .65
 screen_addTop(screen["right_buttons"], "empty3", newEmpty(0,0,200,10))
 
---new tile
+--New Tile
+function screen_leveleditor_newTile()
+    screen["newtile"].render = not screen["newtile"].render
+end
+screen_addTop(screen["left_buttons"], "newtilecontext", newTextButton("New Tile", 0,0,200,50, {16,16,16}, screen_leveleditor_newTile))
+screen["left_buttons"]["newtilecontext"].textRatio = .75
+screen_add(screen, "newtile", newChild("center","center",1280,720))
+screen["newtile"].render = false
+screen_add(screen["newtile"], "bkg", newSprite("context", 0, 0, 1280, 720))
+screen_add(screen["newtile"], "context", newChild("center","center",1210,650))
+screen_addTop(screen["newtile"]["context"], "newtile_title", newText("New Tile", "center", 0, 200, 50, {16,16,16}))
+screen_addTop(screen["newtile"]["context"], "newtilecontext", newChild("center",0,1210,550))
+
+local tSize = tileSize
+local spacing = tileSize/5
+local x = 0
+local y = 0
+local width = 1210
+local height = 550
+
+function screen_leveleditor_newTile_click(tile)
+    buildTile = newTile(tile)
+    screen["newtile"].render = false
+end
+
+for k,v in pairs(assets_tiles) do
+    screen_add(screen["newtile"]["context"]["newtilecontext"], "tile_"..k, newButton(v, x, y, tSize, tSize, screen_leveleditor_newTile_click, v))
+    x = x + tSize + spacing
+    if x + tSize > width then
+        x = 0
+        y = y + tSize + spacing
+    end
+end
+
 --edit tile
+--New Prefab
 --toggle layer
 
 --zoom
 --speed
 --object id
-
-tileSize_ = 16
-tileSize = mya_getHeight()/tileSize_
 
 --Offset variables, moves based on the camera
 local offsetX = 0
@@ -97,6 +148,60 @@ function player_right_le(isPressed)
 	end
 end
 
+mouse_left = false
+function scr_leveleditor_mouseButtonUp(btn)
+    scr = getScreen(STATE_LEVELEDITOR)
+    coliding = false
+    for k,v in pairs(scr) do
+        if type(v) == "table" then
+            if v.render then
+                if isCursorIn(v) then
+                    coliding = true
+                end
+            end
+        end
+    end
+
+    if not coliding then
+        tilex = math.floor((mouseX-offsetX)/tileSize)
+        tiley = math.floor((mouseY-offsetY)/tileSize)
+
+        if btn == "left" then
+            mouse_left = false
+            if screen["right_buttons"]["dropper_mode"].toggle then
+                if layer == 1 then --Under
+                    buildTile = world.undertiles[tilex.."-"..tiley]
+                else --Over
+                    buildTile = world.tiles[tilex.."-"..tiley]
+                end
+                screen["right_buttons"]["dropper_mode"].toggle = false
+            end
+        end
+    end
+end
+screen.onMouseButtonUp = scr_leveleditor_mouseButtonUp
+
+function scr_leveleditor_mouseButtonDown(btn)
+    scr = getScreen(STATE_LEVELEDITOR)
+    coliding = false
+    for k,v in pairs(scr) do
+        if type(v) == "table" then
+            if v.render then
+                if isCursorIn(v) then
+                    coliding = true
+                end
+            end
+        end
+    end
+
+    if not coliding then
+        if btn == "left" then
+            mouse_left = true
+        end
+    end
+end
+screen.onMouseButtonDown = scr_leveleditor_mouseButtonDown
+
 function scr_leveleditor_tupdate()
 
 end
@@ -107,6 +212,36 @@ function scr_leveleditor_update()
 
     tilex = math.floor((mouseX-offsetX)/tileSize)
 	tiley = math.floor((mouseY-offsetY)/tileSize)
+
+    scr = getScreen(STATE_LEVELEDITOR)
+    coliding = false
+    for k,v in pairs(scr) do
+        if type(v) == "table" then
+            if v.render then
+                if isCursorIn(v) then
+                    coliding = true
+                end
+            end
+        end
+    end
+
+    if not coliding then
+        if mouse_left then
+            if screen["right_buttons"]["build_mode"].toggle then
+                if layer == 1 then --Under
+                    world.undertiles[tilex.."-"..tiley] = buildTile
+                else --Over
+                    world.tiles[tilex.."-"..tiley] = buildTile
+                end
+            elseif screen["right_buttons"]["destroy_mode"].toggle then
+                if layer == 1 then --Under
+                    world.undertiles[tilex.."-"..tiley] = nil
+                else --Over
+                    world.tiles[tilex.."-"..tiley] = nil
+                end
+            end
+        end
+    end
 
     --Handle camera movement
 	local speed = playerSpeed*(mya_getDelta()/1000)
@@ -163,18 +298,6 @@ function scr_leveleditor_render()
         end
     end
 
-    --Render Objects
-    for k, v in pairs(world.objects) do
-        if type(v) == "table" then
-            if v.x >= x-renderDistH-1 and v.x <= x+renderDistH+1 and v.y >= y-renderDistV-1 and v.y <= y+renderDistV+1 then
-                sprite_tile:setTexture(assets:getTexture(v.tex))
-                sprite_tile:setX((v.x*tileSize)+offsetX)
-                sprite_tile:setY((v.y*tileSize)+offsetY)
-                sprite_tile:render(mya_getRenderer(), v.w*tileSize, v.h*tileSize,v.deg, false)
-            end
-        end
-    end
-
     --Render Entities
     for k, v in pairs(world.entities) do
         sprite_entity:setTexture(assets:getTexture(v.id))
@@ -186,9 +309,9 @@ function scr_leveleditor_render()
     --Display build tile @ top right
     if buildTile ~= nil then
         sprite_tile:setTexture(assets:getTexture(buildTile.tex))
-        sprite_tile:setX(mya_getWidth()-tileSize)
+        sprite_tile:setX(mya_getWidth()-tileSize/5*4)
         sprite_tile:setY(0)
-        sprite_tile:render(mya_getRenderer(), tileSize+1, tileSize+1)
+        sprite_tile:render(mya_getRenderer(), tileSize/5*4+1, tileSize/5*4+1)
     end
 end
 screen.onRender = scr_leveleditor_render

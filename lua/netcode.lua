@@ -64,6 +64,10 @@ function removeMyselfSafe()
 	end
 	network:close()
 	net_hasInit = false
+
+	clients = {}
+	clients_simplified = {}
+
 	state = STATE_JOINSERVER
 
 	--Reset world to empty

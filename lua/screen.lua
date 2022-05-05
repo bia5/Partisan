@@ -190,12 +190,16 @@ end
 function mouseButtonUp(screen, button, offsetX, offsetY)
     local width_ratio = mya_getWidth() / 1920
     local height_ratio = mya_getHeight() / 1080
+    edit = false
 
     if screen ~= nil then
         for k, v in pairs(screen) do
             if type(v) == "table" then
                 if v.id == "child" then
-                    mouseButtonUp(v, button, offsetX + v.x, offsetY + v.y)
+                    ed = mouseButtonUp(v, button, offsetX + v.x, offsetY + v.y)
+                    if ed then
+                        edit = true
+                    end
                 elseif v.id == "button" or v.id == "tbutton" or v.id == "togglebutton" or v.id == "ttbutton" then
                     if v.clicked then
                         if v.id == "togglebutton" or v.id == "ttbutton" then
@@ -204,24 +208,33 @@ function mouseButtonUp(screen, button, offsetX, offsetY)
                         v.clicked = false
                         v.sprite:setRenderOutline(false)
                         if v.render and v.onClick then
-                            v.onClick()
+                            if v.args then
+                                v.onClick(v.args)
+                            else
+                                v.onClick()
+                            end
                         end
                     end
                 elseif v.id == "etext" then
-                    x = (v.x + offsetX)*width_ratio
-                    y = (v.y + offsetY)*height_ratio
-                    w = (v.x + v.w + offsetX)*width_ratio
-                    h = (v.y + v.h + offsetY)*height_ratio
+                    if v.render then
+                        x = (v.x + offsetX)*width_ratio
+                        y = (v.y + offsetY)*height_ratio
+                        w = (v.x + v.w + offsetX)*width_ratio
+                        h = (v.y + v.h + offsetY)*height_ratio
 
-                    if mouseX > x and mouseX < w and mouseY > y and mouseY < h then
-                        v.editing = true
-                    else
-                        v.editing = false
+                        if mouseX > x and mouseX < w and mouseY > y and mouseY < h then
+                            v.editing = true
+                            edit = true
+                        else
+                            v.editing = false
+                        end
                     end
                 end
             end
         end
     end
+
+    return edit
 end
 
 upspace = false
@@ -369,6 +382,16 @@ function screen_add(child, obj_name, obj)
     child[obj_name] = obj
 end
 
+function isCursorIn(child)
+    local width_ratio = mya_getWidth() / 1920
+    local height_ratio = mya_getHeight() / 1080
+
+    if mouseX > child.x*width_ratio and mouseX < (child.x + child.w)*width_ratio and mouseY > child.y*height_ratio and mouseY < (child.y + child.h)*height_ratio then
+        return true
+    end
+    return false
+end
+
 
 
 --OBJECTS
@@ -388,6 +411,9 @@ function newChild(x, y, w, h)
 
     child.render = true
 
+    child.onMouseButtonUp = nil
+    child.onMouseButtonDown = nil
+    
     child.onUpdate = nil
     child.onTUpdate = nil
     child.onRender = nil
@@ -424,7 +450,7 @@ function newSprite(tex, x, y, width, height)
     return sprite
 end
 
-function newButton(tex, x, y, width, height, onClick)
+function newButton(tex, x, y, width, height, onClick, _args)
     button = {}
 
     button.id = "button"
@@ -442,7 +468,9 @@ function newButton(tex, x, y, width, height, onClick)
     button.hovering = false
     button.clicked = false
     button.onClick = onClick
-    
+
+    button.args = _args
+
     return button
 end
 

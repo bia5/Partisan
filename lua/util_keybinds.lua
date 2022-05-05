@@ -12,7 +12,9 @@ end
 
 function callBind(key, isPressed)
 	if keys[key] then
-		keys[key]._function(isPressed)
+		if not global_editing then
+			keys[key]._function(isPressed)
+		end
 	end
 end
 

@@ -17,7 +17,7 @@ for i = 0, fileHandler:getSize(files)-1 do
 		if e == "tile" then
 			table.insert(assets_tiles,truename[1])
 		elseif e == "obj_" then
-			table.insert(assets_objects,truename[1])
+			table.insert(assets_tiles,truename[1])
 		end
 	end
 end

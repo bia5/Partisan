@@ -39,12 +39,25 @@ function event_mouseMotion(x, y)
 	mouseY = y
 end
 
+collision = false
 function event_mouseButtonDown(btn)
+	screen = getScreen(state)
+	if screen ~= nil then
+        if screen.onMouseButtonDown then
+            screen.onMouseButtonDown(btn)
+        end
+    end
 	mouseButtonDown(getScreen(state), btn, 0, 0)
 end
 
 function event_mouseButtonUp(btn)
-	mouseButtonUp(getScreen(state), btn, 0, 0)
+	screen = getScreen(state)
+	if screen ~= nil then
+        if screen.onMouseButtonUp then
+            screen.onMouseButtonUp(btn)
+        end
+    end
+	global_editing = mouseButtonUp(getScreen(state), btn, 0, 0)
 end
 
 function event_keyDown(key)

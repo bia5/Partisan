@@ -16,8 +16,6 @@ function newWorld()
 
 	world.undertiles = {}
 	world.tiles = {}
-	world.objectIDs = 1
-	world.objects = {}
 
 	world.entityIDs = 1
 	world.entities = {}
@@ -41,7 +39,6 @@ function worldToString()
 	str = str.."s1y="..world.spawn1Y..splitter0
 	str = str.."s2x="..world.spawn2X..splitter0
 	str = str.."s2y="..world.spawn2Y..splitter0
-	str = str.."oid="..world.objectIDs..splitter0
 	
 	--undertiles
 	str = str.."ut"..splitter1
@@ -55,15 +52,6 @@ function worldToString()
 	--tiles
 	str = str.."t"..splitter1
 	for k,v in pairs(world.tiles) do
-		if v ~= nil then
-			str = str..k..splitter3..tileToString(v)..splitter2
-		end
-	end
-	str = str..splitter0
-
-	--objects & id
-	str = str.."o"..splitter1
-	for k,v in pairs(world.objects) do
 		if v ~= nil then
 			str = str..k..splitter3..tileToString(v)..splitter2
 		end
@@ -94,8 +82,6 @@ function stringToWorld(str)
 			world.spawn2X = tonumber(inputs2[2])
 		elseif inputs2[1] == "s2y" then
 			world.spawn2Y = tonumber(inputs2[2])
-		elseif inputs2[1] == "oid" then
-			world.objectIDs = tonumber(inputs2[2])
 		elseif inputs2[1] == "ut" then
 			if inputs2[2] ~= nil then
 				local inputs3 = mysplit(inputs2[2], splitter2)
@@ -112,38 +98,8 @@ function stringToWorld(str)
 					world.tiles[inputs4[1]] = stringToTile(inputs4[2])
 				end
 			end
-		elseif inputs2[1] == "o" then
-			if inputs2[2] ~= nil then
-				local inputs3 = mysplit(inputs2[2], splitter2)
-				for k2, v2 in pairs(inputs3) do
-					local inputs4 = mysplit(v2, splitter3)
-					world.objects[tonumber(inputs4[1])] = stringToTile(inputs4[2])
-				end
-			end
 		end
 	end
-end
-
---Help to easily add an object to the world
-function addObject(x,y,w,h,tile)
-	local newTile = newTile(tile.id)
-	newTile.x = math.floor(x*100)/100
-	newTile.y = math.floor(y*100)/100
-	newTile.w = w
-	newTile.h = h
-	world.objects[world.objectIDs] = newTile
-	world.objectIDs = world.objectIDs+1
-end
-
---Gets all the objects in a world x,y
-function getObjectsColliding(x,y)
-	objects_ = {}
-	for k,v in pairs(world.objects) do
-		if isPointColliding(v.x,v.y,v.w,v.h,x,y) then
-			table.insert(objects_,k)
-		end
-	end
-	return objects_
 end
 
 --Saves the world to a file
@@ -189,16 +145,6 @@ function isTileCollision(x,y)
 		noTile = false
 		if not tile.walkable then
 			return tile
-		end
-	end
-
-	--objects
-	for k,v in pairs(world.objects) do
-		if x >= v.x and x <= v.x+v.w and y >= v.y and y <= v.y+v.h then
-			noTile = false
-			if not v.walkable then
-				return v
-			end
 		end
 	end
 
@@ -249,9 +195,6 @@ function updateWorld()
 		exeTileFunction(v.onUpdate,v)
 	end
 	for k,v in pairs(world.tiles) do
-		exeTileFunction(v.onUpdate,v)
-	end
-	for k,v in pairs(world.objects) do
 		exeTileFunction(v.onUpdate,v)
 	end
 end
