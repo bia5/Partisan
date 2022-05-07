@@ -66,8 +66,9 @@ screen_add(screen, "newtile", newChild("center","center",1280,720))
 screen["newtile"].render = false
 screen_add(screen["newtile"], "bkg", newSprite("context", 0, 0, 1280, 720))
 screen_add(screen["newtile"], "context", newChild("center","center",1210,650))
-screen_addTop(screen["newtile"]["context"], "newtile_title", newText("New Tile", "center", 0, 200, 50, {16,16,16}))
-screen_addTop(screen["newtile"]["context"], "newtilecontext", newChild("center",0,1210,550))
+screen_addTop(screen["newtile"]["context"], "title", newText("New Tile", "center", 0, 200, 50, {16,16,16}))
+screen_addTop(screen["newtile"]["context"], "context", newChild("center",0,1210,550))
+screen_addTop(screen["left_buttons"], "empty2", newEmpty(0,0,200,10))
 
 local tSize = tileSize
 local spacing = tileSize/5
@@ -82,7 +83,43 @@ function screen_leveleditor_newTile_click(tile)
 end
 
 for k,v in pairs(assets_tiles) do
-    screen_add(screen["newtile"]["context"]["newtilecontext"], "tile_"..k, newButton(v, x, y, tSize, tSize, screen_leveleditor_newTile_click, v))
+    screen_add(screen["newtile"]["context"]["context"], "tile_"..k, newButton(v, x, y, tSize, tSize, screen_leveleditor_newTile_click, v))
+    x = x + tSize + spacing
+    if x + tSize > width then
+        x = 0
+        y = y + tSize + spacing
+    end
+end
+
+--New Prefab
+function screen_leveleditor_newPrefab()
+    screen["newprefab"].render = not screen["newprefab"].render
+end
+screen_addTop(screen["left_buttons"], "newprefabcontext", newTextButton("New Prefab", 0,0,200,50, {16,16,16}, screen_leveleditor_newPrefab))
+screen["left_buttons"]["newprefabcontext"].textRatio = .75
+screen_add(screen, "newprefab", newChild("center","center",1280,720))
+screen["newprefab"].render = false
+screen_add(screen["newprefab"], "bkg", newSprite("context", 0, 0, 1280, 720))
+screen_add(screen["newprefab"], "context", newChild("center","center",1210,650))
+screen_addTop(screen["newprefab"]["context"], "title", newText("New Prefab", "center", 0, 200, 50, {16,16,16}))
+screen_addTop(screen["newprefab"]["context"], "context", newChild("center",0,1210,550))
+screen_addTop(screen["left_buttons"], "empty3", newEmpty(0,0,200,10))
+
+local tSize = tileSize
+local spacing = tileSize/5
+local x = 0
+local y = 0
+local width = 1210
+local height = 550
+
+function screen_leveleditor_newPrefab_click(tile)
+    buildTile = getTileType(tile)
+    print("Selected Prefab: "..tile)
+    screen["newprefab"].render = false
+end
+
+for k,v in pairs(tileTypes) do
+    screen_add(screen["newprefab"]["context"]["context"], "tile_"..k, newButton(v.tex, x, y, tSize, tSize, screen_leveleditor_newPrefab_click, k))
     x = x + tSize + spacing
     if x + tSize > width then
         x = 0
@@ -91,12 +128,76 @@ for k,v in pairs(assets_tiles) do
 end
 
 --edit tile
---New Prefab
---toggle layer
+function screen_leveleditor_editTile()
+    screen["edittile"].render = not screen["edittile"].render
+end
+screen_addTop(screen["left_buttons"], "edittilecontext", newTextButton("Edit Tile", 0,0,200,50, {16,16,16}, screen_leveleditor_editTile))
+screen["left_buttons"]["edittilecontext"].textRatio = .75
+screen_add(screen, "edittile", newChild("center","center",1280,720))
+screen["edittile"].render = false
+screen_add(screen["edittile"], "bkg", newSprite("context", 0, 0, 1280, 720))
+screen_add(screen["edittile"], "context", newChild("center","center",1210,650))
+screen_addTop(screen["edittile"]["context"], "title", newText("Edit Tile", "center", 0, 200, 50, {16,16,16}))
+screen_addTop(screen["edittile"]["context"], "context", newChild("center",0,1210,550))
+screen_addTop(screen["left_buttons"], "empty4", newEmpty(0,0,200,10))
+
+--layer
+screen_addBottom(screen["right_buttons"], "layerbuttoncontext", newChild("center","center",200,50))
+function btn_le_down() 
+    layer = layer - 1 
+    scr = getScreen(STATE_LEVELEDITOR)
+    scr["right_buttons"]["layerbuttoncontext"]["layer"].text = layer
+end
+screen_addLeft(screen["right_buttons"]["layerbuttoncontext"], "down", newTextButton("<", 0,0,50,50, {16,16,16}, btn_le_down))
+function btn_le_up() 
+    layer = layer + 1
+    scr = getScreen(STATE_LEVELEDITOR)
+    scr["right_buttons"]["layerbuttoncontext"]["layer"].text = layer 
+end
+screen_addRight(screen["right_buttons"]["layerbuttoncontext"], "up", newTextButton(">", 0,0,50,50, {16,16,16}, btn_le_up))
+screen_addLeft(screen["right_buttons"]["layerbuttoncontext"], "layer", newEditText(layer, 0,0,100,50, {16,16,16}))
+
+--Toggle Walkable
+screen_addBottom(screen["right_buttons"], "-empty1", newEmpty(0,0,200,10))
+screen_addBottom(screen["right_buttons"], "walkable", newTextToggleButton("Walkable", 0,0,200,50, {16,16,16}, nil))
+screen["right_buttons"]["walkable"].textRatio = .65
+
+--Rotation
+screen_addBottom(screen["right_buttons"], "-empty2", newEmpty(0,0,200,10))
+screen_addBottom(screen["right_buttons"], "rotationcontext", newChild("center","center",200,50))
+function btn_le_rotL() 
+    if buildTile  ~= nil then
+        buildTile.deg = buildTile.deg - 90
+        if buildTile.deg >= 360 then
+            buildTile.deg = buildTile.deg - 360
+        end
+        if buildTile.deg < 0 then
+            buildTile.deg = buildTile.deg + 360
+        end
+        scr = getScreen(STATE_LEVELEDITOR)
+        scr["right_buttons"]["rotationcontext"]["rotation"].text = buildTile.deg 
+    end
+end
+screen_addLeft(screen["right_buttons"]["rotationcontext"], "down", newTextButton("<", 0,0,50,50, {16,16,16}, btn_le_rotL))
+function btn_le_rotR() 
+    if buildTile  ~= nil then
+        buildTile.deg = buildTile.deg + 90
+        if buildTile.deg >= 360 then
+            buildTile.deg = buildTile.deg - 360
+        end
+        if buildTile.deg < 0 then
+            buildTile.deg = buildTile.deg + 360
+        end
+        scr = getScreen(STATE_LEVELEDITOR)
+        scr["right_buttons"]["rotationcontext"]["rotation"].text = buildTile.deg 
+    end
+end
+screen_addRight(screen["right_buttons"]["rotationcontext"], "up", newTextButton(">", 0,0,50,50, {16,16,16}, btn_le_rotR))
+screen_addLeft(screen["right_buttons"]["rotationcontext"], "rotation", newEditText(buildTile.deg, 0,0,100,50, {16,16,16}))
+
 
 --zoom
 --speed
---object id
 
 --Offset variables, moves based on the camera
 local offsetX = 0
@@ -169,11 +270,7 @@ function scr_leveleditor_mouseButtonUp(btn)
         if btn == "left" then
             mouse_left = false
             if screen["right_buttons"]["dropper_mode"].toggle then
-                if layer == 1 then --Under
-                    buildTile = world.undertiles[tilex.."-"..tiley]
-                else --Over
-                    buildTile = world.tiles[tilex.."-"..tiley]
-                end
+                buildTile = getTile(tilex, tiley, layer)
                 screen["right_buttons"]["dropper_mode"].toggle = false
             end
         end
@@ -212,6 +309,19 @@ function scr_leveleditor_update()
 
     tilex = math.floor((mouseX-offsetX)/tileSize)
 	tiley = math.floor((mouseY-offsetY)/tileSize)
+    
+    scr = getScreen(STATE_LEVELEDITOR)
+    _layer = tonumber(scr["right_buttons"]["layerbuttoncontext"]["layer"].text)
+    if _layer ~= nil then
+        layer = _layer
+    end
+    buildTile.walkable = scr["right_buttons"]["walkable"].toggle
+    _rotation = tonumber(scr["right_buttons"]["rotationcontext"]["rotation"].text)
+    if _rotation ~= nil then
+        if buildTile  ~= nil then
+            buildTile.deg = _rotation
+        end
+    end
 
     scr = getScreen(STATE_LEVELEDITOR)
     coliding = false
@@ -228,17 +338,9 @@ function scr_leveleditor_update()
     if not coliding then
         if mouse_left then
             if screen["right_buttons"]["build_mode"].toggle then
-                if layer == 1 then --Under
-                    world.undertiles[tilex.."-"..tiley] = buildTile
-                else --Over
-                    world.tiles[tilex.."-"..tiley] = buildTile
-                end
+                setTile(tilex, tiley, layer, table.copy(buildTile))
             elseif screen["right_buttons"]["destroy_mode"].toggle then
-                if layer == 1 then --Under
-                    world.undertiles[tilex.."-"..tiley] = nil
-                else --Over
-                    world.tiles[tilex.."-"..tiley] = nil
-                end
+                setTile(tilex, tiley, layer, nil)
             end
         end
     end
@@ -280,20 +382,14 @@ function scr_leveleditor_render()
     --Render Tiles
     for ii = y-renderDistV, y+renderDistV do
         for i = x-renderDistH, x+renderDistH do
-            tile = world.undertiles[i.."-"..ii]
-            if tile ~= nil then
-                sprite_tile:setTexture(assets:getTexture(tile.tex))
-                sprite_tile:setX((i*tileSize)+offsetX)
-                sprite_tile:setY((ii*tileSize)+offsetY)
-                sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
-            end
-
-            tile = world.tiles[i.."-"..ii]
-            if tile ~= nil then
-                sprite_tile:setTexture(assets:getTexture(tile.tex))
-                sprite_tile:setX((i*tileSize)+offsetX)
-                sprite_tile:setY((ii*tileSize)+offsetY)
-                sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+            tiles = getTile(i,ii)
+            if tiles ~= nil then
+                for k,tile in spairs(tiles, function(t, a, b) return a < b end) do
+                    sprite_tile:setTexture(assets:getTexture(tile.tex))
+                    sprite_tile:setX((i*tileSize)+offsetX)
+                    sprite_tile:setY((ii*tileSize)+offsetY)
+                    sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
+                end
             end
         end
     end

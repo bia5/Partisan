@@ -1,5 +1,14 @@
 --TODO: add textures and animations
 
+tileTypes = {}
+function registerDefaultTileType(name, tile)
+    tileTypes[name] = tile
+end
+
+function getTileType(name)
+    return tileTypes[name]
+end
+
 function newSwitch(tex)
     switch = newTile("switch")
     switch.data = false
@@ -8,6 +17,7 @@ function newSwitch(tex)
 
     return switch
 end
+registerDefaultTileType("switch", newSwitch("switch"))
 
 function newPressurePlate(tex)
     plate = newTile("pressureplate")
@@ -17,6 +27,7 @@ function newPressurePlate(tex)
 
     return plate
 end
+registerDefaultTileType("pressureplate", newPressurePlate("pressureplate"))
 
 --ANIMATION
 function newSpikes(tex,maxTick)
@@ -26,6 +37,7 @@ function newSpikes(tex,maxTick)
 
     return spikes
 end
+registerDefaultTileType("spikes", newSpikes("spikes",mya_getUPS()*2))
 
 function newArrowSpawner(tex,maxTick,x,y,velX,velY,deg)
     spawner = newTile("arrowspawner")
@@ -35,6 +47,7 @@ function newArrowSpawner(tex,maxTick,x,y,velX,velY,deg)
 
     return spawner
 end
+registerDefaultTileType("arrowspawner", newArrowSpawner("arrowspawner",mya_getUPS()*2,0,0,0,0,0))
 
 --ANIMATION
 function newFire()
@@ -43,6 +56,7 @@ function newFire()
 
     return fire
 end
+registerDefaultTileType("fire", newFire())
 
 function newTeleporter(tex,x,y)
     teleporter = newTile("teleporter")
@@ -52,6 +66,7 @@ function newTeleporter(tex,x,y)
 
     return teleporter
 end
+registerDefaultTileType("teleporter", newTeleporter("teleporter",0,0))
 
 --strs
 --strings split by |
@@ -63,6 +78,7 @@ function newChest(tex,strs)
 
     return chest
 end
+registerDefaultTileType("chest", newChest("chest",""))
 
 --multiple textures
 
@@ -80,3 +96,4 @@ function newDoor(tex,strs)
 
     return door
 end
+registerDefaultTileType("door", newDoor("door",""))

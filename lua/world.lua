@@ -14,7 +14,6 @@ function newWorld()
 	world.spawn2X = 0
 	world.spawn2Y = 0
 
-	world.undertiles = {}
 	world.tiles = {}
 
 	world.entityIDs = 1
@@ -31,29 +30,22 @@ function worldToString()
 	local splitter1 = "="
 	local splitter2 = ","
 	local splitter3 = "&"
+	local splitter4 = "["
 	local str = ""
 	
 	--world details
 	str = str.."v="..world.version..splitter0
-	str = str.."s1x="..world.spawn1X..splitter0
-	str = str.."s1y="..world.spawn1Y..splitter0
-	str = str.."s2x="..world.spawn2X..splitter0
-	str = str.."s2y="..world.spawn2Y..splitter0
-	
-	--undertiles
-	str = str.."ut"..splitter1
-	for k,v in pairs(world.undertiles) do
-		if v ~= nil then
-			str = str..k..splitter3..tileToString(v)..splitter2
-		end
-	end
-	str = str..splitter0
 	
 	--tiles
 	str = str.."t"..splitter1
 	for k,v in pairs(world.tiles) do
-		if v ~= nil then
-			str = str..k..splitter3..tileToString(v)..splitter2
+		for k2,v2 in pairs(v) do
+			for k3,v3 in pairs(v2) do
+				tile = getTile(k, k2, k3)
+				if tile ~= nil then
+					str = str..k..splitter4..k2..splitter4..k3..splitter3..tileToString(tile)..splitter2
+				end
+			end
 		end
 	end
 	str = str..splitter0
@@ -68,34 +60,20 @@ function stringToWorld(str)
 	local splitter1 = "="
 	local splitter2 = ","
 	local splitter3 = "&"
+	local splitter4 = "["
 	local inputs = mysplit(str, splitter0)
 
 	for k, v in pairs(inputs) do
 		local inputs2 = mysplit(v, splitter1)
 		if inputs2[1] == "v" then
 			world.version = inputs2[2]
-		elseif inputs2[1] == "s1x" then
-			world.spawn1X = tonumber(inputs2[2])
-		elseif inputs2[1] == "s1y" then
-			world.spawn1Y = tonumber(inputs2[2])
-		elseif inputs2[1] == "s2x" then
-			world.spawn2X = tonumber(inputs2[2])
-		elseif inputs2[1] == "s2y" then
-			world.spawn2Y = tonumber(inputs2[2])
-		elseif inputs2[1] == "ut" then
-			if inputs2[2] ~= nil then
-				local inputs3 = mysplit(inputs2[2], splitter2)
-				for k2, v2 in pairs(inputs3) do
-					local inputs4 = mysplit(v2, splitter3)
-					world.undertiles[inputs4[1]] = stringToTile(inputs4[2])
-				end
-			end
 		elseif inputs2[1] == "t" then
 			if inputs2[2] ~= nil then
 				local inputs3 = mysplit(inputs2[2], splitter2)
 				for k2, v2 in pairs(inputs3) do
 					local inputs4 = mysplit(v2, splitter3)
-					world.tiles[inputs4[1]] = stringToTile(inputs4[2])
+					local inputs5 = mysplit(inputs4[1], splitter4)
+					setTile(tonumber(inputs5[1]),tonumber(inputs5[2]),tonumber(inputs5[3]),stringToTile(inputs4[2]))
 				end
 			end
 		end
@@ -127,24 +105,42 @@ function loadWorld()
 	end
 end
 
+function setTile(x, y, layer, tile)
+	if world.tiles[x] == nil then
+		world.tiles[x] = {}
+	end
+	if world.tiles[x][y] == nil then
+		world.tiles[x][y] = {}
+	end
+	world.tiles[x][y][layer] = tile
+end
+
+function getTile(x, y, layer)
+	if world.tiles[x] == nil then
+		return nil
+	end
+	if world.tiles[x][y] == nil then
+		return nil
+	end
+	if layer == nil then
+		return world.tiles[x][y]
+	end
+	return world.tiles[x][y][layer]
+end
+
 --Gets if x,y is colliding with any tile or object and returns the tile
 function isTileCollision(x,y)
 	noTile = true
-	--under
-	local tile = world.undertiles[math.floor(x).."-"..math.floor(y)]
-	if tile ~= nil then
-		noTile = false
-		if not tile.walkable then
-			return tile
-		end
-	end
 
-	--tiles
-	tile = world.tiles[math.floor(x).."-"..math.floor(y)]
-	if tile ~= nil then
-		noTile = false
-		if not tile.walkable then
-			return tile
+	tiles = getTile(math.floor(x), math.floor(y))
+	if tiles ~= nil then
+		for k,v in pairs(tiles) do
+			if v ~= nil then
+				noTile = false
+				if not v.walkable then
+					return v
+				end
+			end
 		end
 	end
 
@@ -191,10 +187,11 @@ function updateWorld()
 		exeEntityFunction(v.onUpdate,v)
 	end
 
-	for k,v in pairs(world.undertiles) do
-		exeTileFunction(v.onUpdate,v)
-	end
 	for k,v in pairs(world.tiles) do
-		exeTileFunction(v.onUpdate,v)
+		for k2,v2 in pairs(v) do
+			for k3,v3 in pairs(v2) do
+				exeTileFunction(v3.onUpdate,v3)
+			end
+		end
 	end
 end

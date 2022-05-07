@@ -116,23 +116,9 @@ function scr_ingame_render()
 		--Render Tiles
 		for ii = y-renderDistV, y+renderDistV do
 			for i = x-renderDistH, x+renderDistH do
-				tile = world.undertiles[i.."-"..ii]
-				if tile ~= nil then
-					if tile.onRender ~= "nil" then
-						exeTileFunction(tile.onRender, tile)
-					else
-						sprite_tile:setTexture(assets:getTexture(tile.tex))
-						sprite_tile:setX((i*tileSize)+offsetX)
-						sprite_tile:setY((ii*tileSize)+offsetY)
-						sprite_tile:renderFlip(mya_getRenderer(), tileSize+1, tileSize+1,tile.deg, false)
-					end
-				end
-
-				tile = world.tiles[i.."-"..ii]
-				if tile ~= nil then
-					if tile.onRender ~= "nil" then
-						exeTileFunction(tile.onRender, tile)
-					else
+				tiles = getTile(i,ii)
+				if tiles ~= nil then
+					for k,tile in pairs(tiles) do
 						sprite_tile:setTexture(assets:getTexture(tile.tex))
 						sprite_tile:setX((i*tileSize)+offsetX)
 						sprite_tile:setY((ii*tileSize)+offsetY)
