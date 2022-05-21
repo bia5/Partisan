@@ -79,6 +79,7 @@ local height = 550
 
 function screen_leveleditor_newTile_click(tile)
     buildTile = newTile(tile)
+    print("Tile Selected: "..tile)
     screen["newtile"].render = false
 end
 
@@ -315,7 +316,7 @@ function scr_leveleditor_update()
     if _layer ~= nil then
         layer = _layer
     end
-    buildTile.walkable = scr["right_buttons"]["walkable"].toggle
+    buildTile.walkable = not scr["right_buttons"]["walkable"].toggle
     _rotation = tonumber(scr["right_buttons"]["rotationcontext"]["rotation"].text)
     if _rotation ~= nil then
         if buildTile  ~= nil then

@@ -1,7 +1,7 @@
 keys = {}
 
 function registerBinds()
-	
+	registerBind("P", "spawn boss", spawnBoss)
 end
 
 function registerBind(key, name, _function)

@@ -106,5 +106,5 @@ NET_MSG_ = ""
 -- Game Variables
 isHosting = true
 playerid = 0
-world_id = "world_partisan_1"
+world_id = "world"
 local_player_id = 0

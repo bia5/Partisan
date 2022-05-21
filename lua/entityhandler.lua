@@ -45,6 +45,7 @@ function newEntity(id, spawnID)
 
     --functions
     entity.onUpdate = "nil"
+    entity.onTUpdate = "nil"
     entity.onCollision = "nil"
 
     return entity

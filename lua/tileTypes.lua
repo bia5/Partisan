@@ -78,7 +78,7 @@ function newChest(tex,strs)
 
     return chest
 end
-registerDefaultTileType("chest", newChest("chest",""))
+registerDefaultTileType("chest", newChest("chest1",""))
 
 --multiple textures
 

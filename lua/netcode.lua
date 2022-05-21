@@ -261,12 +261,14 @@ function event_networkMessage(clientMessage)
 	msg = network:getDataFromClientMessage(clientMessage)
 	ip = network:getIPFromClientMessage(clientMessage)
 	pack = json.decode(msg)
-	for k,v in pairs(pack) do
-		v.ip = ip --Pack ip to packet for easy access
-		if isHosting then
-			server_handlePacket(v)
-		else
-			handlePacket(v)
+	if pack ~= nil then
+		for k,v in pairs(pack) do
+			v.ip = ip --Pack ip to packet for easy access
+			if isHosting then
+				server_handlePacket(v)
+			else
+				handlePacket(v)
+			end
 		end
 	end
 end

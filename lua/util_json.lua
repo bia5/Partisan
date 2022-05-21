@@ -163,12 +163,14 @@ local literal_map = {
 
 
 local function next_char(str, idx, set, negate)
-  for i = idx, #str do
-    if set[str:sub(i, i)] ~= negate then
-      return i
+  if type(idx) == "number" then
+    for i = idx, #str do
+      if set[str:sub(i, i)] ~= negate then
+        return i
+      end
     end
+    return #str + 1
   end
-  return #str + 1
 end
 
 
@@ -380,8 +382,10 @@ function json.decode(str)
   end
   local res, idx = parse(str, next_char(str, 1, space_chars, true))
   idx = next_char(str, idx, space_chars, true)
-  if idx <= #str then
-    decode_error(str, idx, "trailing garbage")
+  if type(idx) == "number" then
+    if idx <= #str then
+      decode_error(str, idx, "trailing garbage")
+    end
   end
   return res
 end

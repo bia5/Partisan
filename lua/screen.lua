@@ -1,5 +1,6 @@
 --SCREEN HANDLER
 screens = {}
+sprite_empty = Sprite.new(assets:getTexture("empty"))
 
 function addScreen(_state, screen)
     screens[_state] = screen
@@ -131,6 +132,14 @@ function renderChild(child, offsetX, offsetY)
                             child_sprite:setY(((v.y + offsetY) * height_ratio)+(((v.h*height_ratio)/2)-((v.tv:getHeight() * hR)/2)))
                             child_sprite:render(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
                         end
+                    elseif v.id == "loadingbar" then
+                        sprite_empty:setX((v.x + offsetX) * width_ratio)
+                        sprite_empty:setY((v.y + offsetY) * height_ratio)
+                        sprite_empty:setRenderOutline(true)
+                        sprite_empty:setOutlineColor(v.color1[1], v.color1[2], v.color1[3], 255)
+                        sprite_empty:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
+                        sprite_empty:setOutlineColor(v.color2[1], v.color2[2], v.color2[3], 255)
+                        sprite_empty:render(mya_getRenderer(), (v.w*v.ratio) * width_ratio, v.h * height_ratio)
                     end
                 end
             end
@@ -196,27 +205,31 @@ function mouseButtonUp(screen, button, offsetX, offsetY)
         for k, v in pairs(screen) do
             if type(v) == "table" then
                 if v.id == "child" then
-                    ed = mouseButtonUp(v, button, offsetX + v.x, offsetY + v.y)
-                    if ed then
-                        edit = true
+                    if screen.render and v.render then
+                        ed = mouseButtonUp(v, button, offsetX + v.x, offsetY + v.y)
+                        if ed then
+                            edit = true
+                        end
                     end
                 elseif v.id == "button" or v.id == "tbutton" or v.id == "togglebutton" or v.id == "ttbutton" then
-                    if v.clicked then
-                        if v.id == "togglebutton" or v.id == "ttbutton" then
-                            v.toggle = not v.toggle
-                        end
-                        v.clicked = false
-                        v.sprite:setRenderOutline(false)
-                        if v.render and v.onClick then
-                            if v.args then
-                                v.onClick(v.args)
-                            else
-                                v.onClick()
+                    if screen.render and v.render then
+                        if v.clicked then
+                            if v.id == "togglebutton" or v.id == "ttbutton" then
+                                v.toggle = not v.toggle
+                            end
+                            v.clicked = false
+                            v.sprite:setRenderOutline(false)
+                            if v.render and v.onClick then
+                                if v.args then
+                                    v.onClick(v.args)
+                                else
+                                    v.onClick()
+                                end
                             end
                         end
                     end
                 elseif v.id == "etext" then
-                    if v.render then
+                    if screen.render and v.render then
                         x = (v.x + offsetX)*width_ratio
                         y = (v.y + offsetY)*height_ratio
                         w = (v.x + v.w + offsetX)*width_ratio
@@ -603,4 +616,23 @@ function newToggleButton(tex, x, y, width, height, onClick)
     button.onClick = onClick
     
     return button
+end
+
+function newLoadingBar(x, y, width, height, color1, color2)
+    bar = {}
+
+    bar.id = "loadingbar"
+    bar.x = x
+    bar.y = y
+    bar.w = width
+    bar.h = height
+
+    bar.ratio = 1
+
+    bar.render = true
+
+    bar.color1 = color1
+    bar.color2 = color2
+
+    return bar
 end

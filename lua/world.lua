@@ -9,6 +9,7 @@ function newWorld()
 	world.isLinked = false
 	world.version = world_standard
 
+	--Remove eventually
 	world.spawn1X = 0
 	world.spawn1Y = 0
 	world.spawn2X = 0
@@ -158,13 +159,13 @@ function isEntityCollision(entity,offX,offY)
 	local w = entity.w
 	local h = entity.h
 
-	if isTileCollision(x,y) then
+	if isTileCollision(x+(w/4),y+(h/2)) then
 		return true
-	elseif isTileCollision(x+w,y+h) then
+	elseif isTileCollision(x+w-(w/4),y+(h/2)) then
 		return true
-	elseif isTileCollision(x+w,y) then
+	elseif isTileCollision(x+w-(w/4),y+h) then
 		return true
-	elseif isTileCollision(x,y+h) then
+	elseif isTileCollision(x+(w/4),y+h) then
 		return true
 	end
 	return false
@@ -175,6 +176,8 @@ function entity_add(entity)
 	entity.spawnID = world.entityIDs
 	world.entities[world.entityIDs] = entity
 	world.entityIDs = world.entityIDs+1
+
+	return world.entityIDs-1
 end
 
 --World updater
@@ -191,6 +194,24 @@ function updateWorld()
 		for k2,v2 in pairs(v) do
 			for k3,v3 in pairs(v2) do
 				exeTileFunction(v3.onUpdate,v3)
+			end
+		end
+	end
+end
+
+function tUpdateWorld()
+	for k,v in pairs(world.players) do
+		exeEntityFunction(v.onTUpdate,v)
+	end
+
+	for k,v in pairs(world.entities) do
+		exeEntityFunction(v.onTUpdate,v)
+	end
+
+	for k,v in pairs(world.tiles) do
+		for k2,v2 in pairs(v) do
+			for k3,v3 in pairs(v2) do
+				exeTileFunction(v3.onTUpdate,v3)
 			end
 		end
 	end

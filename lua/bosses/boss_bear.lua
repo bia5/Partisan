@@ -1,0 +1,527 @@
+--Variables
+local bearDist_wander = 10
+
+local bearDist_toSentry = 45
+local bearSpeed_sentry = 1
+
+local bearDist_toAnger = 25
+local bearSpeed_anger = 2
+
+local bearDist_toChase = 15
+local bearDist_toChaseWhenAngry = 20
+local bearDist_toCalmFromAnger = 35
+local bearSpeed_chase = 2.5
+
+local bearDist_toAttack = 3
+
+local bearDist_toSwing = 1
+local bearDist_swingReach = 2.5
+local bearTime_swing = .5
+local bearDmg_swing = 15
+local bearSpeed_swing = 3
+
+function spawnBoss_Bear(x,y)
+    local bear = newEntity("boss_bear")
+    bear.x = x
+    bear.y = y
+    bear.w = 1.9
+    bear.h = 1.9
+    bear.velX = 0
+    bear.velY = 0
+    bear.onUpdate = "boss_bear_update"
+    bear.onTUpdate = "boss_bear_tupdate"
+    bear.onCollision = "boss_bear_collision"
+    bear.hp = 1000
+    bear.data = "0,"..x..","..y..",".."idle" --timer,x,y,state
+    bear.tex = "angry_bear_idle"
+    bear.maxhp = 1000
+
+    bear.speed = 2
+
+    print("spawn bear")
+    print("nil -> idle")
+
+    return bear
+end
+
+function bear_closeToTarget(bear, dist)
+    if dist == nil then
+        dist = .5
+    end
+    local strs = mysplit(bear.data, ",")
+    local tX = tonumber(strs[2])
+    local tY = tonumber(strs[3])
+
+    return bear.x < tX + dist and bear.x > tX - dist and bear.y < tY + dist and bear.y > tY - dist  
+end
+
+function bear_walk(bear)
+    local strs = mysplit(bear.data, ",")
+    local timer = tonumber(strs[1])
+    local tX = tonumber(strs[2])
+    local tY = tonumber(strs[3])
+    local bState = strs[4]
+
+    local speed = bear.speed*(mya_getDelta()/1000)
+    x = 0
+	y = 0
+
+    if tX-bear.x >= 0 then
+        bear.velX = bear.speed
+    else
+        bear.velX = -bear.speed
+    end
+    
+    if tY-bear.y >= 0 then
+        bear.velY = bear.speed
+    else
+        bear.velY = -bear.speed
+    end
+
+    if bear.velX > 0 then
+        if not isEntityCollision(bear, speed, 0) then
+            x=x+1
+        end
+    elseif bear.velX < 0 then
+        if not isEntityCollision(bear, -speed, 0) then
+            x=x-1
+        end
+    end
+
+    if bear.velY > 0 then
+        if not isEntityCollision(bear, 0, speed) then
+            y=y+1
+        end
+    elseif bear.velY < 0 then
+        if not isEntityCollision(bear, 0, -speed) then
+            y=y-1
+        end
+    end
+    --print(x..","..y)
+    if x ~= 0 or y ~= 0 then
+        rad = math.atan2(y, x)
+        bear.x = bear.x + (math.cos(rad) * speed)
+        bear.y = bear.y + (math.sin(rad) * speed)
+    else
+        return false
+    end
+
+    if bear.x > tX-.5 and bear.x < tX+.5 then
+        bear.velX = 0
+    end
+    if bear.y > tY-.5 and bear.y < tY+.5 then
+        bear.velY = 0
+    end
+    return true
+end
+
+function bear_clearPath(bear, x, y)
+    ix = 0
+    iy = 0
+
+    if x >= 0 then
+        ix = 1
+    else
+        ix = -1
+    end
+
+    if y >= 0 then
+        iy = 1
+    else
+        iy = -1
+    end
+
+    local continue = true
+    for i = 0, x, ix do
+        for j = 0, y, iy do
+            if isEntityCollision(bear, i, j) ~= false then
+                continue = false
+                break
+            end
+        end
+    end
+
+    return continue
+end
+
+--Bear AI
+function ef_boss_bear_update(bear)
+    local strs = mysplit(bear.data, ",")
+    local timer = tonumber(strs[1])
+    local tX = tonumber(strs[2])
+    local tY = tonumber(strs[3])
+    local bState = strs[4]
+
+    local anger = 1-(bear.hp/bear.maxhp)
+    local bearX = bear.x + (bear.w/2)
+    local bearY = bear.y + (bear.h)
+
+    if bState == "idle" then
+        for k, v in pairs(world.players) do
+            local x = v.x
+            local y = v.y
+            local w = v.w
+            local h = v.h
+
+            local xx = x+(w/2)
+            local yy = y+h
+
+            local rx = xx-bearX
+            local ry = yy-bearY
+
+            local dist = math.sqrt(rx*rx+ry*ry)
+
+            if dist < bearDist_toSentry then
+                bState = "sentry"
+                print("idle -> sentry")
+                break
+            end
+        end
+
+    elseif bState == "sentry" then
+        bear.speed = bearSpeed_sentry
+
+        for k, v in pairs(world.players) do
+            local x = v.x
+            local y = v.y
+            local w = v.w
+            local h = v.h
+
+            local xx = x+(w/2)
+            local yy = y+h
+
+            local rx = xx-bearX
+            local ry = yy-bearY
+
+            local dist = math.sqrt(rx*rx+ry*ry)
+
+            if dist < bearDist_toAnger then
+                bState = "angrysentry"
+                print("sentry -> angrysentry")
+                break
+            end
+        end
+        if bState == "sentry" then
+            --if is close to target change target
+            if bear_closeToTarget(bear) then
+                local ran = math.random(1, 100)
+                if ran == 1 then
+                    bState = "forceidle"
+                    print("sentry -> forceidle")
+                end
+
+                passed = false
+                while passed == false do
+                    _tX = math.random(-bearDist_wander, bearDist_wander)
+                    _tY = math.random(-bearDist_wander, bearDist_wander)
+
+                    if bear_clearPath(bear, _tX, _tY) then
+                        passed = true
+                        tX = _tX
+                        tY = _tY
+                    end
+                end
+                tX = bear.x + tX
+                tY = bear.y + tY
+            else
+                bear_walk(bear)
+            end
+        end
+
+    elseif bState == "forceidle" then
+        for k, v in pairs(world.players) do
+            local x = v.x
+            local y = v.y
+            local w = v.w
+            local h = v.h
+
+            local xx = x+(w/2)
+            local yy = y+h
+
+            local rx = xx-bearX
+            local ry = yy-bearY
+
+            local dist = math.sqrt(rx*rx+ry*ry)
+
+            if dist < bearDist_toAnger then
+                if dist < distance then
+                    distance = dist
+                end
+
+                _tX = v.x - bearX
+                _tY = v.y - bearY
+
+                if bear_clearPath(bear, _tX, _tY) then
+                    bState = "chase"
+                    print("forceidle -> chase")
+                    tX = _tX
+                    tY = _tY
+                    break
+                end
+            end
+        end
+        if bState == "forceidle" then
+            local ran = math.random(1, 1000)
+            if ran == 1 then
+                bState = "sentry"
+                print("forceidle -> sentry")
+            end
+        end
+
+    elseif bState == "angrysentry" then
+        bear.speed = bearSpeed_anger
+
+        distance = bearDist_toCalmFromAnger+5
+        for k, v in pairs(world.players) do
+            local x = v.x
+            local y = v.y
+            local w = v.w
+            local h = v.h
+
+            local xx = x+(w/2)
+            local yy = y+h
+
+            local rx = xx-bearX
+            local ry = yy-bearY
+
+            local dist = math.sqrt(rx*rx+ry*ry)
+
+            if dist < bearDist_toChaseWhenAngry then
+                if dist < distance then
+                    distance = dist
+                end
+
+                _tX = v.x - bearX
+                _tY = v.y - bearY
+
+                if bear_clearPath(bear, _tX, _tY) then
+                    bState = "chase"
+                    print("angrysentry -> chase")
+                    tX = _tX
+                    tY = _tY
+                    break
+                end
+            elseif dist < distance then
+                distance = dist
+            end
+        end
+        if bState == "angrysentry" then
+            if distance > bearDist_toCalmFromAnger then
+                bState = "sentry"
+                print("angrysentry -> sentry")
+            end
+        end
+        if bState == "angrysentry" then
+            --if is close to target change target
+            if bear_closeToTarget(bear) then
+                passed = false
+                while passed == false do
+                    _tX = math.random(-bearDist_wander, bearDist_wander)
+                    _tY = math.random(-bearDist_wander, bearDist_wander)
+                    if bear_clearPath(bear, _tX, _tY) then
+                        passed = true
+                        tX = _tX
+                        tY = _tY
+                    end
+                end
+
+                tX = bear.x + tX
+                tY = bear.y + tY
+            else
+                bear_walk(bear)
+            end
+        end
+    elseif bState == "chase" then
+        bear.speed = bearSpeed_chase
+        distance = bearDist_toChase
+        p = nil
+        for k, v in pairs(world.players) do
+            local x = v.x
+            local y = v.y
+            local w = v.w
+            local h = v.h
+
+            local xx = x+(w/2)
+            local yy = y+h
+
+            local rx = xx-bearX
+            local ry = yy-bearY
+
+            local dist = math.sqrt(rx*rx+ry*ry)
+
+            if dist < bearDist_toAttack then
+                tX = v.x - bearX
+                tY = v.y - bearY
+
+                tX = bear.x + tX
+                tY = bear.y + tY
+
+                --choose attack
+                local ran = math.random(1, 100)
+                bState = "swing"
+                print("chase -> swing")
+
+                break
+            elseif dist < distance then
+                distance = dist
+                p = v
+            end
+        end
+        if bState == "chase" then
+            if p == nil then
+                bState = "angrysentry"
+                print("chase -> angrysentry")
+                bear.velX = 0
+                bear.velY = 0
+            else
+                _tX = p.x - bearX
+                _tY = p.y - bearY
+
+                if bear_clearPath(bear, _tX, _tY) then
+                    tX = bear.x + _tX
+                    tY = bear.y + _tY
+                    bear.data = timer..","..tX..","..tY..","..bState
+
+                    bear_walk(bear)
+                else
+                    if bear_closeToTarget(bear) then
+                        bState = "angrysentry"
+                        print("chase -> angrysentry")
+                    else
+                        if not bear_walk(bear) then
+                            bState = "angrysentry"
+                            print("chase -> angrysentry")
+                        end
+                    end
+                end
+            end
+        end
+
+    elseif bState == "swing" then
+        if timer < 1000 then
+            distance = bearDist_toChase
+            p = nil
+            for k, v in pairs(world.players) do
+                local x = v.x
+                local y = v.y
+                local w = v.w
+                local h = v.h
+
+                local xx = x+(w/2)
+                local yy = y+h
+
+                local rx = xx-bearX
+                local ry = yy-bearY
+
+                local dist = math.sqrt(rx*rx+ry*ry)
+
+                if dist < bearDist_toSwing then
+                    bear.speed = 1
+                    --swing
+                    timer = 1000 + (bearTime_swing * mya_getUPS())
+                    break
+                elseif dist < distance then
+                    distance = dist
+                    p = v
+                end
+            end
+            if bState == "swing" then
+                bear.speed = bearSpeed_swing
+                if p == nil then
+                    timer = timer - 1
+                    if timer <= 0 then
+                        bState = "angrysentry"
+                        print("swing -> angrysentry")
+                        bear.velX = 0
+                        bear.velY = 0
+                    end
+                else
+                    timer = 200
+                    _tX = p.x+(p.w/2) - bearX
+                    _tY = p.y+p.h - bearY
+                    
+                    if bear_clearPath(bear, _tX, _tY) then
+                        tX = bear.x + _tX
+                        tY = bear.y + _tY
+                        bear.data = timer..","..tX..","..tY..","..bState
+
+                        bear_walk(bear)
+                    else
+                        local tX = tonumber(strs[2])
+                        local tY = tonumber(strs[3])
+                        if bear_closeToTarget(bear) then
+                            bState = "angrysentry"
+                            print("swing -> angrysentry")
+                        else
+                            --print(bear_walk(bear))
+                            --print("x: "..bear.x.." y: "..bear.y.." tX: "..tX.." tY: "..tY.." velX: "..bear.velX.." velY: "..bear.velY)
+                            if not bear_walk(bear) then
+                                bState = "angrysentry"
+                                print("swing -> angrysentry")
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    elseif bState == "roll" then
+        bState = "chase"
+        print("roll -> chase")
+    elseif bState == "jump" then
+        bState = "chase"
+        print("jump -> chase")
+    end
+
+    printInfo = false
+    bear.data = timer..","..tX..","..tY..","..bState
+end
+newEntityFunction("boss_bear_update", ef_boss_bear_update)
+
+function ef_boss_bear_tupdate(bear)
+    local strs = mysplit(bear.data, ",")
+    local timer = tonumber(strs[1])
+    local tX = tonumber(strs[2])
+    local tY = tonumber(strs[3])
+    local bState = strs[4]
+
+    local anger = 1-(bear.hp/bear.maxhp)
+    local bearX = bear.x + (bear.w/2)
+    local bearY = bear.y + (bear.h)
+
+    if bState == "swing" then
+        if timer > 999 then
+            timer = timer -1
+
+            if timer == 1000 then
+                timer = 0
+                for k, v in pairs(world.players) do
+                    local x = v.x
+                    local y = v.y
+                    local w = v.w
+                    local h = v.h
+
+                    local xx = x+(w/2)
+                    local yy = y+h
+
+                    local rx = xx-bearX
+                    local ry = yy-bearY
+
+                    local dist = math.sqrt(rx*rx+ry*ry)
+
+                    if dist < bearDist_swingReach then
+                        v.health = v.health - bearDmg_swing
+                    end
+                end
+                bState = "angrysentry"
+            end
+        end
+    end
+    bear.data = timer..","..tX..","..tY..","..bState
+end
+newEntityFunction("boss_bear_tupdate", ef_boss_bear_tupdate)
+
+function spawnBoss(pressed)
+    if pressed == false then
+        eid = entity_add(spawnBoss_Bear(0,0))
+    end
+end

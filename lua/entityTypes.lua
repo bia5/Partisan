@@ -9,7 +9,7 @@ function spawnBullet(x,y,velX,velY,size,hp,dmg,tex,deg)
     bullet.onUpdate = "bullet_update"
 	bullet.onCollision = "bullet_collision"
     bullet.hp = hp
-    bullet.data = 0
+    bullet.data = 0 --I want max hp here
     bullet.tex = tex
     bullet.maxhp = dmg --Entity's maxhp = bullet damage
     bullet.deg = deg --Degrees
@@ -20,3 +20,5 @@ end
 function arrow(x,y,velX,velY,deg)
     spawnBullet(x,y,velX,velY,0.2,1,10,"entity_arrow_0",deg)
 end
+
+require("bosses/boss_bear")

@@ -1,5 +1,5 @@
 screen = newChild(0, 0, 1920, 1080)
-local selected_level = "world_partisan_1" --selected world level
+local selected_level = "world" --selected world level
 
 screen_addTop(screen, "tv_host", newText("Host Server", "center", 10, 350, 80, {255, 128, 50}))
 
