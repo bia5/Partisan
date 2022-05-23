@@ -2,7 +2,7 @@
 local bearDist_wander = 10
 
 local bearDist_toSentry = 45
-local bearSpeed_sentry = 1
+local bearSpeed_sentry = 3
 
 local bearDist_toAnger = 25
 local bearSpeed_anger = 2
@@ -15,7 +15,7 @@ local bearSpeed_chase = 2.5
 local bearDist_toAttack = 3
 
 local bearDist_toSwing = 1
-local bearDist_swingReach = 2.5
+local bearDist_swingReach = 2
 local bearTime_swing = .5
 local bearDmg_swing = 15
 local bearSpeed_swing = 3
@@ -46,7 +46,7 @@ end
 
 function bear_closeToTarget(bear, dist)
     if dist == nil then
-        dist = .5
+        dist = .1
     end
     local strs = mysplit(bear.data, ",")
     local tX = tonumber(strs[2])
@@ -65,17 +65,22 @@ function bear_walk(bear)
     local speed = bear.speed*(mya_getDelta()/1000)
     x = 0
 	y = 0
+    dist = .1
 
-    if tX-bear.x >= 0 then
-        bear.velX = bear.speed
-    else
-        bear.velX = -bear.speed
+    if not (bear.x < tX + dist and bear.x > tX - dist) then
+        if tX-bear.x >= 0 then
+            bear.velX = bear.speed
+        else
+            bear.velX = -bear.speed
+        end
     end
     
-    if tY-bear.y >= 0 then
-        bear.velY = bear.speed
-    else
-        bear.velY = -bear.speed
+    if not (bear.y < tY + dist and bear.y > tY - dist) then
+        if tY-bear.y >= 0 then
+            bear.velY = bear.speed
+        else
+            bear.velY = -bear.speed
+        end
     end
 
     if bear.velX > 0 then
@@ -153,21 +158,13 @@ function ef_boss_bear_update(bear)
     local bState = strs[4]
 
     local anger = 1-(bear.hp/bear.maxhp)
-    local bearX = bear.x + (bear.w/2)
-    local bearY = bear.y + (bear.h)
 
     if bState == "idle" then
         for k, v in pairs(world.players) do
             local x = v.x
             local y = v.y
-            local w = v.w
-            local h = v.h
-
-            local xx = x+(w/2)
-            local yy = y+h
-
-            local rx = xx-bearX
-            local ry = yy-bearY
+            local rx = x-bear.x
+            local ry = y-bear.y
 
             local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -184,14 +181,8 @@ function ef_boss_bear_update(bear)
         for k, v in pairs(world.players) do
             local x = v.x
             local y = v.y
-            local w = v.w
-            local h = v.h
-
-            local xx = x+(w/2)
-            local yy = y+h
-
-            local rx = xx-bearX
-            local ry = yy-bearY
+            local rx = x-bear.x
+            local ry = y-bear.y
 
             local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -217,12 +208,10 @@ function ef_boss_bear_update(bear)
 
                     if bear_clearPath(bear, _tX, _tY) then
                         passed = true
-                        tX = _tX
-                        tY = _tY
+                        tX = _tX+bear.x
+                        tY = _tY+bear.y
                     end
                 end
-                tX = bear.x + tX
-                tY = bear.y + tY
             else
                 bear_walk(bear)
             end
@@ -232,14 +221,8 @@ function ef_boss_bear_update(bear)
         for k, v in pairs(world.players) do
             local x = v.x
             local y = v.y
-            local w = v.w
-            local h = v.h
-
-            local xx = x+(w/2)
-            local yy = y+h
-
-            local rx = xx-bearX
-            local ry = yy-bearY
+            local rx = x-bear.x
+            local ry = y-bear.y
 
             local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -248,14 +231,14 @@ function ef_boss_bear_update(bear)
                     distance = dist
                 end
 
-                _tX = v.x - bearX
-                _tY = v.y - bearY
+                _tX = v.x - bear.x
+                _tY = v.y - bear.y
 
                 if bear_clearPath(bear, _tX, _tY) then
                     bState = "chase"
                     print("forceidle -> chase")
-                    tX = _tX
-                    tY = _tY
+                    tX = _tX+bear.x
+                    tY = _tY+bear.y
                     break
                 end
             end
@@ -275,14 +258,8 @@ function ef_boss_bear_update(bear)
         for k, v in pairs(world.players) do
             local x = v.x
             local y = v.y
-            local w = v.w
-            local h = v.h
-
-            local xx = x+(w/2)
-            local yy = y+h
-
-            local rx = xx-bearX
-            local ry = yy-bearY
+            local rx = x-bear.x
+            local ry = y-bear.y
 
             local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -291,14 +268,14 @@ function ef_boss_bear_update(bear)
                     distance = dist
                 end
 
-                _tX = v.x - bearX
-                _tY = v.y - bearY
+                _tX = v.x - bear.x
+                _tY = v.y - bear.y
 
                 if bear_clearPath(bear, _tX, _tY) then
                     bState = "chase"
                     print("angrysentry -> chase")
-                    tX = _tX
-                    tY = _tY
+                    tX = _tX+bear.x
+                    tY = _tY+bear.y
                     break
                 end
             elseif dist < distance then
@@ -320,15 +297,23 @@ function ef_boss_bear_update(bear)
                     _tY = math.random(-bearDist_wander, bearDist_wander)
                     if bear_clearPath(bear, _tX, _tY) then
                         passed = true
-                        tX = _tX
-                        tY = _tY
+                        tX = _tX+bear.x
+                        tY = _tY+bear.y
                     end
                 end
-
-                tX = bear.x + tX
-                tY = bear.y + tY
             else
-                bear_walk(bear)
+                if not bear_walk(bear) then
+                    passed = false
+                    while passed == false do
+                        _tX = math.random(-bearDist_wander, bearDist_wander)
+                        _tY = math.random(-bearDist_wander, bearDist_wander)
+                        if bear_clearPath(bear, _tX, _tY) then
+                            passed = true
+                            tX = _tX+bear.x
+                            tY = _tY+bear.y
+                        end
+                    end
+                end
             end
         end
     elseif bState == "chase" then
@@ -338,30 +323,25 @@ function ef_boss_bear_update(bear)
         for k, v in pairs(world.players) do
             local x = v.x
             local y = v.y
-            local w = v.w
-            local h = v.h
-
-            local xx = x+(w/2)
-            local yy = y+h
-
-            local rx = xx-bearX
-            local ry = yy-bearY
+            local rx = x-bear.x
+            local ry = y-bear.y
 
             local dist = math.sqrt(rx*rx+ry*ry)
 
             if dist < bearDist_toAttack then
-                tX = v.x - bearX
-                tY = v.y - bearY
+                tX = v.x - bear.x
+                tY = v.y - bear.y
 
-                tX = bear.x + tX
-                tY = bear.y + tY
+                if bear_clearPath(bear, tX, tY) then
+                    tX = bear.x + tX
+                    tY = bear.y + tY
+                    --choose attack
+                    local ran = math.random(1, 100)
+                    bState = "swing"
+                    print("chase -> swing")
 
-                --choose attack
-                local ran = math.random(1, 100)
-                bState = "swing"
-                print("chase -> swing")
-
-                break
+                    break
+                end
             elseif dist < distance then
                 distance = dist
                 p = v
@@ -374,8 +354,8 @@ function ef_boss_bear_update(bear)
                 bear.velX = 0
                 bear.velY = 0
             else
-                _tX = p.x - bearX
-                _tY = p.y - bearY
+                _tX = p.x - bear.x
+                _tY = p.y - bear.y
 
                 if bear_clearPath(bear, _tX, _tY) then
                     tX = bear.x + _tX
@@ -404,14 +384,8 @@ function ef_boss_bear_update(bear)
             for k, v in pairs(world.players) do
                 local x = v.x
                 local y = v.y
-                local w = v.w
-                local h = v.h
-
-                local xx = x+(w/2)
-                local yy = y+h
-
-                local rx = xx-bearX
-                local ry = yy-bearY
+                local rx = x-bear.x
+                local ry = y-bear.y
 
                 local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -437,8 +411,8 @@ function ef_boss_bear_update(bear)
                     end
                 else
                     timer = 200
-                    _tX = p.x+(p.w/2) - bearX
-                    _tY = p.y+p.h - bearY
+                    _tX = p.x - bear.x
+                    _tY = p.y - bear.y
                     
                     if bear_clearPath(bear, _tX, _tY) then
                         tX = bear.x + _tX
@@ -485,8 +459,6 @@ function ef_boss_bear_tupdate(bear)
     local bState = strs[4]
 
     local anger = 1-(bear.hp/bear.maxhp)
-    local bearX = bear.x + (bear.w/2)
-    local bearY = bear.y + (bear.h)
 
     if bState == "swing" then
         if timer > 999 then
@@ -497,14 +469,8 @@ function ef_boss_bear_tupdate(bear)
                 for k, v in pairs(world.players) do
                     local x = v.x
                     local y = v.y
-                    local w = v.w
-                    local h = v.h
-
-                    local xx = x+(w/2)
-                    local yy = y+h
-
-                    local rx = xx-bearX
-                    local ry = yy-bearY
+                    local rx = x-bear.x
+                    local ry = y-bear.y
 
                     local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -522,6 +488,6 @@ newEntityFunction("boss_bear_tupdate", ef_boss_bear_tupdate)
 
 function spawnBoss(pressed)
     if pressed == false then
-        eid = entity_add(spawnBoss_Bear(0,0))
+        eid = entity_add(spawnBoss_Bear(0,5))
     end
 end

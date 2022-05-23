@@ -1,5 +1,7 @@
 screen = newChild(0, 0, 1920, 1080)
 
+screen_add(screen, "debug_tv", newText("Debug", 0, 1000, 1920, 45, {16,16,16}))
+
 screen_add(screen, "hud", newChild(0, 0, 1920, 1080))
 screen_addTop(screen["hud"], "empty1", newEmpty(0, 0, 1920, 10))
 screen_addTop(screen["hud"], "player_info", newChild(10, 0, 1910, 110))
@@ -113,11 +115,15 @@ function scr_ingame_update()
 		end
 
 		if v.id == getPlayerID() then
-			offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)-tileSize/2
-			offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)-tileSize/2
+			offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)
+			offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)
 
 			scr["hud"]["player_info"]["hp"].w = v.maxHealth*8
 			scr["hud"]["player_info"]["hp"].ratio = v.health/v.maxHealth
+
+			tilex = math.floor((mouseX-offsetX)/tileSize)
+			tiley = math.floor((mouseY-offsetY)/tileSize)
+			scr["debug_tv"].text = "FPS: "..mya_getFPS()..", X: "..tostring(math.floor(v.x*100)/100)..", Y: "..tostring(math.floor(v.y*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_..", MouseX: "..mouseX..", MouseY: "..mouseY..", TileX: "..tilex..", TileY: "..tiley
 		else
 			scr["hud"]["coop_player_info"].render = true
 			scr["hud"]["coop_player_info"]["player1_hp"].ratio = v.health/v.maxHealth
@@ -131,7 +137,7 @@ function scr_ingame_render()
 
     --Get render distance for tiles
 	renderDistH = tileSize_
-	renderDistV = tileSize_/2
+	renderDistV = tileSize_/2+1
 
 	t_tiles = {}
 	
@@ -164,8 +170,8 @@ function scr_ingame_render()
 		if v ~= nil then
 			if v.number ~= nil then
 				sprite_player:setTexture(assets:getTexture("player"..v.number.."_"..v.deg.."_0"))
-				sprite_player:setX((v.x*tileSize)+offsetX)
-				sprite_player:setY((v.y*tileSize)+offsetY)
+				sprite_player:setX(((v.x-(v.w/2))*tileSize)+offsetX)
+				sprite_player:setY(((v.y-v.h)*tileSize)+offsetY)
 				sprite_player:render(mya_getRenderer(), tileSize, tileSize)
 			end
 		end
@@ -174,8 +180,8 @@ function scr_ingame_render()
 	--Render Entities
 	for k, v in pairs(world.entities) do
 		sprite_entity:setTexture(assets:getTexture(v.tex))
-		sprite_entity:setX((v.x*tileSize)+offsetX)
-		sprite_entity:setY((v.y*tileSize)+offsetY)
+		sprite_entity:setX(((v.x-(v.w/2))*tileSize)+offsetX)
+		sprite_entity:setY(((v.y-v.h)*tileSize)+offsetY)
 		sprite_entity:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h,v.deg,false)
 	end
 

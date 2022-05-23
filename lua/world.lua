@@ -11,9 +11,9 @@ function newWorld()
 
 	--Remove eventually
 	world.spawn1X = 0
-	world.spawn1Y = 0
+	world.spawn1Y = 1
 	world.spawn2X = 0
-	world.spawn2Y = 0
+	world.spawn2Y = 1
 
 	world.tiles = {}
 
@@ -159,13 +159,13 @@ function isEntityCollision(entity,offX,offY)
 	local w = entity.w
 	local h = entity.h
 
-	if isTileCollision(x+(w/4),y+(h/2)) then
+	if isTileCollision(x-(w/2)+(w/4),y) then
 		return true
-	elseif isTileCollision(x+w-(w/4),y+(h/2)) then
+	elseif isTileCollision(x-(w/2)+(w/4),y-(w/2)) then
 		return true
-	elseif isTileCollision(x+w-(w/4),y+h) then
+	elseif isTileCollision(x+(w/2)-(w/4),y) then
 		return true
-	elseif isTileCollision(x+(w/4),y+h) then
+	elseif isTileCollision(x+(w/2)-(w/4),y-(w/2)) then
 		return true
 	end
 	return false
