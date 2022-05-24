@@ -71,6 +71,7 @@ function event_keyUp(key)
 end
 
 function event_update()
+	mya_deltaUpdate()
 	update(getScreen(state))
 end
 

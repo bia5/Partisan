@@ -31,16 +31,20 @@ screen_addBottom(screen["worldinfo"]["context"], "buttons", newChild("center",0,
 function scr_leveleditor_loadWorld()
     world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
     loadWorld()
+    genPlayer()
 end
 screen_addLeft(screen["worldinfo"]["context"]["buttons"], "load_button", newTextButton("Load", 0,"center",150,50, {16,16,16}, scr_leveleditor_loadWorld))
 function scr_leveleditor_saveWorld()
     world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
+    world.players = {}
     saveWorld()
+    genPlayer()
 end
 screen_addRight(screen["worldinfo"]["context"]["buttons"], "save_button", newTextButton("Save", 0,"center",150,50, {16,16,16}, scr_leveleditor_saveWorld))
 function scr_leveleditor_newWorld()
     world_id = screen["worldinfo"]["context"]["worldidcontext"]["worldid_et"].text
     newWorld()
+    genPlayer()
 end
 screen_add(screen["worldinfo"]["context"]["buttons"], "empty_button", newTextButton("New World", "center","center",250,50, {16,16,16}, scr_leveleditor_newWorld))
 screen_addTop(screen["left_buttons"], "empty1", newEmpty(0,0,200,10))
@@ -204,14 +208,14 @@ screen_addLeft(screen["right_buttons"]["rotationcontext"], "rotation", newEditTe
 local offsetX = 0
 local offsetY = 0
 
---Camera Movement
-local playerX = 0
-local playerY = 0
-local playerSpeed = 10
-local playerW = false
-local playerA = false
-local playerS = false
-local playerD = false
+--Setup Player Camera
+function genPlayer()
+    player = newPlayer(getPlayerID(), "camera", 0, 0, 1)
+    player.speed = 15
+    player.skipCollision = true
+    world.players[getPlayerID()] = player
+end
+genPlayer()
 
 --Various Sprites
 sprite_tile = Sprite.new(assets:getTexture("empty"))
@@ -226,28 +230,6 @@ function zoomIn()
 	tileSize_ = tileSize_ - 5
 	tileSize = mya_getHeight()/tileSize_
     loadWorld()
-end
-
---Player movement keybind functions
-function player_up_le(isPressed)
-	if state == STATE_LEVELEDITOR then
-		playerW = isPressed
-	end
-end
-function player_down_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
-		playerS = isPressed
-	end
-end
-function player_left_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
-		playerA = isPressed
-	end
-end
-function player_right_le(isPressed) 
-	if state == STATE_LEVELEDITOR then
-		playerD = isPressed
-	end
 end
 
 mouse_left = false
@@ -306,8 +288,6 @@ end
 screen.onTUpdate = scr_leveleditor_tupdate
 
 function scr_leveleditor_update()
-    mya_deltaUpdate()
-
     tilex = math.floor((mouseX-offsetX)/tileSize)
 	tiley = math.floor((mouseY-offsetY)/tileSize)
     
@@ -347,27 +327,16 @@ function scr_leveleditor_update()
     end
 
     --Handle camera movement
-	local speed = playerSpeed*(mya_getDelta()/1000)
-		
-	if playerW then 
-		playerY = playerY - speed
-	end
-	if playerS then 
-		playerY = playerY + speed 
-	end
-	if playerA then 
-		playerX = playerX - speed 
-	end
-	if playerD then 
-		playerX = playerX + speed
+    for k,v in pairs(world.players) do
+		exeEntityFunction(v.onUpdate,v)
 	end
 	
 	--Update Camera Offset
-	offsetX = (mya_getWidth()/2)-(playerX*tileSize)-tileSize/2
-	offsetY = (mya_getHeight()/2)-(playerY*tileSize)-tileSize/2
+	offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)-tileSize/2
+	offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)-tileSize/2
 
     scr = getScreen(STATE_LEVELEDITOR)
-    scr["debug_tv"].text = "FPS: "..mya_getFPS()..", X: "..tostring(math.floor(playerX*100)/100)..", Y: "..tostring(math.floor(playerY*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_
+    scr["debug_tv"].text = "FPS: "..mya_getFPS()..", X: "..tostring(math.floor(getPlayer(getPlayerID()).x*100)/100)..", Y: "..tostring(math.floor(getPlayer(getPlayerID()).y*100)/100)..", Delta: "..(mya_getDelta()/1000)..", Zoom: "..tileSize_
 end
 screen.onUpdate = scr_leveleditor_update
 
@@ -377,8 +346,8 @@ function scr_leveleditor_render()
     --Get render distance for tiles
     renderDistH = tileSize_
     renderDistV = tileSize_/2
-    x = math.floor(playerX+.5)
-    y = math.floor(playerY+.5)
+    x = math.floor(getPlayer(getPlayerID()).x+.5)
+    y = math.floor(getPlayer(getPlayerID()).y+.5)
 
     --Render Tiles
     for ii = y-renderDistV, y+renderDistV do

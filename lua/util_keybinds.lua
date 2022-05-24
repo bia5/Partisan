@@ -1,7 +1,14 @@
 keys = {}
 
 function registerBinds()
-	registerBind("P", "spawn boss", spawnBoss)
+    registerBind("W", "Forward", player_up)
+    registerBind("S", "Back", player_down)
+    registerBind("A", "Left", player_left)
+    registerBind("D", "Right", player_right)
+
+	if devmode then
+		registerBind("P", "spawn boss", spawnBoss)
+	end
 end
 
 function registerBind(key, name, _function)

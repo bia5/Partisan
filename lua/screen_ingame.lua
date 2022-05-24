@@ -35,55 +35,16 @@ end
 screen.onTUpdate = scr_ingame_tupdate
 
 function scr_ingame_update()
-    mya_deltaUpdate()
 	updateWorld()
 
 	scr = getScreen(STATE_INGAME)
 	scr["hud"]["coop_player_info"].render = false
 
     --Update Player
-	--Once again, move to player based
 	for k, v in pairs(world.players) do
 		if v.id == getPlayerID() then
-		local speed = v.speed*(mya_getDelta()/1000)
-			
-		x = 0
-		y = 0
-
-		if v.key_w then 
-			if not isEntityCollision(v, 0, -speed) then
-				y=y-1
-			end
-			v.deg = 270
-		end
-		if v.key_s then
-			if not isEntityCollision(v, 0, speed) then
-				y=y+1
-			end
-			v.deg = 0
-		end
-		if v.key_a then 
-			if not isEntityCollision(v, -speed, 0) then
-				x=x-1
-			end
-			v.deg = 180
-		end
-		if v.key_d then 
-			if not isEntityCollision(v, speed, 0) then
-				x=x+1
-			end
-			v.deg = 90
-		end
-
-		if x ~= 0 or y ~= 0 then
-			rad = math.atan2(y, x)
-			v.x = v.x + (math.cos(rad) * speed)
-			v.y = v.y + (math.sin(rad) * speed)
-		end
-
-		if v.id == getPlayerID() then
-			offsetX = (mya_getWidth()/2)-(getPlayer(getPlayerID()).x*tileSize)
-			offsetY = (mya_getHeight()/2)-(getPlayer(getPlayerID()).y*tileSize)
+			offsetX = (mya_getWidth()/2)-(v.x*tileSize)
+			offsetY = (mya_getHeight()/2)-(v.y*tileSize)
 
 			scr["hud"]["player_info"]["hp"].w = v.maxHealth*8
 			scr["hud"]["player_info"]["hp"].ratio = v.health/v.maxHealth
@@ -96,7 +57,6 @@ function scr_ingame_update()
 			scr["hud"]["coop_player_info"]["player1_hp"].ratio = v.health/v.maxHealth
 		end
 	end
-end
 end
 screen.onUpdate = scr_ingame_update
 
