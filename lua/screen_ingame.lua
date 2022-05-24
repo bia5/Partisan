@@ -23,47 +23,13 @@ sprite_player = Sprite.new(assets:getTexture("empty"))
 sprite_tile = Sprite.new(assets:getTexture("empty"))
 sprite_entity = Sprite.new(assets:getTexture("empty"))
 
-function player_up(isPressed)
-	if state == STATE_INGAME then
-		message("w",{getPlayerID(),isPressed})
-		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).key_w = isPressed
-		end
-	end
-end
-function player_down(isPressed) 
-	if state == STATE_INGAME then
-		message("s",{getPlayerID(),isPressed})
-		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).key_s = isPressed
-		end
-	end
-end
-function player_left(isPressed) 
-	if state == STATE_INGAME then
-		message("a",{getPlayerID(),isPressed})
-		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).key_a = isPressed
-		end
-	end
-end
-function player_right(isPressed) 
-	if state == STATE_INGAME then
-		message("d",{getPlayerID(),isPressed})
-		if getPlayer(getPlayerID()) ~= nil then
-			getPlayer(getPlayerID()).key_d = isPressed
-		end
-	end
-end
-
 function scr_ingame_tupdate()
 	tUpdateWorld()
-    if getPlayer(getPlayerID()) then
-		message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
-	end
-	if tablelength(clients_simplified) ~= tablelength(world.players) then
-		print("Player count mismatch")
-		message(NET_MSG_SENDPLAYER, {})
+	if not isHosting then
+		if tablelength(clients_simplified) ~= tablelength(world.players) then
+			print("Player count mismatch")
+			message(NET_MSG_SENDPLAYER, {})
+		end
 	end
 end
 screen.onTUpdate = scr_ingame_tupdate
@@ -78,6 +44,7 @@ function scr_ingame_update()
     --Update Player
 	--Once again, move to player based
 	for k, v in pairs(world.players) do
+		if v.id == getPlayerID() then
 		local speed = v.speed*(mya_getDelta()/1000)
 			
 		x = 0
@@ -130,6 +97,7 @@ function scr_ingame_update()
 		end
 	end
 end
+end
 screen.onUpdate = scr_ingame_update
 
 function scr_ingame_render()
@@ -165,25 +133,27 @@ function scr_ingame_render()
 		end
 	end
 
-	--Render Players
-	for k, v in spairs(world.players, function(t, a, b) return t[a].y+t[a].h < t[b].y+t[b].h end) do
+	local es = table.copy(world.entities)
+	for k,v in pairs(world.players) do
+		table.insert(es, v)
+	end
+
+	for k, v in spairs(es, function(t, a, b) return t[a].y < t[b].y end) do
 		if v ~= nil then
 			if v.number ~= nil then
 				sprite_player:setTexture(assets:getTexture("player"..v.number.."_"..v.deg.."_0"))
 				sprite_player:setX(((v.x-(v.w/2))*tileSize)+offsetX)
 				sprite_player:setY(((v.y-v.h)*tileSize)+offsetY)
-				sprite_player:render(mya_getRenderer(), tileSize, tileSize)
+				sprite_player:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
+			else
+				sprite_entity:setTexture(assets:getTexture(v.tex))
+				sprite_entity:setX(((v.x-(v.w/2))*tileSize)+offsetX)
+				sprite_entity:setY(((v.y-v.h)*tileSize)+offsetY)
+				sprite_entity:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
 			end
 		end
 	end
-
-	--Render Entities
-	for k, v in pairs(world.entities) do
-		sprite_entity:setTexture(assets:getTexture(v.tex))
-		sprite_entity:setX(((v.x-(v.w/2))*tileSize)+offsetX)
-		sprite_entity:setY(((v.y-v.h)*tileSize)+offsetY)
-		sprite_entity:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h,v.deg,false)
-	end
+	es = nil
 
 	for k,tile in pairs(t_tiles) do
 		sprite_tile:setTexture(assets:getTexture(tile.tex))

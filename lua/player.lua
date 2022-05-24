@@ -32,7 +32,7 @@ function newPlayer(id, name, x, y, number)
 
 	--functions
 	player.onUpdate = "nil"
-    player.onTUpdate = "nil"
+    player.onTUpdate = "player_tupdate"
     player.onCollision = "nil"
 	
 	return player
@@ -40,4 +40,40 @@ end
 
 function getPlayer(id)
 	return world.players[id]
+end
+
+function player_tupdate()
+	if getPlayer(getPlayerID()) then
+		message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
+	end
+end
+newEntityFunction("player_tupdate", player_tupdate)
+
+function player_up(isPressed)
+	if state == STATE_INGAME then
+		if getPlayer(getPlayerID()) ~= nil then
+			getPlayer(getPlayerID()).key_w = isPressed
+		end
+	end
+end
+function player_down(isPressed) 
+	if state == STATE_INGAME then
+		if getPlayer(getPlayerID()) ~= nil then
+			getPlayer(getPlayerID()).key_s = isPressed
+		end
+	end
+end
+function player_left(isPressed) 
+	if state == STATE_INGAME then
+		if getPlayer(getPlayerID()) ~= nil then
+			getPlayer(getPlayerID()).key_a = isPressed
+		end
+	end
+end
+function player_right(isPressed) 
+	if state == STATE_INGAME then
+		if getPlayer(getPlayerID()) ~= nil then
+			getPlayer(getPlayerID()).key_d = isPressed
+		end
+	end
 end

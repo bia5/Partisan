@@ -65,7 +65,7 @@ function bear_walk(bear)
     local speed = bear.speed*(mya_getDelta()/1000)
     x = 0
 	y = 0
-    dist = .1
+    dist = .5
 
     if not (bear.x < tX + dist and bear.x > tX - dist) then
         if tX-bear.x >= 0 then
@@ -121,32 +121,39 @@ function bear_walk(bear)
 end
 
 function bear_clearPath(bear, x, y)
-    ix = 0
-    iy = 0
+    speed = .1
+    dist = .5
 
-    if x >= 0 then
-        ix = 1
-    else
-        ix = -1
-    end
-
-    if y >= 0 then
-        iy = 1
-    else
-        iy = -1
-    end
-
-    local continue = true
-    for i = 0, x, ix do
-        for j = 0, y, iy do
-            if isEntityCollision(bear, i, j) ~= false then
-                continue = false
-                break
+    while true do
+        finish = true
+        if not (x > -dist and x < dist) then
+            finish = false
+            if x > 0 then
+                x = x - speed
+            else
+                x = x + speed
             end
         end
-    end
 
-    return continue
+        if not (y > -dist and y < dist) then
+            finish = false
+
+            if y > 0 then
+                y=y-speed
+            else
+                y=y+speed
+            end
+        end
+        
+        local e = isEntityCollision(bear, x, y,false)
+        if e ~= false then
+            return false
+        end
+
+        if finish then
+            return true
+        end
+    end
 end
 
 --Bear AI
@@ -385,7 +392,7 @@ function ef_boss_bear_update(bear)
                 local x = v.x
                 local y = v.y
                 local rx = x-bear.x
-                local ry = y-bear.y
+                local ry = y-(bear.y-(bear.h/4))
 
                 local dist = math.sqrt(rx*rx+ry*ry)
 
@@ -488,6 +495,6 @@ newEntityFunction("boss_bear_tupdate", ef_boss_bear_tupdate)
 
 function spawnBoss(pressed)
     if pressed == false then
-        eid = entity_add(spawnBoss_Bear(0,5))
+        eid = entity_add(spawnBoss_Bear(0,0))
     end
 end

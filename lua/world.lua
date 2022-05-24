@@ -11,9 +11,9 @@ function newWorld()
 
 	--Remove eventually
 	world.spawn1X = 0
-	world.spawn1Y = 1
+	world.spawn1Y = 0
 	world.spawn2X = 0
-	world.spawn2Y = 1
+	world.spawn2Y = 0
 
 	world.tiles = {}
 
@@ -130,7 +130,7 @@ function getTile(x, y, layer)
 end
 
 --Gets if x,y is colliding with any tile or object and returns the tile
-function isTileCollision(x,y)
+function isTileCollision(x,y,entityCheck)
 	noTile = true
 
 	tiles = getTile(math.floor(x), math.floor(y))
@@ -145,6 +145,23 @@ function isTileCollision(x,y)
 		end
 	end
 
+	if entityCheck then
+		for k,entity in pairs(world.entities) do
+			if entity ~= nil then
+				if x > entity.x-(entity.w/2)+(entity.w/4) and x < entity.x+(entity.w/2)-(entity.w/4) and y>entity.y-(entity.w/2) and y<entity.y then
+					return entity
+				end
+			end
+		end
+		for k,entity in pairs(world.players) do
+			if entity ~= nil then
+				if x > entity.x-(entity.w/2)+(entity.w/4) and x < entity.x+(entity.w/2)-(entity.w/4) and y>entity.y-(entity.w/2) and y<entity.y then
+					return entity
+				end
+			end
+		end
+	end
+
 	if noTile then
 		return true
 	end
@@ -153,20 +170,30 @@ function isTileCollision(x,y)
 end
 
 --Entity collision detection with tile
-function isEntityCollision(entity,offX,offY)
+function isEntityCollision(entity,offX,offY,entityCheck)
+	if entityCheck == nil then
+		entityCheck = true
+	end
 	local x = entity.x+offX
 	local y = entity.y+offY
 	local w = entity.w
 	local h = entity.h
 
-	if isTileCollision(x-(w/2)+(w/4),y) then
-		return true
-	elseif isTileCollision(x-(w/2)+(w/4),y-(w/2)) then
-		return true
-	elseif isTileCollision(x+(w/2)-(w/4),y) then
-		return true
-	elseif isTileCollision(x+(w/2)-(w/4),y-(w/2)) then
-		return true
+	e = isTileCollision(x-(w/2)+(w/8),y,entityCheck)
+	if e then
+		return e
+	end
+	e = isTileCollision(x-(w/2)+(w/8),y-(w/2),entityCheck)
+	if e then
+		return e
+	end
+	e = isTileCollision(x+(w/2)-(w/8),y,entityCheck)
+	if e then
+		return e
+	end
+	e = isTileCollision(x+(w/2)-(w/8),y-(w/2),entityCheck)
+	if e then
+		return e
 	end
 	return false
 end
