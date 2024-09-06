@@ -22,3 +22,4 @@ function arrow(x,y,velX,velY,deg)
 end
 
 require("bosses/boss_bear")
+require("bosses/boss_skelly")

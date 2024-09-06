@@ -1,5 +1,5 @@
 --TODO: SAVING/LOADING
-
+--maybe state handling using the same system that the entityfunctions use?
 
 --I just noticed the mistype, I think i might be dyslexic ~Alex 9/6/2024
 

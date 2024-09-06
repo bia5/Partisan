@@ -8,7 +8,8 @@ function registerBinds()
 
 	registerBind("L", "Shoot", player_shootarrow)
 	if devmode then
-		registerBind("P", "spawn boss", spawnBoss)
+		registerBind("P", "spawn boss bear", spawnBossBear)
+		registerBind("O", "spawn boss skelly", spawnBossSkelly)
 	end
 end
 

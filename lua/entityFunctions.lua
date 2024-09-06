@@ -16,7 +16,8 @@ function ef_bullet_update(bullet)
     --check if in entity
     for k, v in pairs(world.entities) do
         if v.id ~= bullet.id then
-            if bullet.x > v.x and bullet.x < v.x+v.w and bullet.y > v.y and bullet.y < v.y+v.h then
+            --dont ask why the hitbox is so weird... I forgot why i did it honestly...
+            if bullet.x > v.x-(v.w/2) and bullet.x < (v.x-(v.w/2))+v.w and bullet.y > v.y-v.h and bullet.y < v.y then
                 exeEntityFunction(bullet.onCollision, bullet)
                 v.hp = v.hp - bullet.maxhp
             end
@@ -26,7 +27,6 @@ function ef_bullet_update(bullet)
     --kills bullet after a second
     bullet.data = bullet.data + (1*(mya_getDelta()/1000))
     if bullet.data > 1 then
-		print("ded")
         world.entities[bullet.spawnID] = nil
     end
 end
@@ -37,7 +37,7 @@ function ef_bullet_collision(bullet)
     bullet.hp = bullet.hp - 1
 
     if bullet.hp <= 0 then
-        world.entities[bullet.spawnID] = nil
+        --world.entities[bullet.spawnID] = nil
     end
 end
 newEntityFunction("bullet_collision", ef_bullet_collision)

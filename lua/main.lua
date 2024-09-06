@@ -6,10 +6,10 @@ math.randomseed(os.time()) math.random() math.random() math.random() --setup tha
 fileHandler = FileHandler.new()
 
 -- Import Files
-json = require "util_json"
-require("util")
-require("util_file")
-require("util_assets")
+json = require "util/util_json"
+require("util/util")
+require("util/util_file")
+require("util/util_assets")
 require("variables")
 require("netcode")
 require("screen")
@@ -24,15 +24,15 @@ require("entityTypes")
 require("world")
 require("player")
 
-require("screen_mainmenu")
-require("screen_chooseplay")
-require("screen_options")
-require("screen_joinserver")
-require("screen_host")
-require("screen_ingame")
-require("screen_leveleditor")
+require("screens/screen_mainmenu")
+require("screens/screen_chooseplay")
+require("screens/screen_options")
+require("screens/screen_joinserver")
+require("screens/screen_host")
+require("screens/screen_ingame")
+require("screens/screen_leveleditor")
 
-require("util_keybinds")
+require("util/util_keybinds")
 
 function event_mouseMotion(x, y)
 	mouseX = x

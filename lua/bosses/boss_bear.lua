@@ -1,3 +1,5 @@
+--This whole file barely has any comments and it scares me :(
+
 --Variables
 local bearDist_wander = 10
 
@@ -177,7 +179,6 @@ function ef_boss_bear_update(bear)
 
             if dist < bearDist_toSentry then
                 bState = "sentry"
-                print("idle -> sentry")
                 break
             end
         end
@@ -195,17 +196,16 @@ function ef_boss_bear_update(bear)
 
             if dist < bearDist_toAnger then
                 bState = "angrysentry"
-                print("sentry -> angrysentry")
                 break
             end
         end
+        --why the fuck did i add this if statement... its funny now so it stays.
         if bState == "sentry" then
             --if is close to target change target
             if bear_closeToTarget(bear) then
                 local ran = math.random(1, 100)
                 if ran == 1 then
                     bState = "forceidle"
-                    print("sentry -> forceidle")
                 end
 
                 passed = false
@@ -243,7 +243,6 @@ function ef_boss_bear_update(bear)
 
                 if bear_clearPath(bear, _tX, _tY) then
                     bState = "chase"
-                    print("forceidle -> chase")
                     tX = _tX+bear.x
                     tY = _tY+bear.y
                     break
@@ -254,7 +253,6 @@ function ef_boss_bear_update(bear)
             local ran = math.random(1, 1000)
             if ran == 1 then
                 bState = "sentry"
-                print("forceidle -> sentry")
             end
         end
 
@@ -280,7 +278,6 @@ function ef_boss_bear_update(bear)
 
                 if bear_clearPath(bear, _tX, _tY) then
                     bState = "chase"
-                    print("angrysentry -> chase")
                     tX = _tX+bear.x
                     tY = _tY+bear.y
                     break
@@ -292,7 +289,6 @@ function ef_boss_bear_update(bear)
         if bState == "angrysentry" then
             if distance > bearDist_toCalmFromAnger then
                 bState = "sentry"
-                print("angrysentry -> sentry")
             end
         end
         if bState == "angrysentry" then
@@ -345,7 +341,6 @@ function ef_boss_bear_update(bear)
                     --choose attack
                     local ran = math.random(1, 100)
                     bState = "swing"
-                    print("chase -> swing")
 
                     break
                 end
@@ -357,7 +352,6 @@ function ef_boss_bear_update(bear)
         if bState == "chase" then
             if p == nil then
                 bState = "angrysentry"
-                print("chase -> angrysentry")
                 bear.velX = 0
                 bear.velY = 0
             else
@@ -373,11 +367,9 @@ function ef_boss_bear_update(bear)
                 else
                     if bear_closeToTarget(bear) then
                         bState = "angrysentry"
-                        print("chase -> angrysentry")
                     else
                         if not bear_walk(bear) then
                             bState = "angrysentry"
-                            print("chase -> angrysentry")
                         end
                     end
                 end
@@ -412,7 +404,6 @@ function ef_boss_bear_update(bear)
                     timer = timer - 1
                     if timer <= 0 then
                         bState = "angrysentry"
-                        print("swing -> angrysentry")
                         bear.velX = 0
                         bear.velY = 0
                     end
@@ -432,25 +423,24 @@ function ef_boss_bear_update(bear)
                         local tY = tonumber(strs[3])
                         if bear_closeToTarget(bear) then
                             bState = "angrysentry"
-                            print("swing -> angrysentry")
                         else
                             --print(bear_walk(bear))
                             --print("x: "..bear.x.." y: "..bear.y.." tX: "..tX.." tY: "..tY.." velX: "..bear.velX.." velY: "..bear.velY)
                             if not bear_walk(bear) then
                                 bState = "angrysentry"
-                                print("swing -> angrysentry")
                             end
                         end
                     end
                 end
             end
         end
+
+        --idk what i was doing here
+        --I repeat, do NOT let him cook.
     elseif bState == "roll" then
         bState = "chase"
-        print("roll -> chase")
     elseif bState == "jump" then
         bState = "chase"
-        print("jump -> chase")
     end
 
     printInfo = false
@@ -496,7 +486,7 @@ function ef_boss_bear_tupdate(bear)
 end
 newEntityFunction("boss_bear_tupdate", ef_boss_bear_tupdate)
 
-function spawnBoss(pressed)
+function spawnBossBear(pressed)
     if pressed == false then
         eid = entity_add(spawnBoss_Bear(0,0))
     end
