@@ -22,6 +22,8 @@ function newPlayer(id, name, x, y, number)
 	player.key_left = false
 	player.key_back = false
 	player.key_right = false
+	player.attack = false
+	player.attack_cooldown = 0
 	player.speed = 5
 	player.skipCollision = false
 
@@ -50,6 +52,8 @@ function player_update(player)
 	local speed = player.speed*(mya_getDelta()/1000)
 	x = 0
 	y = 0
+
+	
 
 	if player.key_forward then
 		if not isEntityCollision(player, 0, -speed) or player.skipCollision then
@@ -80,6 +84,8 @@ function player_update(player)
 		player.state = "running"
 	end
 
+	
+
 	if x ~= 0 or y ~= 0 then
 		rad = math.atan2(y, x)
 		player.x = player.x + (math.cos(rad) * speed)
@@ -92,6 +98,25 @@ function player_tupdate()
 	if getPlayer(getPlayerID()) then
 		message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
 	end
+
+	if player.attack then
+		if player.attack_cooldown < 1 then
+			if player.deg == 0 then
+				arrow(player.x,player.y,0,10,player.deg)
+			end
+			if player.deg == 90 then
+				arrow(player.x,player.y,10,0,player.deg)
+			end
+			if player.deg == 180 then
+				arrow(player.x,player.y,-10,0,player.deg)
+			end
+			if player.deg == 270 then
+				arrow(player.x,player.y,0,-10,player.deg)
+			end
+			player.attack_cooldown = 10
+		end
+	end
+	player.attack_cooldown = player.attack_cooldown - 1
 end
 newEntityFunction("player_tupdate", player_tupdate)
 
@@ -120,6 +145,14 @@ function player_right(isPressed)
 	if state == STATE_INGAME or state == STATE_LEVELEDITOR then
 		if getPlayer(getPlayerID()) ~= nil then
 			getPlayer(getPlayerID()).key_right = isPressed
+		end
+	end
+end
+
+function player_shootarrow(isPressed)
+	if state == STATE_INGAME then
+		if getPlayer(getPlayerID()) ~= nil then
+			getPlayer(getPlayerID()).attack = isPressed
 		end
 	end
 end

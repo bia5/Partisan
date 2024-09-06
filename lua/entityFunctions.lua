@@ -8,7 +8,9 @@ function ef_bullet_update(bullet)
     local input = isTileCollision(bullet.x, bullet.y)
     if input ~= false then
         exeEntityFunction(bullet.onCollision, bullet)
-        exeTileFunction(input.onColBullet, input, bullet)
+        if input ~= true then
+            exeTileFunction(input.onColBullet, input, bullet)
+        end
     end
 
     --check if in entity
@@ -21,9 +23,10 @@ function ef_bullet_update(bullet)
         end
     end
 
-    --check if dead
+    --kills bullet after a second
     bullet.data = bullet.data + (1*(mya_getDelta()/1000))
     if bullet.data > 1 then
+		print("ded")
         world.entities[bullet.spawnID] = nil
     end
 end

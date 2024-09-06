@@ -1,6 +1,6 @@
 --Partisan by Alex Cooper Aug-4-2021
 --Hi from April 28th 2022
-init = mya_init("Partisan", 1280, 720)
+init = mya_init("Partisan", 720, 480)
 
 math.randomseed(os.time()) math.random() math.random() math.random() --setup that random
 fileHandler = FileHandler.new()
@@ -66,6 +66,7 @@ function event_keyDown(key)
 end
 
 function event_keyUp(key)
+	--print(math.floor(os.clock()).."."..mya_getTime())
 	callBind(key, false)
 	keyUp(getScreen(state), key)
 end

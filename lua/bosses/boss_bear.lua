@@ -31,10 +31,10 @@ function spawnBoss_Bear(x,y)
     bear.onUpdate = "boss_bear_update"
     bear.onTUpdate = "boss_bear_tupdate"
     bear.onCollision = "boss_bear_collision"
-    bear.hp = 1000
+    bear.hp = 1250 --thickkk as fuckkkkk
     bear.data = "0,"..x..","..y..",".."idle" --timer,x,y,state
     bear.tex = "angry_bear_idle"
-    bear.maxhp = 1000
+    bear.maxhp = 1250
 
     bear.speed = 2
 
@@ -490,6 +490,9 @@ function ef_boss_bear_tupdate(bear)
         end
     end
     bear.data = timer..","..tX..","..tY..","..bState
+    if bear.hp <= 0 then
+        world.entities[bear.spawnID] = nil
+    end
 end
 newEntityFunction("boss_bear_tupdate", ef_boss_bear_tupdate)
 

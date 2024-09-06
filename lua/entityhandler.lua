@@ -1,14 +1,21 @@
 --TODO: SAVING/LOADING
 
+
+--I just noticed the mistype, I think i might be dyslexic ~Alex 9/6/2024
+
+--Purpose for the next 3 functions are to make handling stray functions for entities easier.
+--newEntityFunction delcares a new function and adds it to the list
 entityFucntions = {}
 function newEntityFunction(name, func)
     entityFucntions[name] = func
 end
 
+--getEntityFunction reuturns the function (idk why this is important i forgor)
 function getEntityFunction(name)
     return entityFucntions[name]
 end
 
+--executes entity function
 function exeEntityFunction(name, ...)
     if entityFucntions[name] ~= nil then
         entityFucntions[name](...)
