@@ -18,7 +18,7 @@ function spawnBullet(x,y,velX,velY,size,hp,dmg,tex,deg)
 end
 
 function arrow(x,y,velX,velY,deg)
-    entity_add(spawnBullet(x,y,velX,velY,0.2,1,10,"arrow",deg))
+    entity_add(spawnBullet(x,y,velX,velY,0.2,1,1,"arrow",deg))
 end
 
 require("bosses/boss_bear")
