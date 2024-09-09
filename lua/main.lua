@@ -18,7 +18,6 @@ require("tileHandler")
 require("tileFunctions")
 require("tileTypes")
 require("entityHandler")
-require("entityFunctions")
 require("entityTypes")
 
 require("world")

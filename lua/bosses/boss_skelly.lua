@@ -97,9 +97,9 @@ function ef_boss_skelly_update(skelly)
             local yy = p.y - skelly.y
             local angle = math.atan(yy/xx)
             if xx > 0 then
-                arrow(skelly.x,skelly.y,skellyArrow_speed*(math.cos(angle)),skellyArrow_speed*(math.sin(angle)),skelly.deg)
+                arrow(skelly.x,skelly.y,skellyArrow_speed*(math.cos(angle)),skellyArrow_speed*(math.sin(angle)),skelly.deg, 15,skelly.spawnID)
             else
-                arrow(skelly.x,skelly.y,-skellyArrow_speed*(math.cos(angle)),-skellyArrow_speed*(math.sin(angle)),skelly.deg)
+                arrow(skelly.x,skelly.y,-skellyArrow_speed*(math.cos(angle)),-skellyArrow_speed*(math.sin(angle)),skelly.deg, 15,skelly.spawnID)
             end
             timer = skellyTime_shoot * mya_getUPS()
         end

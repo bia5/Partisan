@@ -1,6 +1,8 @@
 --TODO: SAVING/LOADING
 --TODO: Functions
 
+local playerArrow_speed = 10
+
 function newPlayer(id, name, x, y, number)
 	player = newEntity(id, -1)
 
@@ -101,19 +103,15 @@ function player_tupdate()
 
 	if player.attack then
 		if player.attack_cooldown < 1 then
-			if player.deg == 0 then
-				arrow(player.x,player.y,0,10,player.deg)
+			local xx = mouseX-(mya_getWidth()/2)
+            local yy = mouseY-(mya_getHeight()/2)
+            local angle = math.atan(yy/xx)
+            if xx > 0 then
+                arrow(player.x,player.y,playerArrow_speed*(math.cos(angle)),playerArrow_speed*(math.sin(angle)),player.deg, 15,player.spawnID)
+            else
+                arrow(player.x,player.y,-playerArrow_speed*(math.cos(angle)),-playerArrow_speed*(math.sin(angle)),player.deg, 15,player.spawnID)
 			end
-			if player.deg == 90 then
-				arrow(player.x,player.y,10,0,player.deg)
-			end
-			if player.deg == 180 then
-				arrow(player.x,player.y,-10,0,player.deg)
-			end
-			if player.deg == 270 then
-				arrow(player.x,player.y,0,-10,player.deg)
-			end
-			player.attack_cooldown = 10
+            player.attack_cooldown = 10
 		end
 	end
 	player.attack_cooldown = player.attack_cooldown - 1

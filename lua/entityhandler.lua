@@ -1,3 +1,5 @@
+--Core entity setup
+
 --TODO: SAVING/LOADING
 --maybe state handling using the same system that the entityfunctions use?
 
