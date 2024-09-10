@@ -61,6 +61,7 @@ function renderChild(child, offsetX, offsetY)
                             child_sprite:render(mya_getRenderer(), v.w * width_ratio, v.h * height_ratio)
                         end
                     elseif v.id == "text" then
+                        wR = ((v.w * width_ratio) / v.tv:getWidth())
                         hR = ((v.h * height_ratio) / v.tv:getHeight())
                         if screen_debug then
                             child_sprite:setX((v.x + offsetX) * width_ratio)
@@ -69,8 +70,20 @@ function renderChild(child, offsetX, offsetY)
                             child_sprite:render(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
                         end
                         v.tv:setText(v.text, mya_getRenderer())
-                        v.tv:setXY((v.x + offsetX) * width_ratio, (v.y + offsetY) * height_ratio)
-                        v.tv:renderWH(mya_getRenderer(), (v.tv:getWidth() * hR), (v.tv:getHeight() * hR))
+                        centerOffsetX = 0
+                        centerOffsetY = 0
+                        if v.centeredX then
+                            centerOffsetX = -(v.tv:getWidth()*v.ratio)/4
+                        end
+                        if v.centeredY then
+                            centerOffsetY = -(v.tv:getHeight()*v.ratio)/2
+                        end
+                        v.tv:setXY((v.x + offsetX+centerOffsetX) * width_ratio, (v.y + offsetY+centerOffsetY) * height_ratio)
+                        if v.stretch == true then
+                            v.tv:renderWH(mya_getRenderer(), (v.w * wR)*v.ratio, (v.h * hR)*v.ratio)
+                        else
+                            v.tv:renderWH(mya_getRenderer(), (v.tv:getWidth() * wR)*v.ratio, (v.tv:getHeight() * hR)*v.ratio)
+                        end
                     elseif v.id == "etext" then
                         hR = ((v.h * height_ratio) / v.tv:getHeight())
                         if screen_debug then
@@ -492,11 +505,16 @@ function newText(_text, x, y, width, height, color)
 
     xx = x
     yy = y
+    
+    text.centeredX = false
+    text.centeredY = false
     if x == "center" then
         xx = 0
+        text.centeredX = true
     end
     if y == "center" then
         yy = 0
+        text.centeredY = true
     end
 
     text.id = "text"
@@ -506,8 +524,21 @@ function newText(_text, x, y, width, height, color)
     text.text = _text
     text.x = x
     text.y = y
-    text.w = width
-    text.h = height
+
+    text.stretch = false
+    text.ratio = 1
+
+    if width == 0 then
+        text.w = text.tv:getWidth()
+    else
+        text.w = width
+    end
+
+    if height == 0 then
+        text.h = text.tv:getHeight()
+    else
+        text.h = height
+    end
 
     text.render = true
 

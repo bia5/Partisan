@@ -83,5 +83,5 @@ function arrow(x,y,velX,velY,deg,dmg,ignoreEntityID)
     if dmg == nil then
         dmg = 1
     end
-    entity_add(spawnBullet(x,y,velX,velY,0.2,1,dmg,"arrow",deg,ignoreEntityID))
+    entity_add(spawnBullet(x,y,velX,velY,0.5,1,dmg,"arrow",deg,ignoreEntityID))
 end

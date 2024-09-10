@@ -16,6 +16,11 @@ screen_addTop(screen["hud"]["player_info"], "empty1", newEmpty(0, 0, 1920, 10))
 screen_addTop(screen["hud"], "coop_player_info", newChild(10, 0, 1910, 110))
 screen_addTop(screen["hud"]["coop_player_info"], "player1_hp", newLoadingBar(0,0,120,25,{126,17,20},{232,18,22}))
 
+--Death Screen
+screen_add(screen["hud"], "death_popup", newChild("center","center",1080,720))
+screen_add(screen["hud"]["death_popup"], "you_died", newText("poopoop a poopoop", "center", "center", 0, 0, {16,16,16}))
+screen["hud"]["death_popup"]["you_died"].ratio = 2
+
 tileSize_ = 16
 local offsetX = 0
 local offsetY = 0
