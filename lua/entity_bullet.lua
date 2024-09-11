@@ -20,7 +20,10 @@ function ef_bullet_update(bullet)
     for k, v in pairs(world.entities) do
         if v.id ~= bullet.id and v.spawnID ~= bullet.ignoreEntityID then
             --dont ask why the hitbox is so weird... I forgot why i did it honestly...
-            if bullet.x > v.x-(v.w/2) and bullet.x < (v.x-(v.w/2))+v.w and bullet.y > v.y-v.h and bullet.y < v.y then
+            if bullet.x > v.x-(v.w/2) 
+            and bullet.x < (v.x-(v.w/2))+v.w 
+            and bullet.y > v.y-v.h 
+            and bullet.y < v.y then
                 exeEntityFunction(bullet.onCollision, bullet)
                 v.hp = v.hp - bullet.maxhp
             end
@@ -29,10 +32,12 @@ function ef_bullet_update(bullet)
 
     --check if in players
     for k, v in pairs(world.players) do
-
         if v.id ~= bullet.id and v.spawnID ~= bullet.ignoreEntityID then
             --dont ask why the hitbox is so weird... I forgot why i did it honestly...
-            if bullet.x > v.x-(v.w/2) and bullet.x < (v.x-(v.w/2))+v.w and bullet.y > v.y-v.h and bullet.y < v.y then
+            if bullet.x > v.x-(v.w/2) 
+            and bullet.x < (v.x-(v.w/2))+v.w 
+            and bullet.y > v.y-v.h 
+            and bullet.y < v.y then
                 exeEntityFunction(bullet.onCollision, bullet)
                 v.health = v.health - bullet.maxhp
             end

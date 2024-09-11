@@ -129,8 +129,52 @@ function getTile(x, y, layer)
 	return world.tiles[x][y][layer]
 end
 
+require("util/AABB")
+
 --Gets if x,y is colliding with any tile or object and returns the tile
-function isTileCollision(x,y,entityCheck)
+function isTileCollision(x,y,entityCheck,_aabb1,ignoreEntityID)
+	noTile = true
+
+	tiles = getTile(math.floor(x), math.floor(y))
+	if tiles ~= nil then
+		for k,v in pairs(tiles) do
+			if v ~= nil then
+				noTile = false
+				if not v.walkable then
+					return v
+				end
+			end
+		end
+	end
+
+	if entityCheck then
+		for k,entity in pairs(world.entities) do
+			if entity ~= nil and entity.spawnID ~= ignoreEntityID then
+				local _aabb2 = aabb(entity.x,entity.y,entity.w,entity.h)
+				if aabb_collision(_aabb1,_aabb2,true) then
+					return entity
+				end
+			end
+		end
+		for k,entity in pairs(world.players) do
+			if entity ~= nil and entity.spawnID ~= ignoreEntityID then
+				local _aabb2 = aabb(entity.x,entity.y,entity.w,entity.h)
+				if aabb_collision(_aabb1,_aabb2,true) then
+					return entity
+				end
+			end
+		end
+	end
+
+	if noTile then
+		return true
+	end
+
+	return false
+end
+
+--Gets if x,y is colliding with any tile or object and returns the tile
+function _isTileCollision(x,y,entityCheck)
 	noTile = true
 
 	tiles = getTile(math.floor(x), math.floor(y))
@@ -148,14 +192,20 @@ function isTileCollision(x,y,entityCheck)
 	if entityCheck then
 		for k,entity in pairs(world.entities) do
 			if entity ~= nil then
-				if x > entity.x-(entity.w/2)+(entity.w/4) and x < entity.x+(entity.w/2)-(entity.w/4) and y>entity.y-(entity.w/2) and y<entity.y then
+				if x > entity.x-(entity.w/2)+(entity.w/4) 
+				and x < entity.x+(entity.w/2)-(entity.w/4) 
+				and y>entity.y-(entity.w/2) 
+				and y<entity.y then
 					return entity
 				end
 			end
 		end
 		for k,entity in pairs(world.players) do
 			if entity ~= nil then
-				if x > entity.x-(entity.w/2)+(entity.w/4) and x < entity.x+(entity.w/2)-(entity.w/4) and y>entity.y-(entity.w/2) and y<entity.y then
+				if x > entity.x-(entity.w/2)+(entity.w/4) 
+				and x < entity.x+(entity.w/2)-(entity.w/4) 
+				and y>entity.y-(entity.w/2) 
+				and y<entity.y then
 					return entity
 				end
 			end
@@ -169,8 +219,29 @@ function isTileCollision(x,y,entityCheck)
 	return false
 end
 
---Entity collision detection with tile
+--checks whether entity collides with anything
 function isEntityCollision(entity,offX,offY,entityCheck)
+	if entityCheck == nil then
+		entityCheck = true
+	end
+	local x = entity.x+offX
+	local y = entity.y+offY
+	local w = entity.w
+	local h = entity.h
+
+	local _aabb1 = aabb(x,y,w,h)
+	
+	e = isTileCollision(x,y,entityCheck,_aabb1,entity.spawnID)
+
+	if e then
+		return e
+	end
+
+	return false
+end
+
+--Entity collision detection with tile
+function _isEntityCollision(entity,offX,offY,entityCheck)
 	if entityCheck == nil then
 		entityCheck = true
 	end

@@ -18,8 +18,9 @@ screen_addTop(screen["hud"]["coop_player_info"], "player1_hp", newLoadingBar(0,0
 
 --Death Screen
 screen_add(screen["hud"], "death_popup", newChild("center","center",1080,720))
-screen_add(screen["hud"]["death_popup"], "you_died", newText("poopoop a poopoop", "center", "center", 0, 0, {16,16,16}))
-screen["hud"]["death_popup"]["you_died"].ratio = 2
+screen_add(screen["hud"]["death_popup"], "you_died", newText("YOU DIED", "center", "center", 0, 0, {255,16,16}))
+screen["hud"]["death_popup"]["you_died"].ratio = 3
+screen["hud"]["death_popup"].render = false
 
 tileSize_ = 16
 local offsetX = 0
@@ -48,6 +49,9 @@ function scr_ingame_update()
     --Update Player
 	for k, v in pairs(world.players) do
 		if v.id == getPlayerID() then
+			if v.health < 1 then
+				scr["hud"]["death_popup"].render = true
+			end
 			offsetX = (mya_getWidth()/2)-(v.x*tileSize)
 			offsetY = (mya_getHeight()/2)-(v.y*tileSize)
 

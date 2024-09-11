@@ -55,7 +55,9 @@ function player_update(player)
 	x = 0
 	y = 0
 
-	
+	if player.health < 1 then
+
+	else
 
 	if player.key_forward then
 		if not isEntityCollision(player, 0, -speed) or player.skipCollision then
@@ -86,7 +88,7 @@ function player_update(player)
 		player.state = "running"
 	end
 
-	
+end
 
 	if x ~= 0 or y ~= 0 then
 		rad = math.atan2(y, x)
@@ -101,6 +103,9 @@ function player_tupdate()
 		message(NET_MSG_UPDATEPLAYER,{player = getPlayer(getPlayerID())})
 	end
 
+	if player.health < 1 then
+
+	else
 	if player.attack then
 		if player.attack_cooldown < 1 then
 			local xx = mouseX-(mya_getWidth()/2)
@@ -114,6 +119,7 @@ function player_tupdate()
             player.attack_cooldown = 10
 		end
 	end
+end
 	player.attack_cooldown = player.attack_cooldown - 1
 end
 newEntityFunction("player_tupdate", player_tupdate)

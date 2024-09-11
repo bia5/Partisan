@@ -22,7 +22,7 @@ function spawnBoss_Skelly(x,y)
     skelly.onTUpdate = "boss_skelly_tupdate"
     skelly.onCollision = "boss_skelly_collision"
     skelly.hp = 500 --lower hp but more agile
-    skelly.data = "0,"..x..","..y..",".."shoot" --timer,x,y,state
+    skelly.data = "0,"..x..","..y..",".."idle" --timer,x,y,state
     skelly.tex = "skelly"
     skelly.maxhp = 500
 
