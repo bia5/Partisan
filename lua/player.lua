@@ -2,6 +2,7 @@
 --TODO: Functions
 
 local playerArrow_speed = 10
+local deathTimeout = 3
 
 function newPlayer(id, name, x, y, number)
 	player = newEntity(id, -1)
@@ -55,8 +56,14 @@ function player_update(player)
 	x = 0
 	y = 0
 
+	--Player is dead if health is less than 1:
 	if player.health < 1 then
+		--handle death timeout, then respawn
+		if player.deathTimeout == nil then
+			player.deathTimeout = deathTimeout*mya_getUPS()
+		end
 
+	--Player is alive:	
 	else
 
 	if player.key_forward then
@@ -104,7 +111,10 @@ function player_tupdate()
 	end
 
 	if player.health < 1 then
-
+		player.deathTimeout = player.deathTimeout - 1
+		if player.deathTimeout < 1 then
+			player_respawn()
+		end
 	else
 	if player.attack then
 		if player.attack_cooldown < 1 then
@@ -158,5 +168,17 @@ function player_shootarrow(isPressed)
 		if getPlayer(getPlayerID()) ~= nil then
 			getPlayer(getPlayerID()).attack = isPressed
 		end
+	end
+end
+
+--Handles player respawn to coords 0,0
+function player_respawn()
+	local p = getPlayer(getPlayerID())
+	if p ~= nil then
+		p.x = 0
+		p.y = 0
+
+		p.health = p.maxHealth
+		p.deathTimeout = nil
 	end
 end

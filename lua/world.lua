@@ -149,7 +149,9 @@ function isTileCollision(x,y,entityCheck,_aabb1,ignoreEntityID)
 
 	if entityCheck then
 		for k,entity in pairs(world.entities) do
-			if entity ~= nil and entity.spawnID ~= ignoreEntityID then
+			if entity ~= nil and entity.spawnID ~= ignoreEntityID 
+			  --doesn't allow player to collide with arrows it spawned
+			  and entity.ignoreEntityID ~= ignoreEntityID then
 				local _aabb2 = aabb(entity.x,entity.y,entity.w,entity.h)
 				if aabb_collision(_aabb1,_aabb2,true) then
 					return entity

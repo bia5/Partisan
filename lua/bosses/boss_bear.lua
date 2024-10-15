@@ -17,7 +17,7 @@ local bearSpeed_chase = 2.5
 local bearDist_toAttack = 3
 
 local bearDist_toSwing = 1
-local bearDist_swingReach = 2
+local bearDist_swingReach = 2.5
 local bearTime_swing = .5
 local bearDmg_swing = 15
 local bearSpeed_swing = 3
@@ -386,7 +386,22 @@ function ef_boss_bear_update(bear)
                 local rx = x-bear.x
                 local ry = y-(bear.y-(bear.h/4))
 
-                local dist = math.sqrt(rx*rx+ry*ry)
+
+                --gives the bear 3 spheres to attempt to collide with player for swing
+                local dist = math.sqrt((rx*rx)+(ry*ry))
+
+                local rx1 = rx+(bear.w/3)
+                local dist1 = math.sqrt((rx1*rx1)+(ry*ry))
+                
+                local rx2 = rx-(bear.w/3)
+                local dist2 = math.sqrt((rx2*rx2)+(ry*ry))
+
+                if dist > dist1 then
+                    dist = dist1
+                end
+                if dist > dist2 then
+                    dist = dist2
+                end
 
                 if dist < bearDist_toSwing then
                     bear.speed = 1
@@ -460,7 +475,6 @@ function ef_boss_bear_tupdate(bear)
     if bState == "swing" then
         if timer > 999 then
             timer = timer -1
-
             if timer == 1000 then
                 timer = 0
                 for k, v in pairs(world.players) do
@@ -469,8 +483,8 @@ function ef_boss_bear_tupdate(bear)
                     local rx = x-bear.x
                     local ry = y-bear.y
 
-                    local dist = math.sqrt(rx*rx+ry*ry)
-
+                    local dist = math.sqrt((rx*rx)+(ry*ry))
+                    
                     if dist < bearDist_swingReach then
                         v.health = v.health - bearDmg_swing
                     end

@@ -49,8 +49,11 @@ function scr_ingame_update()
     --Update Player
 	for k, v in pairs(world.players) do
 		if v.id == getPlayerID() then
+			--Toggles dead popup when player dies
 			if v.health < 1 then
 				scr["hud"]["death_popup"].render = true
+			else
+				scr["hud"]["death_popup"].render = false
 			end
 			offsetX = (mya_getWidth()/2)-(v.x*tileSize)
 			offsetY = (mya_getHeight()/2)-(v.y*tileSize)
