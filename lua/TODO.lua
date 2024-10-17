@@ -1,9 +1,7 @@
 --[[
 
-world.lua: Handle when two entities are stuck in eachother
+world.lua: Handle when two entities are stuck in eachother (dash)
 
 boss_skelly.lua: Add movement
-
-rotate arrows to direction
 
 ]]--

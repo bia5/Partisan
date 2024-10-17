@@ -121,7 +121,7 @@ function scr_ingame_render()
 				sprite_entity:setTexture(assets:getTexture(v.tex))
 				sprite_entity:setX(((v.x-(v.w/2))*tileSize)+offsetX)
 				sprite_entity:setY(((v.y-v.h)*tileSize)+offsetY)
-				sprite_entity:render(mya_getRenderer(), tileSize*v.w, tileSize*v.h)
+				sprite_entity:renderFlip(mya_getRenderer(), tileSize*v.w, tileSize*v.h, v.deg, false)
 			end
 		end
 	end

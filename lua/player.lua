@@ -121,10 +121,12 @@ function player_tupdate()
 			local xx = mouseX-(mya_getWidth()/2)
             local yy = mouseY-(mya_getHeight()/2)
             local angle = math.atan(yy/xx)
+			local t_angle = (angle*(180/math.pi))
             if xx > 0 then
-                arrow(player.x,player.y,playerArrow_speed*(math.cos(angle)),playerArrow_speed*(math.sin(angle)),player.deg, 15,player.spawnID)
+                arrow(player.x,player.y,playerArrow_speed*(math.cos(angle)),playerArrow_speed*(math.sin(angle)),t_angle, 15,player.spawnID)
             else
-                arrow(player.x,player.y,-playerArrow_speed*(math.cos(angle)),-playerArrow_speed*(math.sin(angle)),player.deg, 15,player.spawnID)
+				t_angle = t_angle-180
+                arrow(player.x,player.y,-playerArrow_speed*(math.cos(angle)),-playerArrow_speed*(math.sin(angle)),t_angle, 15,player.spawnID)
 			end
             player.attack_cooldown = 10
 		end
